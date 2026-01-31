@@ -31,26 +31,58 @@ function cleanYouTubeUrl(url) {
     return url;
 }
 
+// Sanitize string for use as filename (remove invalid characters)
+function sanitizeFilename(name) {
+    if (!name) return "";
+    // Remove characters not allowed in Windows filenames: \ / : * ? " < > |
+    // Also remove other problematic characters
+    return name
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 // Handle download request via Flask backend
 async function handleDownload(message) {
-    const { url, quality } = message;
+    const { url, quality, videoTitle, channelName } = message;
     
     // Clean the URL first
     const cleanUrl = cleanYouTubeUrl(url);
     console.log("Clean URL:", cleanUrl);
+    console.log("Quality data:", quality);
 
-    // Build simple yt-dlp format string - let yt-dlp handle format selection
+    // Build yt-dlp format string based on quality selection
     let format;
-    switch (quality) {
-        case "best":
-            format = "best";
-            break;
-        case "audio":
+    let resolution = "";
+    let codec = "";
+    
+    if (typeof quality === "object") {
+        // New format with height and codec info
+        if (quality.isAudio) {
             format = "bestaudio/best";
-            break;
-        default:
-            // Simple height filter with fallback to best
-            format = `best[height<=${quality}]/best`;
+            resolution = "";
+            codec = "mp3";
+        } else if (quality.height) {
+            // Request specific height
+            format = `bestvideo[height<=${quality.height}]+bestaudio/best[height<=${quality.height}]/best`;
+            resolution = `${quality.height}p`;
+            codec = quality.codec || "";
+        } else {
+            format = "best";
+        }
+    } else {
+        // Legacy format (string)
+        switch (quality) {
+            case "best":
+                format = "best";
+                break;
+            case "audio":
+                format = "bestaudio/best";
+                break;
+            default:
+                format = `best[height<=${quality}]/best`;
+                resolution = `${quality}p`;
+        }
     }
 
     try {
@@ -68,14 +100,36 @@ async function handleDownload(message) {
         const healthData = await healthCheck.json();
         console.log("Server health:", healthData);
 
-        // Build download URL
-        const downloadUrl = `${SERVER_URL}/download?url=${encodeURIComponent(cleanUrl)}&format=${encodeURIComponent(format)}`;
+        // Build download URL with all metadata
+        const params = new URLSearchParams({
+            url: cleanUrl,
+            format: format,
+            title: videoTitle || "",
+            channel: channelName || "",
+            resolution: resolution,
+            codec: codec
+        });
+        
+        const downloadUrl = `${SERVER_URL}/download?${params.toString()}`;
         
         console.log("Starting download from:", downloadUrl);
+
+        // Build filename: "Title - Channel (Resolution, Codec).mp4"
+        let filename = sanitizeFilename(videoTitle || "video");
+        if (channelName) {
+            filename += " - " + sanitizeFilename(channelName);
+        }
+        if (resolution && codec) {
+            filename += ` (${resolution}, ${codec})`;
+        } else if (resolution) {
+            filename += ` (${resolution})`;
+        }
+        filename += ".mp4";
 
         // Trigger browser download - streams directly from Flask server
         const downloadId = await browser.downloads.download({
             url: downloadUrl,
+            filename: filename,
             saveAs: true
         });
         

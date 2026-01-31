@@ -7,9 +7,9 @@
 </head>
 <body>
     <div id="video-thumbnail">
-        <img id="thumbnail-img" src="" alt="Video Thumbnail">
+        <img id="thumbnail-img" src="" alt="Video Thumbnail" style="display: none;">
     </div>
-    <div id="video-title">Loading</div>
+    <div id="video-title">Loading...</div>
     <div id="channel-row">
         <span id="channel-name"></span>
         <span id="video-duration"></span>
@@ -17,17 +17,12 @@
     
     <div id="quality-container">
         <label for="quality-select">Quality:</label>
-        <select id="quality-select">
-            <option value="best">Best</option>
-            <option value="1080">1080p</option>
-            <option value="720" selected>720p</option>
-            <option value="480">480p</option>
-            <option value="360">360p</option>
-            <option value="audio">Audio Only</option>
+        <select id="quality-select" disabled>
+            <option value="">Loading qualities...</option>
         </select>
     </div>
     
-    <button id="download-btn">Download</button>
+    <button id="download-btn" disabled>Download</button>
     <div id="status"></div>
     
     <script src="popup.js"></script>

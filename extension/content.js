@@ -95,7 +95,7 @@ async function getVideoInfo() {
     const durationElement = document.querySelector(".ytp-time-duration");
     const duration = durationElement?.innerText.trim() || "";
 
-    const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;  // More reliable than maxresdefault
     const qualities = await getAvailableQualities();
 
     return {

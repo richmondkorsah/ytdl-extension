@@ -137,19 +137,55 @@ def info():
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             
-            # Get available formats
+            # Get available formats and extract unique resolutions
             formats = []
+            resolutions_seen = set()
+            available_qualities = []
+            
             for f in info_dict.get("formats", []):
+                height = f.get("height")
+                vcodec = f.get("vcodec", "none")
+                acodec = f.get("acodec", "none")
+                
                 formats.append({
                     "format_id": f.get("format_id"),
                     "ext": f.get("ext"),
                     "resolution": f.get("resolution", "audio only"),
+                    "height": height,
                     "filesize": f.get("filesize"),
-                    "vcodec": f.get("vcodec"),
-                    "acodec": f.get("acodec"),
+                    "vcodec": vcodec,
+                    "acodec": acodec,
                 })
+                
+                # Collect unique video resolutions (with video codec)
+                if height and vcodec != "none":
+                    if height not in resolutions_seen:
+                        resolutions_seen.add(height)
+                        # Simplify codec name for display
+                        codec_display = "h264" if "avc" in vcodec.lower() else \
+                                       "h265" if "hevc" in vcodec.lower() or "hev" in vcodec.lower() else \
+                                       "vp9" if "vp9" in vcodec.lower() or "vp09" in vcodec.lower() else \
+                                       "av1" if "av01" in vcodec.lower() or "av1" in vcodec.lower() else \
+                                       vcodec.split(".")[0]
+                        available_qualities.append({
+                            "height": height,
+                            "label": f"{height}p",
+                            "codec": codec_display,
+                            "vcodec": vcodec,
+                        })
             
-            logger.info(f"Found {len(formats)} formats for: {info_dict.get('title')}")
+            # Sort qualities by height (highest first)
+            available_qualities.sort(key=lambda x: x["height"], reverse=True)
+            
+            # Remove duplicates keeping highest quality codec for each resolution
+            unique_qualities = []
+            seen_heights = set()
+            for q in available_qualities:
+                if q["height"] not in seen_heights:
+                    seen_heights.add(q["height"])
+                    unique_qualities.append(q)
+            
+            logger.info(f"Found {len(unique_qualities)} unique resolutions for: {info_dict.get('title')}")
             
             return jsonify({
                 "success": True,
@@ -160,7 +196,8 @@ def info():
                 "channel": info_dict.get("channel"),
                 "view_count": info_dict.get("view_count"),
                 "upload_date": info_dict.get("upload_date"),
-                "formats": formats
+                "formats": formats,
+                "available_qualities": unique_qualities
             })
     except Exception as e:
         logger.error(f"Error fetching info: {e}")
@@ -171,6 +208,11 @@ def download():
     """Download video and stream to client"""
     url = request.args.get("url")
     format_str = request.args.get("format", "best")
+    # Get metadata for filename
+    video_title = request.args.get("title", "")
+    channel_name = request.args.get("channel", "")
+    resolution = request.args.get("resolution", "")
+    codec = request.args.get("codec", "")
     
     if not url:
         return jsonify({"error": "URL parameter is required"}), 400
@@ -194,11 +236,39 @@ def download():
         # Download the video
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
-            title = info.get("title", "video")
-            # Clean filename for headers
-            safe_title = "".join(c for c in title if c.isalnum() or c in " -_").strip()
-            if not safe_title:
-                safe_title = "video"
+            
+            # Get video info for filename if not provided
+            if not video_title:
+                video_title = info.get("title", "video")
+            if not channel_name:
+                channel_name = info.get("channel", info.get("uploader", "Unknown"))
+            
+            # Get actual downloaded format info
+            if not resolution or not codec:
+                # Try to get from the downloaded format
+                requested_formats = info.get("requested_formats", [])
+                if requested_formats:
+                    video_fmt = next((f for f in requested_formats if f.get("vcodec") != "none"), None)
+                    if video_fmt:
+                        if not resolution:
+                            resolution = f"{video_fmt.get('height', '')}p"
+                        if not codec:
+                            vcodec = video_fmt.get("vcodec", "")
+                            codec = "h264" if "avc" in vcodec.lower() else \
+                                   "h265" if "hevc" in vcodec.lower() else \
+                                   "vp9" if "vp9" in vcodec.lower() else \
+                                   "av1" if "av01" in vcodec.lower() else \
+                                   vcodec.split(".")[0] if vcodec else ""
+                elif info.get("height"):
+                    if not resolution:
+                        resolution = f"{info.get('height')}p"
+                    if not codec:
+                        vcodec = info.get("vcodec", "")
+                        codec = "h264" if "avc" in vcodec.lower() else \
+                               "h265" if "hevc" in vcodec.lower() else \
+                               "vp9" if "vp9" in vcodec.lower() else \
+                               "av1" if "av01" in vcodec.lower() else \
+                               vcodec.split(".")[0] if vcodec else ""
         
         # Find the downloaded file
         downloaded_file = None
@@ -216,7 +286,28 @@ def download():
         
         file_size = os.path.getsize(downloaded_file)
         ext = os.path.splitext(downloaded_file)[1] or ".mp4"
-        filename = f"{safe_title}{ext}"
+        
+        # Build filename: "Video Title - Channel (Resolution, Codec).ext"
+        # Clean characters for filename - be more restrictive for HTTP headers
+        safe_title = "".join(c for c in video_title if c.isalnum() or c in " -_").strip()
+        safe_channel = "".join(c for c in channel_name if c.isalnum() or c in " -_").strip()
+        
+        if not safe_title:
+            safe_title = "video"
+        
+        # Build the filename parts
+        if safe_channel and resolution and codec:
+            filename = f"{safe_title} - {safe_channel} ({resolution}, {codec}){ext}"
+        elif safe_channel and resolution:
+            filename = f"{safe_title} - {safe_channel} ({resolution}){ext}"
+        elif safe_channel:
+            filename = f"{safe_title} - {safe_channel}{ext}"
+        else:
+            filename = f"{safe_title}{ext}"
+        
+        # URL-encode the filename for Content-Disposition header (RFC 5987)
+        from urllib.parse import quote
+        filename_encoded = quote(filename)
         
         logger.info(f"Download complete: {filename} ({file_size} bytes)")
         
@@ -247,9 +338,11 @@ def download():
                 except Exception as e:
                     logger.error(f"Cleanup error: {e}")
         
-        # Build response headers
+        # Build response headers with proper filename encoding
+        # Use both filename (ASCII fallback) and filename* (UTF-8 encoded) for compatibility
+        ascii_filename = "".join(c if ord(c) < 128 else '_' for c in filename)
         headers = {
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f"attachment; filename=\"{ascii_filename}\"; filename*=UTF-8''{filename_encoded}",
             "Content-Length": str(file_size),
             "Content-Type": mime_type,
             "Accept-Ranges": "bytes",
