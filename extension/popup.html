@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="video-thumbnail">
+        <img id="thumbnail-img" src="" alt="Video Thumbnail">
+    </div>
+    <div id="video-title">Loading</div>
+    <div id="channel-row">
+        <span id="channel-name"></span>
+        <span id="video-duration"></span>
+    </div>
+    
+    <div id="quality-container">
+        <label for="quality-select">Quality:</label>
+        <select id="quality-select">
+            <option value="best">Best</option>
+            <option value="1080">1080p</option>
+            <option value="720" selected>720p</option>
+            <option value="480">480p</option>
+            <option value="360">360p</option>
+            <option value="audio">Audio Only</option>
+        </select>
+    </div>
+    
+    <button id="download-btn">Download</button>
+    <div id="status"></div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
