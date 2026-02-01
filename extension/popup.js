@@ -8,6 +8,34 @@ const thumbnailImg = document.getElementById("thumbnail-img");
 const subtitleCheckbox = document.getElementById("subtitle-checkbox");
 const subtitleLang = document.getElementById("subtitle-lang");
 
+// Queue elements
+const addToQueueBtn = document.getElementById("add-to-queue-btn");
+const queueList = document.getElementById("queue-list");
+const queueBadge = document.getElementById("queue-badge");
+const clearQueueBtn = document.getElementById("clear-queue-btn");
+const queueSection = document.getElementById("queue-section");
+const toggleQueueBtn = document.getElementById("toggle-queue-btn");
+const queueListContainer = document.getElementById("queue-list-container");
+const queueEmpty = document.getElementById("queue-empty");
+const queueFooter = document.getElementById("queue-footer");
+const queueStats = document.getElementById("queue-stats");
+
+// Download queue state
+let downloadQueue = [];
+let isProcessingQueue = false;
+let queueCollapsed = false;
+
+// Check if queue UI elements exist (only check essential elements)
+const queueEnabled = !!(addToQueueBtn && queueList && queueSection);
+
+console.log("Queue enabled:", queueEnabled, {
+  addToQueueBtn: !!addToQueueBtn,
+  queueList: !!queueList,
+  queueSection: !!queueSection,
+  queueBadge: !!queueBadge,
+  clearQueueBtn: !!clearQueueBtn
+});
+
 // Format bytes to human-readable size
 function formatFileSize(bytes) {
     if (!bytes || bytes <= 0) return null;
@@ -112,10 +140,12 @@ async function loadVideoInfo() {
     videoContainer.style.display = "block";
     downloadBtn.textContent = "Download";
 
-    // Show loading state in dropdown while fetching qualities
+    // Show fallback qualities immediately so user can interact
+    // Better qualities will load in background
     populateFallbackQualities();
-    qualitySelect.disabled = true;
-    downloadBtn.disabled = true;
+    qualitySelect.disabled = false;
+    downloadBtn.disabled = false;
+    if (addToQueueBtn) addToQueueBtn.disabled = false;
 
     // Get basic info from content script first (for quick display)
     let contentResponse = null;
@@ -181,16 +211,27 @@ async function loadVideoInfo() {
     if (!infoData) {
       const cleanUrl = cleanYouTubeUrl(tab.url);
       try {
-        status.textContent = "Loading qualities...";
-        const infoResponse = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`);
+        status.textContent = "Loading better qualities...";
+        status.style.color = "#888";
+        // Use AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        
+        const infoResponse = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
         infoData = await infoResponse.json();
       } catch (serverError) {
         console.error("Server error:", serverError);
-        status.textContent = "Server not running. Start: python backend/server.py";
-        status.style.color = "#f44336";
-        populateFallbackQualities();
-        qualitySelect.disabled = false;
-        downloadBtn.disabled = false;
+        if (serverError.name === 'AbortError') {
+          status.textContent = "Couldn't load qualities. Using defaults.";
+        } else {
+          status.textContent = "Server not running. Using default qualities.";
+        }
+        status.style.color = "#ff9800";
+        // Clear status after a moment - fallback qualities are already loaded
+        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 3000);
         return;
       }
     }
@@ -259,6 +300,7 @@ async function loadVideoInfo() {
       // Enable the dropdown and download button
       qualitySelect.disabled = false;
       downloadBtn.disabled = false;
+      if (addToQueueBtn) addToQueueBtn.disabled = false;
       status.textContent = "";
     } else {
       // Fallback to default qualities if server fetch fails
@@ -266,6 +308,7 @@ async function loadVideoInfo() {
       populateFallbackQualities();
       qualitySelect.disabled = false;
       downloadBtn.disabled = false;
+      if (addToQueueBtn) addToQueueBtn.disabled = false;
       status.textContent = "";
     }
 
@@ -434,5 +477,330 @@ downloadBtn.addEventListener("click", async () => {
     }
   }
 });
+
+// ==================== QUEUE SYSTEM ====================
+
+// Generate unique ID for queue items
+function generateQueueId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// Add video to download queue (via background script)
+async function addToQueue() {
+  if (!queueEnabled) {
+    console.error("Queue UI elements not found");
+    return;
+  }
+  
+  if (!currentVideoInfo || isPlaylistMode) {
+    status.textContent = "No video to add to queue";
+    status.style.color = "#f44336";
+    setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
+    return;
+  }
+  
+  const selectedValue = qualitySelect.value;
+  if (!selectedValue) {
+    status.textContent = "Please select a quality first";
+    status.style.color = "#f44336";
+    setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
+    return;
+  }
+  
+  let qualityData;
+  try {
+    qualityData = JSON.parse(selectedValue);
+  } catch {
+    qualityData = { height: 720, codec: "" };
+  }
+  
+  // Get quality label for display
+  const selectedOption = qualitySelect.options[qualitySelect.selectedIndex];
+  const qualityLabel = selectedOption ? selectedOption.textContent : `${qualityData.height}p`;
+  
+  const queueItem = {
+    id: generateQueueId(),
+    url: currentVideoInfo.url,
+    videoId: currentVideoInfo.videoId || extractVideoId(currentVideoInfo.url),
+    title: currentVideoInfo.videoTitle || "Unknown Video",
+    channel: currentVideoInfo.channelName || "",
+    thumbnail: thumbnailImg.src || "",
+    quality: qualityData,
+    qualityLabel: qualityLabel,
+    subtitles: subtitleCheckbox.checked ? subtitleLang.value : null,
+    status: "pending",
+    error: null,
+    addedAt: Date.now()
+  };
+  
+  try {
+    // Send to background script
+    const result = await browser.runtime.sendMessage({
+      type: "ADD_TO_QUEUE",
+      item: queueItem
+    });
+    
+    if (result && result.success) {
+      status.textContent = "Added to queue!";
+      status.style.color = "#4CAF50";
+      // Refresh queue display
+      loadQueueFromBackground();
+    } else {
+      status.textContent = result?.error || "Failed to add to queue";
+      status.style.color = "#ff9800";
+    }
+  } catch (error) {
+    console.error("Error adding to queue:", error);
+    status.textContent = "Error adding to queue";
+    status.style.color = "#f44336";
+  }
+  
+  setTimeout(() => {
+    status.textContent = "";
+    status.style.color = "";
+  }, 2000);
+}
+
+// Render the queue UI
+function renderQueue() {
+  if (!queueEnabled) {
+    console.log("Queue not enabled, skipping render");
+    return;
+  }
+  
+  console.log("Rendering queue with", downloadQueue.length, "items");
+  
+  // Update badge count
+  if (queueBadge) {
+    queueBadge.textContent = downloadQueue.length;
+    queueBadge.classList.toggle("empty", downloadQueue.length === 0);
+  }
+  
+  // Show/hide empty state
+  if (queueEmpty) {
+    queueEmpty.classList.toggle("hidden", downloadQueue.length > 0);
+  }
+  
+  // Update stats
+  const completed = downloadQueue.filter(i => i.status === "completed").length;
+  const pending = downloadQueue.filter(i => i.status === "pending").length;
+  const downloading = downloadQueue.filter(i => i.status === "downloading").length;
+  const failed = downloadQueue.filter(i => i.status === "failed").length;
+  
+  if (queueStats && queueFooter) {
+    if (downloadQueue.length > 0) {
+      const parts = [];
+      if (downloading > 0) parts.push(`${downloading} downloading`);
+      if (pending > 0) parts.push(`${pending} waiting`);
+      if (completed > 0) parts.push(`${completed} done`);
+      if (failed > 0) parts.push(`${failed} failed`);
+      queueStats.textContent = parts.join(" • ");
+      queueFooter.classList.add("visible");
+    } else {
+      queueFooter.classList.remove("visible");
+    }
+  }
+  
+  // Render queue items
+  queueList.innerHTML = "";
+  
+  for (const item of downloadQueue) {
+    const itemEl = document.createElement("div");
+    itemEl.className = `queue-item ${item.status}`;
+    itemEl.dataset.id = item.id;
+    
+    const thumbnailUrl = item.thumbnail || 
+      (item.videoId ? `https://img.youtube.com/vi/${item.videoId}/default.jpg` : "");
+    
+    let statusIcon = "";
+    let statusText = "";
+    let statusClass = item.status;
+    switch (item.status) {
+      case "pending":
+        statusIcon = "⏸";
+        statusText = "Queued";
+        break;
+      case "downloading":
+        statusIcon = "●";
+        statusText = "Downloading...";
+        break;
+      case "completed":
+        statusIcon = "✓";
+        statusText = "Completed";
+        break;
+      case "failed":
+        statusIcon = "✕";
+        statusText = item.error ? `Failed: ${item.error.substring(0, 20)}` : "Failed";
+        break;
+      default:
+        statusIcon = "?";
+        statusText = "Unknown";
+        statusClass = "pending";
+    }
+    
+    // Truncate title if too long
+    const truncatedTitle = item.title.length > 35 
+      ? item.title.substring(0, 35) + "..." 
+      : item.title;
+    
+    itemEl.innerHTML = `
+      ${thumbnailUrl ? `<img class="queue-item-thumbnail" src="${thumbnailUrl}" alt="">` : ""}
+      <div class="queue-item-info">
+        <div class="queue-item-title" title="${item.title}">${truncatedTitle}</div>
+        <div class="queue-item-details">
+          <span class="queue-item-quality">${item.qualityLabel || "720p"}</span>
+          ${item.channel ? `<span>${item.channel}</span>` : ""}
+        </div>
+      </div>
+      <span class="queue-item-status ${statusClass}">${statusIcon} ${statusText}</span>
+      <div class="queue-item-actions">
+        <button class="queue-item-remove" title="Remove" data-id="${item.id}">×</button>
+      </div>
+    `;
+    
+    queueList.appendChild(itemEl);
+  }
+  
+  // Add click handlers for remove buttons
+  queueList.querySelectorAll(".queue-item-remove").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFromQueue(btn.dataset.id);
+    });
+  });
+}
+
+// Remove item from queue (via background script)
+async function removeFromQueue(id) {
+  try {
+    const result = await browser.runtime.sendMessage({
+      type: "REMOVE_FROM_QUEUE",
+      id: id
+    });
+    if (result && result.success) {
+      loadQueueFromBackground();
+    }
+  } catch (error) {
+    console.error("Error removing from queue:", error);
+  }
+}
+
+// Clear completed/failed items from queue (via background script)
+async function clearCompletedFromQueue() {
+  try {
+    const result = await browser.runtime.sendMessage({
+      type: "CLEAR_COMPLETED"
+    });
+    if (result && result.success) {
+      loadQueueFromBackground();
+    }
+  } catch (error) {
+    console.error("Error clearing queue:", error);
+  }
+}
+
+// Load queue from background script
+async function loadQueueFromBackground() {
+  try {
+    console.log("Loading queue from background...");
+    const state = await browser.runtime.sendMessage({ type: "GET_QUEUE" });
+    console.log("Got queue state:", state);
+    if (state && state.queue) {
+      downloadQueue = state.queue;
+      isProcessingQueue = state.isProcessing;
+    } else {
+      downloadQueue = [];
+      isProcessingQueue = false;
+    }
+    renderQueue();
+  } catch (error) {
+    console.error("Error loading queue from background:", error);
+    downloadQueue = [];
+    renderQueue();
+  }
+}
+
+// Listen for queue updates from background script
+browser.runtime.onMessage.addListener((message) => {
+  if (message.type === "QUEUE_UPDATED") {
+    downloadQueue = message.queue || [];
+    isProcessingQueue = message.isProcessing || false;
+    renderQueue();
+  }
+});
+
+// Load queue from browser storage (for collapsed state)
+async function loadQueueFromStorage() {
+  try {
+    const data = await browser.storage.local.get(["queueCollapsed"]);
+    
+    // Restore collapsed state
+    if (data.queueCollapsed !== undefined) {
+      queueCollapsed = data.queueCollapsed;
+      if (queueListContainer) {
+        queueListContainer.classList.toggle("collapsed", queueCollapsed);
+      }
+      if (toggleQueueBtn) {
+        toggleQueueBtn.classList.toggle("collapsed", queueCollapsed);
+      }
+    }
+    
+    // Load actual queue from background script
+    await loadQueueFromBackground();
+  } catch (e) {
+    console.error("Error loading queue:", e);
+    renderQueue();
+  }
+}
+
+// Toggle queue collapse
+function toggleQueue() {
+  queueCollapsed = !queueCollapsed;
+  if (queueListContainer) {
+    queueListContainer.classList.toggle("collapsed", queueCollapsed);
+  }
+  if (toggleQueueBtn) {
+    toggleQueueBtn.classList.toggle("collapsed", queueCollapsed);
+  }
+  // Save collapsed state
+  browser.storage.local.set({ queueCollapsed: queueCollapsed }).catch(console.error);
+}
+
+// Event listeners for queue
+if (queueEnabled) {
+  console.log("Setting up queue event listeners");
+  
+  addToQueueBtn.addEventListener("click", addToQueue);
+  
+  if (clearQueueBtn) {
+    clearQueueBtn.addEventListener("click", clearCompletedFromQueue);
+  }
+  
+  if (toggleQueueBtn) {
+    toggleQueueBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleQueue();
+    });
+  }
+  
+  // Click header to toggle (except buttons)
+  const queueHeader = document.getElementById("queue-header");
+  if (queueHeader) {
+    queueHeader.addEventListener("click", (e) => {
+      if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
+        toggleQueue();
+      }
+    });
+  }
+  
+  // Load queue on popup open
+  loadQueueFromStorage();
+} else {
+  console.warn("Queue UI elements not found - queue disabled");
+  // Hide queue section if elements are missing
+  if (queueSection) {
+    queueSection.style.display = "none";
+  }
+}
 
 loadVideoInfo();

@@ -56,8 +56,42 @@
         </select>
     </div>
     
-    <button id="download-btn" disabled>Download</button>
+    <div id="button-row">
+        <button id="download-btn" disabled>
+            <span class="btn-icon">⬇️</span>
+            <span class="btn-text">Download</span>
+        </button>
+        <button id="add-to-queue-btn" disabled title="Add to download queue">
+            <span class="btn-icon">+</span>
+        </button>
+    </div>
     <div id="status"></div>
+    
+    <!-- Download Queue Section -->
+    <div id="queue-section">
+        <div id="queue-header">
+            <div id="queue-header-left">
+                <span id="queue-icon">📥</span>
+                <span id="queue-title">Queue</span>
+                <span id="queue-badge">0</span>
+            </div>
+            <div id="queue-header-right">
+                <button id="clear-queue-btn" title="Clear completed">Clear</button>
+                <button id="toggle-queue-btn" title="Toggle queue">▼</button>
+            </div>
+        </div>
+        <div id="queue-list-container">
+            <div id="queue-empty">
+                <span class="empty-icon">📭</span>
+                <span class="empty-text">Queue is empty</span>
+                <span class="empty-hint">Add videos to download them sequentially</span>
+            </div>
+            <div id="queue-list"></div>
+        </div>
+        <div id="queue-footer">
+            <span id="queue-stats"></span>
+        </div>
+    </div>
     
     <script src="popup.js"></script>
 </body>

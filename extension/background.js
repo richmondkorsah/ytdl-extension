@@ -7,6 +7,151 @@ const SERVER_URL = "http://localhost:5000";
 const videoInfoCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
 
+// ==================== QUEUE MANAGEMENT ====================
+let downloadQueue = [];
+let isProcessingQueue = false;
+
+// Load queue from storage on startup
+async function initializeQueue() {
+    try {
+        const data = await browser.storage.local.get("downloadQueue");
+        if (data.downloadQueue && Array.isArray(data.downloadQueue)) {
+            // Reset any "downloading" items to "pending" (browser may have restarted)
+            downloadQueue = data.downloadQueue.map(item => ({
+                ...item,
+                status: item.status === "downloading" ? "pending" : item.status
+            }));
+            await saveQueue();
+            console.log("Queue loaded:", downloadQueue.length, "items");
+            // Start processing if there are pending items
+            processQueue();
+        }
+    } catch (e) {
+        console.error("Error loading queue:", e);
+    }
+}
+
+// Save queue to storage
+async function saveQueue() {
+    try {
+        await browser.storage.local.set({ downloadQueue: downloadQueue });
+    } catch (e) {
+        console.error("Error saving queue:", e);
+    }
+}
+
+// Add item to queue
+async function addToQueue(item) {
+    // Check for duplicates (same video pending or downloading)
+    const exists = downloadQueue.some(q => 
+        q.videoId === item.videoId && 
+        (q.status === "pending" || q.status === "downloading")
+    );
+    
+    if (exists) {
+        return { success: false, error: "Video already in queue" };
+    }
+    
+    downloadQueue.push(item);
+    await saveQueue();
+    
+    // Start processing if not already
+    processQueue();
+    
+    return { success: true, queueLength: downloadQueue.length };
+}
+
+// Remove item from queue
+async function removeFromQueue(id) {
+    const index = downloadQueue.findIndex(item => item.id === id);
+    if (index !== -1 && downloadQueue[index].status !== "downloading") {
+        downloadQueue.splice(index, 1);
+        await saveQueue();
+        return { success: true };
+    }
+    return { success: false, error: "Cannot remove item" };
+}
+
+// Clear completed/failed items
+async function clearCompletedFromQueue() {
+    downloadQueue = downloadQueue.filter(item => 
+        item.status === "pending" || item.status === "downloading"
+    );
+    await saveQueue();
+    return { success: true, queueLength: downloadQueue.length };
+}
+
+// Get current queue state
+function getQueueState() {
+    return {
+        queue: downloadQueue,
+        isProcessing: isProcessingQueue
+    };
+}
+
+// Process the download queue
+async function processQueue() {
+    if (isProcessingQueue) return;
+    
+    const nextItem = downloadQueue.find(item => item.status === "pending");
+    if (!nextItem) return;
+    
+    isProcessingQueue = true;
+    nextItem.status = "downloading";
+    await saveQueue();
+    
+    // Notify popup of queue update
+    notifyPopup();
+    
+    console.log("Processing queue item:", nextItem.title);
+    
+    try {
+        const result = await handleDownload({
+            url: nextItem.url,
+            quality: nextItem.quality,
+            videoTitle: nextItem.title,
+            channelName: nextItem.channel,
+            subtitles: nextItem.subtitles
+        });
+        
+        if (result && result.success) {
+            nextItem.status = "completed";
+            console.log("Queue item completed:", nextItem.title);
+        } else {
+            nextItem.status = "failed";
+            nextItem.error = (result && result.error) || "Download failed";
+            console.error("Queue item failed:", nextItem.title, nextItem.error);
+        }
+    } catch (error) {
+        console.error("Queue download error:", error);
+        nextItem.status = "failed";
+        nextItem.error = error.message || "Unknown error";
+    }
+    
+    await saveQueue();
+    isProcessingQueue = false;
+    
+    // Notify popup of queue update
+    notifyPopup();
+    
+    // Process next item after a short delay
+    setTimeout(() => processQueue(), 500);
+}
+
+// Notify popup of queue changes
+function notifyPopup() {
+    browser.runtime.sendMessage({
+        type: "QUEUE_UPDATED",
+        queue: downloadQueue,
+        isProcessing: isProcessingQueue
+    }).catch(() => {
+        // Popup might not be open, ignore error
+    });
+}
+
+// Initialize queue on startup
+initializeQueue();
+
 // Listen for messages from popup or content scripts
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Background received message:", message);
@@ -37,6 +182,39 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Trigger prefetch without waiting
         prefetchVideoInfo(message.url, message.videoId);
         sendResponse({ acknowledged: true });
+        return false;
+    }
+
+    // ==================== QUEUE MESSAGES ====================
+    if (message.type === "ADD_TO_QUEUE") {
+        addToQueue(message.item)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "REMOVE_FROM_QUEUE") {
+        removeFromQueue(message.id)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "CLEAR_COMPLETED") {
+        clearCompletedFromQueue()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "GET_QUEUE") {
+        sendResponse(getQueueState());
+        return false;
+    }
+
+    if (message.type === "START_QUEUE") {
+        processQueue();
+        sendResponse({ success: true });
         return false;
     }
 
@@ -189,6 +367,38 @@ function sanitizeFilename(name) {
         .trim();
 }
 
+// Wait for a download to complete
+function waitForDownloadComplete(downloadId) {
+    return new Promise((resolve) => {
+        const checkDownload = async () => {
+            try {
+                const [download] = await browser.downloads.search({ id: downloadId });
+                if (!download) {
+                    resolve({ success: false, error: "Download not found" });
+                    return;
+                }
+                
+                if (download.state === "complete") {
+                    console.log("Download completed:", download.filename);
+                    resolve({ success: true });
+                } else if (download.state === "interrupted") {
+                    console.log("Download interrupted:", download.error);
+                    resolve({ success: false, error: download.error || "Download interrupted" });
+                } else {
+                    // Still in progress, check again
+                    setTimeout(checkDownload, 1000);
+                }
+            } catch (e) {
+                console.error("Error checking download:", e);
+                resolve({ success: false, error: e.message });
+            }
+        };
+        
+        // Start checking
+        checkDownload();
+    });
+}
+
 // Handle download request via Flask backend
 async function handleDownload(message) {
     const { url, quality, videoTitle, channelName, subtitles } = message;
@@ -288,7 +498,14 @@ async function handleDownload(message) {
         
         console.log("Download started with ID:", downloadId);
 
-        return { success: true, message: "Download started! Check your downloads." };
+        // Wait for download to complete (for queue tracking)
+        const downloadResult = await waitForDownloadComplete(downloadId);
+        
+        if (downloadResult.success) {
+            return { success: true, message: "Download completed!" };
+        } else {
+            return { success: false, error: downloadResult.error || "Download failed" };
+        }
     } catch (error) {
         console.error("Download error:", error);
         
