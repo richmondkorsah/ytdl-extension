@@ -72,7 +72,6 @@ async function loadVideoInfo() {
     }
 
     // Now fetch actual available qualities from server
-    status.textContent = "Fetching available qualities...";
     const cleanUrl = cleanYouTubeUrl(tab.url);
     
     try {

@@ -127,10 +127,11 @@ async function handleDownload(message) {
         filename += ".mp4";
 
         // Trigger browser download - streams directly from Flask server
+        // saveAs: false uses browser's default download location without prompting
         const downloadId = await browser.downloads.download({
             url: downloadUrl,
             filename: filename,
-            saveAs: true
+            saveAs: false
         });
         
         console.log("Download started with ID:", downloadId);
