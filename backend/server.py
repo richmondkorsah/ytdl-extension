@@ -134,14 +134,17 @@ def get_ydl_opts(for_download=False, format_str="best"):
             "format_sort": ["ext:mp4:m4a", "res"],
         })
         
+        # Initialize postprocessors list
+        opts["postprocessors"] = []
+        
         if FFMPEG_AVAILABLE:
             opts["merge_output_format"] = "mp4"
             if format_str == "bestaudio" or format_str == "bestaudio/best":
-                opts["postprocessors"] = [{
+                opts["postprocessors"].append({
                     "key": "FFmpegExtractAudio",
                     "preferredcodec": "mp3",
                     "preferredquality": "192",
-                }]
+                })
     else:
         opts["skip_download"] = True
     
@@ -292,18 +295,29 @@ def download():
         if subtitles:
             logger.info(f"Subtitles requested: {subtitles}")
             ydl_opts["writesubtitles"] = True
+            ydl_opts["writeautomaticsub"] = True  # Always try auto-generated too
+            
             if subtitles == "auto":
-                ydl_opts["writeautomaticsub"] = True
-                ydl_opts["subtitleslangs"] = ["en"]  # Default to English for auto
+                # For auto, get any available auto-generated subs
+                ydl_opts["subtitleslangs"] = ["en", "en-orig", "en-US", "en-GB"]
             else:
-                ydl_opts["subtitleslangs"] = [subtitles]
+                # Include the language and common variants
+                ydl_opts["subtitleslangs"] = [subtitles, f"{subtitles}-orig", f"{subtitles}-US", f"{subtitles}-GB"]
+            
             ydl_opts["subtitlesformat"] = "srt/vtt/best"
+            
             # Embed subtitles in video if FFmpeg available
             if FFMPEG_AVAILABLE:
-                ydl_opts["postprocessors"] = ydl_opts.get("postprocessors", []) + [{
+                # Initialize postprocessors list if not exists
+                if "postprocessors" not in ydl_opts:
+                    ydl_opts["postprocessors"] = []
+                ydl_opts["postprocessors"].append({
                     "key": "FFmpegEmbedSubtitle",
                     "already_have_subtitle": False
-                }]
+                })
+                logger.info("Subtitles will be embedded in video")
+            else:
+                logger.warning("FFmpeg not available - subtitles will be saved as separate file")
         
         logger.info(f"Downloading to: {temp_dir}")
         
