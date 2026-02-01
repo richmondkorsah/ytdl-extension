@@ -3,6 +3,10 @@
 
 const SERVER_URL = "http://localhost:5000";
 
+// Cache for video info - keyed by video ID
+const videoInfoCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+
 // Listen for messages from popup or content scripts
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Background received message:", message);
@@ -14,8 +18,63 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Keep the message channel open for async response
     }
 
+    if (message.type === "GET_CACHED_INFO") {
+        // Check if we have cached data or if a fetch is in progress
+        getCachedInfoAsync(message.videoId)
+            .then(cached => sendResponse(cached))
+            .catch(() => sendResponse(null));
+        return true; // Keep channel open for async response
+    }
+
+    if (message.type === "PREFETCH_INFO") {
+        // Trigger prefetch without waiting
+        prefetchVideoInfo(message.url, message.videoId);
+        sendResponse({ acknowledged: true });
+        return false;
+    }
+
     return false;
 });
+
+// Listen for tab updates to prefetch video info
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    // Only act when the page has finished loading
+    if (changeInfo.status === "complete" && tab.url) {
+        if (tab.url.includes("youtube.com/watch")) {
+            const videoId = extractVideoId(tab.url);
+            if (videoId && !getCachedInfo(videoId)) {
+                console.log("Prefetching info for video:", videoId);
+                prefetchVideoInfo(tab.url, videoId);
+            }
+        }
+    }
+});
+
+// Also listen for tab activation (switching tabs)
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+    try {
+        const tab = await browser.tabs.get(activeInfo.tabId);
+        if (tab.url && tab.url.includes("youtube.com/watch")) {
+            const videoId = extractVideoId(tab.url);
+            if (videoId && !getCachedInfo(videoId)) {
+                console.log("Prefetching info on tab switch:", videoId);
+                prefetchVideoInfo(tab.url, videoId);
+            }
+        }
+    } catch (e) {
+        // Tab might not exist anymore
+    }
+});
+
+// Extract video ID from YouTube URL
+function extractVideoId(url) {
+    try {
+        const parsed = new URL(url);
+        return parsed.searchParams.get("v");
+    } catch (e) {
+        return null;
+    }
+}
 
 // Clean URL to remove playlist and other parameters
 function cleanYouTubeUrl(url) {
@@ -29,6 +88,87 @@ function cleanYouTubeUrl(url) {
         console.error("URL parsing error:", e);
     }
     return url;
+}
+
+// Get cached video info (synchronous - returns immediately if available)
+function getCachedInfo(videoId) {
+    const cached = videoInfoCache.get(videoId);
+    if (cached && !cached.fetching && (Date.now() - cached.timestamp < CACHE_TTL)) {
+        console.log("Cache hit for video:", videoId);
+        return cached.data;
+    }
+    if (cached && !cached.fetching) {
+        // Expired, remove it
+        videoInfoCache.delete(videoId);
+    }
+    return null;
+}
+
+// Get cached info, waiting for in-progress fetches (up to 10 seconds)
+async function getCachedInfoAsync(videoId) {
+    // First check if we have cached data
+    const immediate = getCachedInfo(videoId);
+    if (immediate) return immediate;
+    
+    // Check if a fetch is in progress
+    const cached = videoInfoCache.get(videoId);
+    if (cached && cached.fetching) {
+        console.log("Waiting for in-progress fetch for:", videoId);
+        // Wait for the fetch to complete (poll every 200ms, max 10 seconds)
+        for (let i = 0; i < 50; i++) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const result = getCachedInfo(videoId);
+            if (result) return result;
+            // Check if fetch failed (entry removed)
+            if (!videoInfoCache.has(videoId)) break;
+        }
+    }
+    
+    return null;
+}
+
+// Prefetch video info from server and cache it
+async function prefetchVideoInfo(url, videoId) {
+    // Don't prefetch if already cached or currently fetching
+    if (videoInfoCache.has(videoId)) {
+        const cached = videoInfoCache.get(videoId);
+        if (cached.fetching || (Date.now() - cached.timestamp < CACHE_TTL)) {
+            return;
+        }
+    }
+
+    // Mark as fetching to prevent duplicate requests
+    videoInfoCache.set(videoId, { fetching: true, timestamp: Date.now() });
+
+    try {
+        const cleanUrl = cleanYouTubeUrl(url);
+        console.log("Prefetching from server:", cleanUrl);
+        
+        const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
+            method: "GET",
+            mode: "cors",
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                videoInfoCache.set(videoId, {
+                    data: data,
+                    timestamp: Date.now(),
+                    fetching: false
+                });
+                console.log("Cached info for video:", videoId, data.title);
+            } else {
+                // Remove failed fetch marker
+                videoInfoCache.delete(videoId);
+            }
+        } else {
+            videoInfoCache.delete(videoId);
+        }
+    } catch (error) {
+        console.error("Prefetch error:", error);
+        videoInfoCache.delete(videoId);
+    }
 }
 
 // Sanitize string for use as filename (remove invalid characters)

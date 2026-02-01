@@ -15,6 +15,42 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Server-side cache for video info (reduces repeated yt-dlp calls)
+from functools import lru_cache
+from threading import Lock
+import time
+
+# Simple in-memory cache with TTL
+class VideoInfoCache:
+    def __init__(self, ttl=300):  # 5 minute TTL
+        self.cache = {}
+        self.ttl = ttl
+        self.lock = Lock()
+    
+    def get(self, video_id):
+        with self.lock:
+            if video_id in self.cache:
+                entry = self.cache[video_id]
+                if time.time() - entry['timestamp'] < self.ttl:
+                    logger.info(f"Cache hit for video: {video_id}")
+                    return entry['data']
+                else:
+                    del self.cache[video_id]
+        return None
+    
+    def set(self, video_id, data):
+        with self.lock:
+            self.cache[video_id] = {
+                'data': data,
+                'timestamp': time.time()
+            }
+            # Limit cache size to 100 entries
+            if len(self.cache) > 100:
+                oldest_key = min(self.cache.keys(), key=lambda k: self.cache[k]['timestamp'])
+                del self.cache[oldest_key]
+
+video_cache = VideoInfoCache()
+
 # Find Deno path and add to environment if needed
 def setup_deno_path():
     """Ensure Deno is in PATH for yt-dlp to find"""
@@ -129,6 +165,20 @@ def info():
         return jsonify({"error": "URL parameter is required"}), 400
     
     url = clean_url(url)
+    
+    # Extract video ID for caching
+    video_id = None
+    if "youtube.com" in url or "youtu.be" in url:
+        parsed = urllib.parse.urlparse(url)
+        params = urllib.parse.parse_qs(parsed.query)
+        video_id = params.get('v', [None])[0]
+    
+    # Check cache first
+    if video_id:
+        cached = video_cache.get(video_id)
+        if cached:
+            return jsonify(cached)
+    
     logger.info(f"Fetching info for: {url}")
     
     ydl_opts = get_ydl_opts(for_download=False)
@@ -187,7 +237,7 @@ def info():
             
             logger.info(f"Found {len(unique_qualities)} unique resolutions for: {info_dict.get('title')}")
             
-            return jsonify({
+            result = {
                 "success": True,
                 "id": info_dict.get("id"),
                 "title": info_dict.get("title"),
@@ -198,7 +248,13 @@ def info():
                 "upload_date": info_dict.get("upload_date"),
                 "formats": formats,
                 "available_qualities": unique_qualities
-            })
+            }
+            
+            # Cache the result
+            if video_id:
+                video_cache.set(video_id, result)
+            
+            return jsonify(result)
     except Exception as e:
         logger.error(f"Error fetching info: {e}")
         return jsonify({"success": False, "error": str(e)}), 500

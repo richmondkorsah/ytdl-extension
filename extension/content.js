@@ -141,3 +141,35 @@ const observer = new MutationObserver(() => {
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
+
+// Immediately trigger prefetch when content script loads on a YouTube video page
+(function triggerPrefetch() {
+    const videoId = getVideoId();
+    if (videoId) {
+        console.log("Content script: triggering prefetch for", videoId);
+        browser.runtime.sendMessage({
+            type: "PREFETCH_INFO",
+            url: window.location.href,
+            videoId: videoId
+        }).catch(() => {
+            // Background script might not be ready yet, that's ok
+        });
+    }
+})();
+
+// Also trigger prefetch on YouTube SPA navigation
+let lastVideoId = getVideoId();
+const navObserver = new MutationObserver(() => {
+    const currentVideoId = getVideoId();
+    if (currentVideoId && currentVideoId !== lastVideoId) {
+        lastVideoId = currentVideoId;
+        console.log("Content script: SPA navigation detected, prefetching", currentVideoId);
+        browser.runtime.sendMessage({
+            type: "PREFETCH_INFO",
+            url: window.location.href,
+            videoId: currentVideoId
+        }).catch(() => {});
+    }
+});
+
+navObserver.observe(document.body, { childList: true, subtree: true });
