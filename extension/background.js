@@ -184,7 +184,7 @@ function sanitizeFilename(name) {
 
 // Handle download request via Flask backend
 async function handleDownload(message) {
-    const { url, quality, videoTitle, channelName } = message;
+    const { url, quality, videoTitle, channelName, subtitles } = message;
     
     // Clean the URL first
     const cleanUrl = cleanYouTubeUrl(url);
@@ -249,6 +249,11 @@ async function handleDownload(message) {
             resolution: resolution,
             codec: codec
         });
+        
+        // Add subtitles parameter if requested
+        if (subtitles) {
+            params.append("subtitles", subtitles);
+        }
         
         const downloadUrl = `${SERVER_URL}/download?${params.toString()}`;
         

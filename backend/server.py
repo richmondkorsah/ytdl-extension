@@ -269,6 +269,7 @@ def download():
     channel_name = request.args.get("channel", "")
     resolution = request.args.get("resolution", "")
     codec = request.args.get("codec", "")
+    subtitles = request.args.get("subtitles", "")  # Subtitle language code
     
     if not url:
         return jsonify({"error": "URL parameter is required"}), 400
@@ -286,6 +287,23 @@ def download():
         # Get download options
         ydl_opts = get_ydl_opts(for_download=True, format_str=format_str)
         ydl_opts["outtmpl"] = output_template
+        
+        # Add subtitle options if requested
+        if subtitles:
+            logger.info(f"Subtitles requested: {subtitles}")
+            ydl_opts["writesubtitles"] = True
+            if subtitles == "auto":
+                ydl_opts["writeautomaticsub"] = True
+                ydl_opts["subtitleslangs"] = ["en"]  # Default to English for auto
+            else:
+                ydl_opts["subtitleslangs"] = [subtitles]
+            ydl_opts["subtitlesformat"] = "srt/vtt/best"
+            # Embed subtitles in video if FFmpeg available
+            if FFMPEG_AVAILABLE:
+                ydl_opts["postprocessors"] = ydl_opts.get("postprocessors", []) + [{
+                    "key": "FFmpegEmbedSubtitle",
+                    "already_have_subtitle": False
+                }]
         
         logger.info(f"Downloading to: {temp_dir}")
         

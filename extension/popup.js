@@ -5,6 +5,13 @@ const videoTitleElement = document.getElementById("video-title");
 const channelNameElement = document.getElementById("channel-name");
 const videoDurationElement = document.getElementById("video-duration");
 const thumbnailImg = document.getElementById("thumbnail-img");
+const subtitleCheckbox = document.getElementById("subtitle-checkbox");
+const subtitleLang = document.getElementById("subtitle-lang");
+
+// Enable/disable subtitle language dropdown based on checkbox
+subtitleCheckbox.addEventListener("change", () => {
+  subtitleLang.disabled = !subtitleCheckbox.checked;
+});
 
 const SERVER_URL = "http://localhost:5000";
 
@@ -250,7 +257,8 @@ downloadBtn.addEventListener("click", async () => {
       url: currentVideoInfo.url,
       quality: qualityData,
       videoTitle: currentVideoInfo.videoTitle,
-      channelName: currentVideoInfo.channelName
+      channelName: currentVideoInfo.channelName,
+      subtitles: subtitleCheckbox.checked ? subtitleLang.value : null
     });
     
     if (response.success) {
