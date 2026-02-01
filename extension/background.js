@@ -18,6 +18,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Keep the message channel open for async response
     }
 
+    if (message.type === "DOWNLOAD_PLAYLIST") {
+        handlePlaylistDownload(message)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
     if (message.type === "GET_CACHED_INFO") {
         // Check if we have cached data or if a fetch is in progress
         getCachedInfoAsync(message.videoId)
@@ -286,6 +293,101 @@ async function handleDownload(message) {
         console.error("Download error:", error);
         
         // Provide helpful error messages
+        if (error.message.includes("NetworkError") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+            throw new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
+        }
+        
+        throw error;
+    }
+}
+
+// Handle playlist download request
+async function handlePlaylistDownload(message) {
+    const { url, quality, playlistTitle, subtitles } = message;
+    
+    console.log("Starting playlist download:", playlistTitle);
+    console.log("Quality:", quality);
+
+    // Build yt-dlp format string based on quality selection
+    let format;
+    let resolution = "";
+    let codec = "";
+    
+    if (typeof quality === "object") {
+        if (quality.isAudio) {
+            format = "bestaudio/best";
+            resolution = "";
+            codec = "mp3";
+        } else if (quality.height) {
+            format = `bestvideo[height<=${quality.height}]+bestaudio/best[height<=${quality.height}]/best`;
+            resolution = `${quality.height}p`;
+            codec = quality.codec || "";
+        } else {
+            format = "best";
+        }
+    } else {
+        switch (quality) {
+            case "best":
+                format = "best";
+                break;
+            case "audio":
+                format = "bestaudio/best";
+                break;
+            default:
+                format = `best[height<=${quality}]/best`;
+                resolution = `${quality}p`;
+        }
+    }
+
+    try {
+        // Check if server is running
+        console.log("Checking server health...");
+        const healthCheck = await fetch(`${SERVER_URL}/health`, {
+            method: "GET",
+            mode: "cors",
+        });
+        
+        if (!healthCheck.ok) {
+            throw new Error("Flask server is not responding. Please start it: python backend/server.py");
+        }
+
+        // Build download URL for playlist
+        const params = new URLSearchParams({
+            url: url,
+            format: format,
+            playlist_title: playlistTitle || "playlist",
+            resolution: resolution,
+            codec: codec
+        });
+        
+        if (subtitles) {
+            params.append("subtitles", subtitles);
+        }
+        
+        const downloadUrl = `${SERVER_URL}/download-playlist?${params.toString()}`;
+        
+        console.log("Starting playlist download from:", downloadUrl);
+
+        // Build filename for ZIP
+        let filename = sanitizeFilename(playlistTitle || "playlist");
+        if (resolution) {
+            filename += ` (${resolution})`;
+        }
+        filename += ".zip";
+
+        // Trigger browser download - streams directly from Flask server
+        const downloadId = await browser.downloads.download({
+            url: downloadUrl,
+            filename: filename,
+            saveAs: false
+        });
+        
+        console.log("Playlist download started with ID:", downloadId);
+
+        return { success: true, message: "Playlist download started! Videos will be saved as a ZIP file." };
+    } catch (error) {
+        console.error("Playlist download error:", error);
+        
         if (error.message.includes("NetworkError") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
             throw new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
         }

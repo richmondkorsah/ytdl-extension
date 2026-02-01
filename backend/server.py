@@ -7,6 +7,7 @@ import subprocess
 import logging
 import shutil
 import urllib.parse
+import zipfile
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -449,6 +450,186 @@ def download():
             shutil.rmtree(temp_dir, ignore_errors=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+@app.route("/playlist-info", methods=["GET"])
+def playlist_info():
+    """Get playlist metadata without downloading"""
+    url = request.args.get("url")
+    
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+    
+    logger.info(f"Fetching playlist info for: {url}")
+    
+    ydl_opts = get_ydl_opts(for_download=False)
+    ydl_opts["extract_flat"] = True  # Don't extract individual videos, just the playlist info
+    ydl_opts["playlistend"] = 1  # Only check first video to get playlist metadata faster
+    
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            
+            # Check if this is actually a playlist
+            if info_dict.get("_type") != "playlist" and not info_dict.get("entries"):
+                return jsonify({"success": False, "error": "Not a playlist URL"}), 400
+            
+            # Get full playlist info (need to re-extract without flat for count)
+            ydl_opts_full = get_ydl_opts(for_download=False)
+            ydl_opts_full["extract_flat"] = "in_playlist"
+            
+            with YoutubeDL(ydl_opts_full) as ydl_full:
+                full_info = ydl_full.extract_info(url, download=False)
+                entries = full_info.get("entries", [])
+                video_count = len([e for e in entries if e]) if entries else 0
+            
+            result = {
+                "success": True,
+                "id": info_dict.get("id"),
+                "title": info_dict.get("title", "Unknown Playlist"),
+                "channel": info_dict.get("channel") or info_dict.get("uploader", "Unknown"),
+                "video_count": video_count,
+                "thumbnail": info_dict.get("thumbnails", [{}])[0].get("url") if info_dict.get("thumbnails") else None,
+            }
+            
+            logger.info(f"Playlist: {result['title']} ({video_count} videos)")
+            return jsonify(result)
+            
+    except Exception as e:
+        logger.error(f"Error fetching playlist info: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/download-playlist", methods=["GET"])
+def download_playlist():
+    """Download entire playlist and stream as ZIP"""
+    url = request.args.get("url")
+    format_str = request.args.get("format", "best")
+    playlist_title = request.args.get("playlist_title", "playlist")
+    resolution = request.args.get("resolution", "")
+    subtitles = request.args.get("subtitles", "")
+    
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+    
+    logger.info(f"Starting playlist download: {url} (format: {format_str})")
+    
+    temp_dir = None
+    
+    try:
+        # Create temp directory for downloads
+        temp_dir = tempfile.mkdtemp()
+        output_template = os.path.join(temp_dir, "%(playlist_index)02d - %(title)s.%(ext)s")
+        
+        # Get download options
+        ydl_opts = get_ydl_opts(for_download=True, format_str=format_str)
+        ydl_opts["outtmpl"] = output_template
+        ydl_opts["noplaylist"] = False  # Enable playlist download
+        ydl_opts["ignoreerrors"] = True  # Continue on individual video errors
+        
+        # Add subtitle options if requested
+        if subtitles:
+            logger.info(f"Subtitles requested for playlist: {subtitles}")
+            ydl_opts["writesubtitles"] = True
+            ydl_opts["writeautomaticsub"] = True
+            
+            if subtitles == "auto":
+                ydl_opts["subtitleslangs"] = ["en", "en-orig", "en-US", "en-GB"]
+            else:
+                ydl_opts["subtitleslangs"] = [subtitles, f"{subtitles}-orig", f"{subtitles}-US", f"{subtitles}-GB"]
+            
+            ydl_opts["subtitlesformat"] = "srt/vtt/best"
+            
+            if FFMPEG_AVAILABLE:
+                if "postprocessors" not in ydl_opts:
+                    ydl_opts["postprocessors"] = []
+                ydl_opts["postprocessors"].append({
+                    "key": "FFmpegEmbedSubtitle",
+                    "already_have_subtitle": False
+                })
+        
+        logger.info(f"Downloading playlist to: {temp_dir}")
+        
+        # Download the playlist
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            playlist_name = info.get("title", playlist_title)
+        
+        # Find all downloaded files
+        downloaded_files = []
+        for f in sorted(os.listdir(temp_dir)):
+            filepath = os.path.join(temp_dir, f)
+            if os.path.isfile(filepath) and not f.endswith(('.vtt', '.srt', '.ass')):
+                downloaded_files.append(filepath)
+        
+        if not downloaded_files:
+            logger.error("Playlist download failed - no files found")
+            if temp_dir:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+            return jsonify({"error": "Playlist download failed - no files created"}), 500
+        
+        logger.info(f"Downloaded {len(downloaded_files)} videos from playlist")
+        
+        # Create ZIP file in memory
+        zip_path = os.path.join(temp_dir, "playlist.zip")
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for filepath in downloaded_files:
+                arcname = os.path.basename(filepath)
+                zipf.write(filepath, arcname)
+        
+        zip_size = os.path.getsize(zip_path)
+        
+        # Build filename
+        safe_title = "".join(c for c in playlist_name if c.isalnum() or c in " -_").strip()
+        if not safe_title:
+            safe_title = "playlist"
+        
+        if resolution:
+            filename = f"{safe_title} ({resolution}).zip"
+        else:
+            filename = f"{safe_title}.zip"
+        
+        from urllib.parse import quote
+        filename_encoded = quote(filename)
+        ascii_filename = "".join(c if ord(c) < 128 else '_' for c in filename)
+        
+        logger.info(f"Playlist ZIP ready: {filename} ({zip_size} bytes, {len(downloaded_files)} videos)")
+        
+        def generate():
+            try:
+                with open(zip_path, "rb") as f:
+                    while True:
+                        chunk = f.read(65536)
+                        if not chunk:
+                            break
+                        yield chunk
+            finally:
+                try:
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    logger.info("Playlist temp files cleaned up")
+                except Exception as e:
+                    logger.error(f"Cleanup error: {e}")
+        
+        headers = {
+            "Content-Disposition": f"attachment; filename=\"{ascii_filename}\"; filename*=UTF-8''{filename_encoded}",
+            "Content-Length": str(zip_size),
+            "Content-Type": "application/zip",
+            "Accept-Ranges": "bytes",
+            "Cache-Control": "no-cache",
+        }
+        
+        return Response(
+            stream_with_context(generate()),
+            mimetype="application/zip",
+            headers=headers
+        )
+        
+    except Exception as e:
+        logger.error(f"Playlist download error: {e}")
+        if temp_dir:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 if __name__ == "__main__":
     print("\n" + "="*60)
     print("YouTube Downloader API")
@@ -461,5 +642,7 @@ if __name__ == "__main__":
     print("  GET /health - Check server status")
     print("  GET /info?url=<youtube_url> - Get video info")
     print("  GET /download?url=<youtube_url>&format=<format> - Download video")
+    print("  GET /playlist-info?url=<playlist_url> - Get playlist info")
+    print("  GET /download-playlist?url=<playlist_url>&format=<format> - Download playlist")
     print("="*60 + "\n")
     app.run(debug=True, port=5000, threaded=True)

@@ -6,13 +6,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="video-thumbnail">
-        <img id="thumbnail-img" src="" alt="Video Thumbnail" style="display: none;">
+    <!-- Playlist Mode UI (hidden by default) -->
+    <div id="playlist-container">
+        <div id="playlist-header">
+            <div id="playlist-icon">📋</div>
+            <div id="playlist-info">
+                <div id="playlist-title">Loading playlist...</div>
+                <div id="playlist-count"></div>
+            </div>
+        </div>
     </div>
-    <div id="video-title">Loading...</div>
-    <div id="channel-row">
-        <span id="channel-name"></span>
-        <span id="video-duration"></span>
+
+    <!-- Video Mode UI -->
+    <div id="video-container">
+        <div id="video-thumbnail">
+            <img id="thumbnail-img" src="" alt="Video Thumbnail" style="display: none;">
+        </div>
+        <div id="video-title">Loading...</div>
+        <div id="channel-row">
+            <span id="channel-name"></span>
+            <span id="video-duration"></span>
+        </div>
     </div>
     
     <div id="quality-container">
