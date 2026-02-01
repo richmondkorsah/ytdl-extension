@@ -8,6 +8,19 @@ const thumbnailImg = document.getElementById("thumbnail-img");
 const subtitleCheckbox = document.getElementById("subtitle-checkbox");
 const subtitleLang = document.getElementById("subtitle-lang");
 
+// Format bytes to human-readable size
+function formatFileSize(bytes) {
+    if (!bytes || bytes <= 0) return null;
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let unitIndex = 0;
+    let size = bytes;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+    }
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+}
+
 // Playlist elements
 const playlistContainer = document.getElementById("playlist-container");
 const videoContainer = document.getElementById("video-container");
@@ -221,7 +234,15 @@ async function loadVideoInfo() {
           codec: quality.codec,
           vcodec: quality.vcodec
         });
-        option.textContent = quality.label;  // Just show "720p", "1080p", etc.
+        
+        // Show quality label with file size if available
+        let label = quality.label;
+        if (quality.filesize) {
+          const sizeStr = formatFileSize(quality.filesize);
+          label += ` (${sizeStr})`;
+        }
+        option.textContent = label;
+        
         // Default to 720p if available, otherwise first option
         if (quality.height === 720) {
           option.selected = true;

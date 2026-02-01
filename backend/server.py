@@ -196,10 +196,14 @@ def info():
             resolutions_seen = set()
             available_qualities = []
             
+            # Track best filesize for each resolution (combine video + audio estimates)
+            resolution_filesizes = {}
+            
             for f in info_dict.get("formats", []):
                 height = f.get("height")
                 vcodec = f.get("vcodec", "none")
                 acodec = f.get("acodec", "none")
+                filesize = f.get("filesize") or f.get("filesize_approx") or 0
                 
                 formats.append({
                     "format_id": f.get("format_id"),
@@ -207,9 +211,15 @@ def info():
                     "resolution": f.get("resolution", "audio only"),
                     "height": height,
                     "filesize": f.get("filesize"),
+                    "filesize_approx": f.get("filesize_approx"),
                     "vcodec": vcodec,
                     "acodec": acodec,
                 })
+                
+                # Track filesize per resolution (video streams)
+                if height and vcodec != "none" and filesize:
+                    if height not in resolution_filesizes or filesize > resolution_filesizes[height]:
+                        resolution_filesizes[height] = filesize
                 
                 # Collect unique video resolutions (with video codec)
                 if height and vcodec != "none":
@@ -232,11 +242,18 @@ def info():
             available_qualities.sort(key=lambda x: x["height"], reverse=True)
             
             # Remove duplicates keeping highest quality codec for each resolution
+            # and add filesize estimates
             unique_qualities = []
             seen_heights = set()
             for q in available_qualities:
                 if q["height"] not in seen_heights:
                     seen_heights.add(q["height"])
+                    # Add filesize estimate for this resolution
+                    if q["height"] in resolution_filesizes:
+                        # Add ~10% for audio stream estimate
+                        video_size = resolution_filesizes[q["height"]]
+                        estimated_total = int(video_size * 1.1)
+                        q["filesize"] = estimated_total
                     unique_qualities.append(q)
             
             logger.info(f"Found {len(unique_qualities)} unique resolutions for: {info_dict.get('title')}")
