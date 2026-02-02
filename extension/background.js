@@ -3,6 +3,130 @@
 
 const SERVER_URL = "http://localhost:5000";
 
+// ==================== LOGGING UTILITIES ====================
+const LOG_PREFIX = "[BG]";
+const LOG_COLORS = {
+    info: "color: #2196F3",
+    success: "color: #4CAF50",
+    warn: "color: #FF9800",
+    error: "color: #F44336",
+    queue: "color: #9C27B0",
+    download: "color: #00BCD4"
+};
+
+// File logging configuration
+const MAX_LOG_ENTRIES = 1000; // Keep last 1000 entries
+let logBuffer = [];
+let logSaveTimeout = null;
+
+// Save logs to storage (debounced)
+async function saveLogsToStorage() {
+    try {
+        await browser.storage.local.set({ extensionLogs: logBuffer });
+    } catch (e) {
+        console.error("Failed to save logs:", e);
+    }
+}
+
+// Debounced save - waits 1 second after last log before saving
+function scheduleSaveLogs() {
+    if (logSaveTimeout) {
+        clearTimeout(logSaveTimeout);
+    }
+    logSaveTimeout = setTimeout(saveLogsToStorage, 1000);
+}
+
+// Load existing logs on startup
+async function loadLogsFromStorage() {
+    try {
+        const data = await browser.storage.local.get("extensionLogs");
+        if (data.extensionLogs && Array.isArray(data.extensionLogs)) {
+            logBuffer = data.extensionLogs;
+            console.log(`[BG] Loaded ${logBuffer.length} existing log entries`);
+        }
+    } catch (e) {
+        console.error("Failed to load logs:", e);
+    }
+}
+
+// Initialize logs
+loadLogsFromStorage();
+
+function log(type, message, ...data) {
+    const now = new Date();
+    const timestamp = now.toISOString().slice(11, 23);
+    const fullTimestamp = now.toISOString();
+    const style = LOG_COLORS[type] || "color: inherit";
+    
+    // Console log
+    if (data.length > 0) {
+        console.log(`%c${LOG_PREFIX} [${timestamp}] [${type.toUpperCase()}] ${message}`, style, ...data);
+    } else {
+        console.log(`%c${LOG_PREFIX} [${timestamp}] [${type.toUpperCase()}] ${message}`, style);
+    }
+    
+    // File log entry
+    const logEntry = {
+        timestamp: fullTimestamp,
+        source: "background",
+        type: type.toUpperCase(),
+        message: message,
+        data: data.length > 0 ? JSON.stringify(data, null, 0) : null
+    };
+    
+    logBuffer.push(logEntry);
+    
+    // Trim if exceeds max entries
+    if (logBuffer.length > MAX_LOG_ENTRIES) {
+        logBuffer = logBuffer.slice(-MAX_LOG_ENTRIES);
+    }
+    
+    // Schedule save
+    scheduleSaveLogs();
+}
+
+function logInfo(message, ...data) { log("info", message, ...data); }
+function logSuccess(message, ...data) { log("success", message, ...data); }
+function logWarn(message, ...data) { log("warn", message, ...data); }
+function logError(message, ...data) { log("error", message, ...data); }
+function logQueue(message, ...data) { log("queue", message, ...data); }
+function logDownload(message, ...data) { log("download", message, ...data); }
+
+// Get all logs (for export)
+function getLogs() {
+    return logBuffer;
+}
+
+// Clear all logs
+async function clearLogs() {
+    logBuffer = [];
+    await browser.storage.local.remove("extensionLogs");
+    return { success: true };
+}
+
+// Export logs as downloadable file
+async function exportLogs() {
+    const logText = logBuffer.map(entry => {
+        const dataStr = entry.data ? ` | ${entry.data}` : "";
+        return `[${entry.timestamp}] [${entry.source.toUpperCase()}] [${entry.type}] ${entry.message}${dataStr}`;
+    }).join("\n");
+    
+    const blob = new Blob([logText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const filename = `yt_downloader_logs_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.txt`;
+    
+    try {
+        await browser.downloads.download({
+            url: url,
+            filename: filename,
+            saveAs: true
+        });
+        return { success: true, filename };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+}
+
 // Cache for video info - keyed by video ID
 const videoInfoCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
@@ -13,21 +137,30 @@ let isProcessingQueue = false;
 
 // Load queue from storage on startup
 async function initializeQueue() {
+    logQueue("Initializing queue from storage...");
     try {
         const data = await browser.storage.local.get("downloadQueue");
         if (data.downloadQueue && Array.isArray(data.downloadQueue)) {
+            const resetCount = data.downloadQueue.filter(i => i.status === "downloading").length;
             // Reset any "downloading" items to "pending" (browser may have restarted)
             downloadQueue = data.downloadQueue.map(item => ({
                 ...item,
                 status: item.status === "downloading" ? "pending" : item.status
             }));
             await saveQueue();
-            console.log("Queue loaded:", downloadQueue.length, "items");
+            logQueue(`Queue loaded: ${downloadQueue.length} items`, {
+                pending: downloadQueue.filter(i => i.status === "pending").length,
+                completed: downloadQueue.filter(i => i.status === "completed").length,
+                failed: downloadQueue.filter(i => i.status === "failed").length,
+                resetFromDownloading: resetCount
+            });
             // Start processing if there are pending items
             processQueue();
+        } else {
+            logQueue("No existing queue found in storage");
         }
     } catch (e) {
-        console.error("Error loading queue:", e);
+        logError("Error loading queue:", e);
     }
 }
 
@@ -35,13 +168,16 @@ async function initializeQueue() {
 async function saveQueue() {
     try {
         await browser.storage.local.set({ downloadQueue: downloadQueue });
+        logQueue(`Queue saved (${downloadQueue.length} items)`);
     } catch (e) {
-        console.error("Error saving queue:", e);
+        logError("Error saving queue:", e);
     }
 }
 
 // Add item to queue
 async function addToQueue(item) {
+    logQueue("Add to queue request:", { id: item.id, title: item.title, videoId: item.videoId, quality: item.qualityLabel });
+    
     // Check for duplicates (same video pending or downloading)
     const exists = downloadQueue.some(q => 
         q.videoId === item.videoId && 
@@ -49,11 +185,14 @@ async function addToQueue(item) {
     );
     
     if (exists) {
+        logWarn("Duplicate video rejected:", item.videoId);
         return { success: false, error: "Video already in queue" };
     }
     
     downloadQueue.push(item);
     await saveQueue();
+    
+    logSuccess(`Added to queue: "${item.title}" (${item.qualityLabel})`, { queueLength: downloadQueue.length });
     
     // Start processing if not already
     processQueue();
@@ -63,21 +202,37 @@ async function addToQueue(item) {
 
 // Remove item from queue
 async function removeFromQueue(id) {
+    logQueue("Remove from queue request:", { id });
     const index = downloadQueue.findIndex(item => item.id === id);
-    if (index !== -1 && downloadQueue[index].status !== "downloading") {
+    if (index !== -1) {
+        const item = downloadQueue[index];
+        if (item.status === "downloading") {
+            logWarn("Cannot remove item - currently downloading:", { id, title: item.title });
+            return { success: false, error: "Cannot remove item while downloading" };
+        }
         downloadQueue.splice(index, 1);
         await saveQueue();
+        logSuccess(`Removed from queue: "${item.title}"`, { id });
         return { success: true };
     }
-    return { success: false, error: "Cannot remove item" };
+    logWarn("Remove failed - item not found:", { id });
+    return { success: false, error: "Item not found" };
 }
 
 // Clear completed/failed items
 async function clearCompletedFromQueue() {
+    const beforeCount = downloadQueue.length;
+    const clearedItems = downloadQueue.filter(item => 
+        item.status === "completed" || item.status === "failed"
+    );
     downloadQueue = downloadQueue.filter(item => 
         item.status === "pending" || item.status === "downloading"
     );
     await saveQueue();
+    logQueue(`Cleared ${clearedItems.length} completed/failed items`, {
+        cleared: clearedItems.map(i => ({ title: i.title, status: i.status })),
+        remaining: downloadQueue.length
+    });
     return { success: true, queueLength: downloadQueue.length };
 }
 
@@ -91,10 +246,18 @@ function getQueueState() {
 
 // Process the download queue
 async function processQueue() {
-    if (isProcessingQueue) return;
+    if (isProcessingQueue) {
+        logQueue("Queue already processing, skipping");
+        return;
+    }
     
-    const nextItem = downloadQueue.find(item => item.status === "pending");
-    if (!nextItem) return;
+    const pendingItems = downloadQueue.filter(item => item.status === "pending");
+    const nextItem = pendingItems[0];
+    
+    if (!nextItem) {
+        logQueue("No pending items in queue");
+        return;
+    }
     
     isProcessingQueue = true;
     nextItem.status = "downloading";
@@ -103,7 +266,13 @@ async function processQueue() {
     // Notify popup of queue update
     notifyPopup();
     
-    console.log("Processing queue item:", nextItem.title);
+    logDownload(`▶ Starting queue download: "${nextItem.title}"`, {
+        id: nextItem.id,
+        quality: nextItem.qualityLabel,
+        pendingRemaining: pendingItems.length - 1
+    });
+    
+    const startTime = Date.now();
     
     try {
         const result = await handleDownload({
@@ -114,16 +283,19 @@ async function processQueue() {
             subtitles: nextItem.subtitles
         });
         
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        
         if (result && result.success) {
             nextItem.status = "completed";
-            console.log("Queue item completed:", nextItem.title);
+            logSuccess(`✓ Queue item completed: "${nextItem.title}" (${elapsed}s)`);
         } else {
             nextItem.status = "failed";
             nextItem.error = (result && result.error) || "Download failed";
-            console.error("Queue item failed:", nextItem.title, nextItem.error);
+            logError(`✗ Queue item failed: "${nextItem.title}"`, { error: nextItem.error, elapsed: `${elapsed}s` });
         }
     } catch (error) {
-        console.error("Queue download error:", error);
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        logError(`✗ Queue download exception: "${nextItem.title}"`, { error: error.message, elapsed: `${elapsed}s`, stack: error.stack });
         nextItem.status = "failed";
         nextItem.error = error.message || "Unknown error";
     }
@@ -135,11 +307,24 @@ async function processQueue() {
     notifyPopup();
     
     // Process next item after a short delay
+    const remainingPending = downloadQueue.filter(i => i.status === "pending").length;
+    if (remainingPending > 0) {
+        logQueue(`Scheduling next download in 500ms (${remainingPending} pending)`);
+    }
     setTimeout(() => processQueue(), 500);
 }
 
 // Notify popup of queue changes
 function notifyPopup() {
+    const stats = {
+        total: downloadQueue.length,
+        pending: downloadQueue.filter(i => i.status === "pending").length,
+        downloading: downloadQueue.filter(i => i.status === "downloading").length,
+        completed: downloadQueue.filter(i => i.status === "completed").length,
+        failed: downloadQueue.filter(i => i.status === "failed").length
+    };
+    logQueue("Notifying popup of queue update", stats);
+    
     browser.runtime.sendMessage({
         type: "QUEUE_UPDATED",
         queue: downloadQueue,
@@ -154,7 +339,8 @@ initializeQueue();
 
 // Listen for messages from popup or content scripts
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Background received message:", message);
+    const source = sender.tab ? `Tab ${sender.tab.id}` : "Popup/Extension";
+    logInfo(`📩 Message received [${message.type}] from ${source}`, message);
 
     if (message.type === "DOWNLOAD_VIDEO") {
         handleDownload(message)
@@ -218,6 +404,44 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return false;
     }
 
+    // ==================== LOG MESSAGES ====================
+    if (message.type === "GET_LOGS") {
+        sendResponse({ success: true, logs: getLogs() });
+        return false;
+    }
+
+    if (message.type === "CLEAR_LOGS") {
+        clearLogs()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "EXPORT_LOGS") {
+        exportLogs()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "ADD_LOG") {
+        // Allow popup to add logs to the shared log buffer
+        const entry = {
+            timestamp: new Date().toISOString(),
+            source: message.source || "popup",
+            type: message.logType || "INFO",
+            message: message.message,
+            data: message.data ? JSON.stringify(message.data, null, 0) : null
+        };
+        logBuffer.push(entry);
+        if (logBuffer.length > MAX_LOG_ENTRIES) {
+            logBuffer = logBuffer.slice(-MAX_LOG_ENTRIES);
+        }
+        scheduleSaveLogs();
+        sendResponse({ success: true });
+        return false;
+    }
+
     return false;
 });
 
@@ -228,7 +452,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (tab.url.includes("youtube.com/watch")) {
             const videoId = extractVideoId(tab.url);
             if (videoId && !getCachedInfo(videoId)) {
-                console.log("Prefetching info for video:", videoId);
+                logInfo(`Tab updated - triggering prefetch for: ${videoId}`);
                 prefetchVideoInfo(tab.url, videoId);
             }
         }
@@ -242,12 +466,13 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
         if (tab.url && tab.url.includes("youtube.com/watch")) {
             const videoId = extractVideoId(tab.url);
             if (videoId && !getCachedInfo(videoId)) {
-                console.log("Prefetching info on tab switch:", videoId);
+                logInfo(`Tab activated - triggering prefetch for: ${videoId}`);
                 prefetchVideoInfo(tab.url, videoId);
             }
         }
     } catch (e) {
         // Tab might not exist anymore
+        logWarn("Tab activation error (tab may not exist):", e.message);
     }
 });
 
@@ -279,12 +504,17 @@ function cleanYouTubeUrl(url) {
 function getCachedInfo(videoId) {
     const cached = videoInfoCache.get(videoId);
     if (cached && !cached.fetching && (Date.now() - cached.timestamp < CACHE_TTL)) {
-        console.log("Cache hit for video:", videoId);
+        logInfo(`Cache HIT for video: ${videoId}`);
         return cached.data;
     }
-    if (cached && !cached.fetching) {
+    if (cached && cached.fetching) {
+        logInfo(`Cache PENDING for video: ${videoId}`);
+    } else if (cached && !cached.fetching) {
         // Expired, remove it
+        logInfo(`Cache EXPIRED for video: ${videoId}`);
         videoInfoCache.delete(videoId);
+    } else {
+        logInfo(`Cache MISS for video: ${videoId}`);
     }
     return null;
 }
@@ -318,16 +548,17 @@ async function prefetchVideoInfo(url, videoId) {
     if (videoInfoCache.has(videoId)) {
         const cached = videoInfoCache.get(videoId);
         if (cached.fetching || (Date.now() - cached.timestamp < CACHE_TTL)) {
+            logInfo(`Skipping prefetch (already ${cached.fetching ? 'fetching' : 'cached'}): ${videoId}`);
             return;
         }
     }
 
     // Mark as fetching to prevent duplicate requests
     videoInfoCache.set(videoId, { fetching: true, timestamp: Date.now() });
+    logInfo(`Starting prefetch for: ${videoId}`);
 
     try {
         const cleanUrl = cleanYouTubeUrl(url);
-        console.log("Prefetching from server:", cleanUrl);
         
         const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
             method: "GET",
@@ -342,16 +573,20 @@ async function prefetchVideoInfo(url, videoId) {
                     timestamp: Date.now(),
                     fetching: false
                 });
-                console.log("Cached info for video:", videoId, data.title);
+                logSuccess(`Prefetch complete: "${data.title}" (${videoId})`, {
+                    qualities: data.available_qualities?.length || 0,
+                    duration: data.duration
+                });
             } else {
-                // Remove failed fetch marker
+                logWarn(`Prefetch returned error for ${videoId}:`, data.error);
                 videoInfoCache.delete(videoId);
             }
         } else {
+            logError(`Prefetch HTTP error for ${videoId}:`, { status: response.status });
             videoInfoCache.delete(videoId);
         }
     } catch (error) {
-        console.error("Prefetch error:", error);
+        logError(`Prefetch exception for ${videoId}:`, { message: error.message });
         videoInfoCache.delete(videoId);
     }
 }
@@ -370,31 +605,37 @@ function sanitizeFilename(name) {
 // Wait for a download to complete
 function waitForDownloadComplete(downloadId) {
     return new Promise((resolve) => {
+        let checkCount = 0;
         const checkDownload = async () => {
+            checkCount++;
             try {
                 const [download] = await browser.downloads.search({ id: downloadId });
                 if (!download) {
+                    logError(`Download ${downloadId} not found after ${checkCount} checks`);
                     resolve({ success: false, error: "Download not found" });
                     return;
                 }
                 
                 if (download.state === "complete") {
-                    console.log("Download completed:", download.filename);
+                    logSuccess(`Download ${downloadId} completed: ${download.filename}`);
                     resolve({ success: true });
                 } else if (download.state === "interrupted") {
-                    console.log("Download interrupted:", download.error);
+                    logError(`Download ${downloadId} interrupted:`, download.error);
                     resolve({ success: false, error: download.error || "Download interrupted" });
                 } else {
                     // Still in progress, check again
+                    if (checkCount % 10 === 0) {
+                        logDownload(`Download ${downloadId} still in progress (check #${checkCount})...`);
+                    }
                     setTimeout(checkDownload, 1000);
                 }
             } catch (e) {
-                console.error("Error checking download:", e);
+                logError(`Error checking download ${downloadId}:`, e.message);
                 resolve({ success: false, error: e.message });
             }
         };
         
-        // Start checking
+        logDownload(`Waiting for download ${downloadId} to complete...`);
         checkDownload();
     });
 }
@@ -405,8 +646,13 @@ async function handleDownload(message) {
     
     // Clean the URL first
     const cleanUrl = cleanYouTubeUrl(url);
-    console.log("Clean URL:", cleanUrl);
-    console.log("Quality data:", quality);
+    logDownload("Processing download request", {
+        title: videoTitle,
+        channel: channelName,
+        url: cleanUrl,
+        quality: quality,
+        subtitles: subtitles
+    });
 
     // Build yt-dlp format string based on quality selection
     let format;
@@ -444,18 +690,19 @@ async function handleDownload(message) {
 
     try {
         // First check if server is running
-        console.log("Checking server health...");
+        logInfo("Checking server health...");
         const healthCheck = await fetch(`${SERVER_URL}/health`, {
             method: "GET",
             mode: "cors",
         });
         
         if (!healthCheck.ok) {
+            logError("Server health check failed", { status: healthCheck.status });
             throw new Error("Flask server is not responding. Please start it: python backend/server.py");
         }
         
         const healthData = await healthCheck.json();
-        console.log("Server health:", healthData);
+        logSuccess("Server health OK", healthData);
 
         // Build download URL with all metadata
         const params = new URLSearchParams({
@@ -474,7 +721,7 @@ async function handleDownload(message) {
         
         const downloadUrl = `${SERVER_URL}/download?${params.toString()}`;
         
-        console.log("Starting download from:", downloadUrl);
+        logDownload("Starting download", { url: downloadUrl, filename: filename });
 
         // Build filename: "Title - Channel (Resolution, Codec).mp4"
         let filename = sanitizeFilename(videoTitle || "video");
@@ -496,7 +743,7 @@ async function handleDownload(message) {
             saveAs: false
         });
         
-        console.log("Download started with ID:", downloadId);
+        logDownload(`Browser download initiated (ID: ${downloadId})`, { filename });
 
         // Wait for download to complete (for queue tracking)
         const downloadResult = await waitForDownloadComplete(downloadId);
@@ -507,11 +754,13 @@ async function handleDownload(message) {
             return { success: false, error: downloadResult.error || "Download failed" };
         }
     } catch (error) {
-        console.error("Download error:", error);
+        logError("Download error", { message: error.message, stack: error.stack });
         
         // Provide helpful error messages
         if (error.message.includes("NetworkError") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
-            throw new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
+            const networkError = new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
+            logError("Network error - server unreachable");
+            throw networkError;
         }
         
         throw error;
@@ -522,8 +771,12 @@ async function handleDownload(message) {
 async function handlePlaylistDownload(message) {
     const { url, quality, playlistTitle, subtitles } = message;
     
-    console.log("Starting playlist download:", playlistTitle);
-    console.log("Quality:", quality);
+    logDownload("Starting playlist download", {
+        title: playlistTitle,
+        url: url,
+        quality: quality,
+        subtitles: subtitles
+    });
 
     // Build yt-dlp format string based on quality selection
     let format;
@@ -558,15 +811,17 @@ async function handlePlaylistDownload(message) {
 
     try {
         // Check if server is running
-        console.log("Checking server health...");
+        logInfo("Checking server health for playlist download...");
         const healthCheck = await fetch(`${SERVER_URL}/health`, {
             method: "GET",
             mode: "cors",
         });
         
         if (!healthCheck.ok) {
+            logError("Server health check failed for playlist", { status: healthCheck.status });
             throw new Error("Flask server is not responding. Please start it: python backend/server.py");
         }
+        logSuccess("Server health OK for playlist download");
 
         // Build download URL for playlist
         const params = new URLSearchParams({
@@ -583,7 +838,7 @@ async function handlePlaylistDownload(message) {
         
         const downloadUrl = `${SERVER_URL}/download-playlist?${params.toString()}`;
         
-        console.log("Starting playlist download from:", downloadUrl);
+        logDownload("Starting playlist download", { url: downloadUrl, filename: filename });
 
         // Build filename for ZIP
         let filename = sanitizeFilename(playlistTitle || "playlist");
@@ -599,13 +854,14 @@ async function handlePlaylistDownload(message) {
             saveAs: false
         });
         
-        console.log("Playlist download started with ID:", downloadId);
+        logDownload(`Playlist download initiated (ID: ${downloadId})`, { filename });
 
         return { success: true, message: "Playlist download started! Videos will be saved as a ZIP file." };
     } catch (error) {
-        console.error("Playlist download error:", error);
+        logError("Playlist download error", { message: error.message, stack: error.stack });
         
         if (error.message.includes("NetworkError") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+            logError("Network error - server unreachable for playlist");
             throw new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
         }
         
@@ -621,17 +877,25 @@ browser.runtime.onInstalled.addListener((details) => {
 // Monitor download progress
 browser.downloads.onChanged.addListener((delta) => {
     if (delta.state) {
-        console.log(`Download ${delta.id} state: ${delta.state.current}`);
-        if (delta.state.current === "complete") {
-            console.log("Download completed successfully!");
-        } else if (delta.state.current === "interrupted") {
-            console.error("Download was interrupted");
+        const state = delta.state.current;
+        if (state === "complete") {
+            logSuccess(`Download ${delta.id} completed successfully!`);
+        } else if (state === "interrupted") {
+            logError(`Download ${delta.id} was interrupted`);
+        } else {
+            logDownload(`Download ${delta.id} state: ${state}`);
         }
     }
+    if (delta.bytesReceived && delta.totalBytes) {
+        const percent = ((delta.bytesReceived.current / delta.totalBytes.current) * 100).toFixed(1);
+        logDownload(`Download ${delta.id} progress: ${percent}%`);
+    }
     if (delta.error) {
-        console.error(`Download ${delta.id} error:`, delta.error.current);
+        logError(`Download ${delta.id} error:`, delta.error.current);
     }
 });
 
-console.log("Background script loaded");
-console.log("Flask server URL:", SERVER_URL);
+logInfo("═══════════════════════════════════════");
+logInfo("Background script loaded");
+logInfo(`Flask server URL: ${SERVER_URL}`);
+logInfo("═══════════════════════════════════════");

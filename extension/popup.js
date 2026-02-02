@@ -1,3 +1,95 @@
+// ==================== LOGGING UTILITIES ====================
+const LOG_PREFIX = "[POPUP]";
+const LOG_COLORS = {
+    info: "color: #2196F3",
+    success: "color: #4CAF50",
+    warn: "color: #FF9800",
+    error: "color: #F44336",
+    queue: "color: #9C27B0",
+    ui: "color: #607D8B"
+};
+
+// Send log to background script for file storage
+async function sendLogToBackground(type, message, data) {
+    try {
+        await browser.runtime.sendMessage({
+            type: "ADD_LOG",
+            source: "popup",
+            logType: type.toUpperCase(),
+            message: message,
+            data: data && data.length > 0 ? data : null
+        });
+    } catch (e) {
+        // Background might not be ready, ignore
+    }
+}
+
+function log(type, message, ...data) {
+    const timestamp = new Date().toISOString().slice(11, 23);
+    const style = LOG_COLORS[type] || "color: inherit";
+    
+    // Console log
+    if (data.length > 0) {
+        console.log(`%c${LOG_PREFIX} [${timestamp}] [${type.toUpperCase()}] ${message}`, style, ...data);
+    } else {
+        console.log(`%c${LOG_PREFIX} [${timestamp}] [${type.toUpperCase()}] ${message}`, style);
+    }
+    
+    // Send to background for file storage
+    sendLogToBackground(type, message, data);
+}
+
+function logInfo(message, ...data) { log("info", message, ...data); }
+function logSuccess(message, ...data) { log("success", message, ...data); }
+function logWarn(message, ...data) { log("warn", message, ...data); }
+function logError(message, ...data) { log("error", message, ...data); }
+function logQueue(message, ...data) { log("queue", message, ...data); }
+function logUI(message, ...data) { log("ui", message, ...data); }
+
+// Export logs to file
+async function exportLogs() {
+    try {
+        const result = await browser.runtime.sendMessage({ type: "EXPORT_LOGS" });
+        if (result.success) {
+            logSuccess("Logs exported to: " + result.filename);
+        } else {
+            logError("Failed to export logs: " + result.error);
+        }
+        return result;
+    } catch (e) {
+        logError("Export error: " + e.message);
+        return { success: false, error: e.message };
+    }
+}
+
+// Clear all logs
+async function clearAllLogs() {
+    try {
+        const result = await browser.runtime.sendMessage({ type: "CLEAR_LOGS" });
+        if (result.success) {
+            logInfo("Logs cleared");
+        }
+        return result;
+    } catch (e) {
+        logError("Clear logs error: " + e.message);
+        return { success: false, error: e.message };
+    }
+}
+
+// Get current log count
+async function getLogCount() {
+    try {
+        const result = await browser.runtime.sendMessage({ type: "GET_LOGS" });
+        return result.logs ? result.logs.length : 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+logInfo("═══════════════════════════════════════");
+logInfo("Popup script initializing...");
+logInfo("═══════════════════════════════════════");
+
 const downloadBtn = document.getElementById("download-btn");
 const qualitySelect = document.getElementById("quality-select");
 const status = document.getElementById("status");
@@ -28,7 +120,8 @@ let queueCollapsed = false;
 // Check if queue UI elements exist (only check essential elements)
 const queueEnabled = !!(addToQueueBtn && queueList && queueSection);
 
-console.log("Queue enabled:", queueEnabled, {
+logUI("Queue UI elements check:", {
+  enabled: queueEnabled,
   addToQueueBtn: !!addToQueueBtn,
   queueList: !!queueList,
   queueSection: !!queueSection,
@@ -114,25 +207,33 @@ function formatDuration(seconds) {
 }
 
 async function loadVideoInfo() {
+  logInfo("Loading video info...");
   try {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    logInfo("Active tab:", { url: tab.url, id: tab.id });
 
     // Check if it's a playlist page
     const playlistId = extractPlaylistId(tab.url);
     const videoId = extractVideoId(tab.url);
     
+    logInfo("URL analysis:", { playlistId, videoId, isPlaylistPage: tab.url.includes("youtube.com/playlist"), isVideoPage: tab.url.includes("youtube.com/watch") });
+    
     // Playlist page (not watching a video in playlist)
     if (tab.url.includes("youtube.com/playlist") && playlistId) {
+      logInfo("Detected playlist page, loading playlist info...");
       await loadPlaylistInfo(tab.url, playlistId);
       return;
     }
     
     // Video page (may or may not be part of a playlist)
     if (!tab.url.includes("youtube.com/watch")) {
+      logWarn("Not a YouTube video page");
       videoTitleElement.textContent = "Not a YouTube video page";
       downloadBtn.disabled = true;
       return;
     }
+
+    logInfo("Detected video page, loading video info...");
 
     // Show video mode UI
     isPlaylistMode = false;
@@ -150,11 +251,13 @@ async function loadVideoInfo() {
     // Get basic info from content script first (for quick display)
     let contentResponse = null;
     try {
+      logInfo("Requesting video info from content script...");
       contentResponse = await browser.tabs.sendMessage(tab.id, {
         type: "GET_VIDEO_INFO"
       });
+      logSuccess("Content script response:", contentResponse);
     } catch (e) {
-      console.log("Content script not ready yet");
+      logWarn("Content script not ready:", e.message);
     }
 
     if (contentResponse) {
@@ -194,16 +297,19 @@ async function loadVideoInfo() {
     let infoData = null;
     if (videoId) {
       try {
+        logInfo("Checking for cached video info...");
         const cachedInfo = await browser.runtime.sendMessage({
           type: "GET_CACHED_INFO",
           videoId: videoId
         });
         if (cachedInfo && cachedInfo.success) {
-          console.log("Using cached video info!");
+          logSuccess("Using cached video info!", { title: cachedInfo.title, qualities: cachedInfo.available_qualities?.length });
           infoData = cachedInfo;
+        } else {
+          logInfo("No cached info available");
         }
       } catch (e) {
-        console.log("No cached info available");
+        logWarn("Cache check error:", e.message);
       }
     }
 
@@ -211,6 +317,7 @@ async function loadVideoInfo() {
     if (!infoData) {
       const cleanUrl = cleanYouTubeUrl(tab.url);
       try {
+        logInfo("Fetching video info from server...", { url: cleanUrl });
         status.textContent = "Loading better qualities...";
         status.style.color = "#888";
         // Use AbortController for timeout
@@ -222,8 +329,9 @@ async function loadVideoInfo() {
         });
         clearTimeout(timeoutId);
         infoData = await infoResponse.json();
+        logSuccess("Server response received", { success: infoData.success, title: infoData.title, qualities: infoData.available_qualities?.length });
       } catch (serverError) {
-        console.error("Server error:", serverError);
+        logError("Server error:", { name: serverError.name, message: serverError.message });
         if (serverError.name === 'AbortError') {
           status.textContent = "Couldn't load qualities. Using defaults.";
         } else {
@@ -408,8 +516,12 @@ downloadBtn.addEventListener("click", async () => {
   
   if (isPlaylistMode) {
     // Playlist download
-    if (!currentPlaylistInfo) return;
+    if (!currentPlaylistInfo) {
+      logWarn("No playlist info available");
+      return;
+    }
     
+    logInfo("Starting playlist download", { title: currentPlaylistInfo.title, quality: qualityData });
     status.textContent = "Starting playlist download...";
     downloadBtn.textContent = "Downloading...";
     
@@ -423,13 +535,14 @@ downloadBtn.addEventListener("click", async () => {
       });
       
       if (response.success) {
+        logSuccess("Playlist download started", response);
         status.textContent = "Playlist download started! Check your downloads.";
         status.style.color = "#4CAF50";
       } else {
         throw new Error(response.error || "Download failed");
       }
     } catch (error) {
-      console.error("Playlist download error:", error);
+      logError("Playlist download error:", { message: error.message });
       status.textContent = "Error: " + error.message;
       status.style.color = "#f44336";
     } finally {
@@ -442,8 +555,12 @@ downloadBtn.addEventListener("click", async () => {
     }
   } else {
     // Single video download
-    if (!currentVideoInfo) return;
+    if (!currentVideoInfo) {
+      logWarn("No video info available");
+      return;
+    }
     
+    logInfo("Starting video download", { title: currentVideoInfo.videoTitle, quality: qualityData, subtitles: subtitleCheckbox.checked ? subtitleLang.value : null });
     status.textContent = "Downloading...";
     downloadBtn.textContent = "Downloading...";
 
@@ -458,13 +575,14 @@ downloadBtn.addEventListener("click", async () => {
       });
       
       if (response.success) {
+        logSuccess("Video download started", response);
         status.textContent = "Download started! Check your downloads.";
         status.style.color = "#4CAF50";
       } else {
         throw new Error(response.error || "Download failed");
       }
     } catch (error) {
-      console.error("Download error:", error);
+      logError("Video download error:", { message: error.message });
       status.textContent = "Error: " + error.message;
       status.style.color = "#f44336";
     } finally {
@@ -487,12 +605,15 @@ function generateQueueId() {
 
 // Add video to download queue (via background script)
 async function addToQueue() {
+  logQueue("Add to queue button clicked");
+  
   if (!queueEnabled) {
-    console.error("Queue UI elements not found");
+    logError("Queue UI elements not found");
     return;
   }
   
   if (!currentVideoInfo || isPlaylistMode) {
+    logWarn("Cannot add to queue:", { hasVideoInfo: !!currentVideoInfo, isPlaylistMode });
     status.textContent = "No video to add to queue";
     status.style.color = "#f44336";
     setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
@@ -501,6 +622,7 @@ async function addToQueue() {
   
   const selectedValue = qualitySelect.value;
   if (!selectedValue) {
+    logWarn("No quality selected");
     status.textContent = "Please select a quality first";
     status.style.color = "#f44336";
     setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
@@ -533,24 +655,31 @@ async function addToQueue() {
     addedAt: Date.now()
   };
   
+  logQueue("Queue item created:", queueItem);
+  
   try {
     // Send to background script
+    logQueue("Sending ADD_TO_QUEUE message to background...");
     const result = await browser.runtime.sendMessage({
       type: "ADD_TO_QUEUE",
       item: queueItem
     });
     
+    logQueue("ADD_TO_QUEUE response:", result);
+    
     if (result && result.success) {
+      logSuccess(`Added to queue: "${queueItem.title}"`);
       status.textContent = "Added to queue!";
       status.style.color = "#4CAF50";
       // Refresh queue display
       loadQueueFromBackground();
     } else {
+      logWarn("Add to queue failed:", result?.error);
       status.textContent = result?.error || "Failed to add to queue";
       status.style.color = "#ff9800";
     }
   } catch (error) {
-    console.error("Error adding to queue:", error);
+    logError("Error adding to queue:", { message: error.message, stack: error.stack });
     status.textContent = "Error adding to queue";
     status.style.color = "#f44336";
   }
@@ -564,11 +693,18 @@ async function addToQueue() {
 // Render the queue UI
 function renderQueue() {
   if (!queueEnabled) {
-    console.log("Queue not enabled, skipping render");
+    logWarn("Queue not enabled, skipping render");
     return;
   }
   
-  console.log("Rendering queue with", downloadQueue.length, "items");
+  const stats = {
+    total: downloadQueue.length,
+    pending: downloadQueue.filter(i => i.status === "pending").length,
+    downloading: downloadQueue.filter(i => i.status === "downloading").length,
+    completed: downloadQueue.filter(i => i.status === "completed").length,
+    failed: downloadQueue.filter(i => i.status === "failed").length
+  };
+  logUI("Rendering queue", stats);
   
   // Update badge count
   if (queueBadge) {
@@ -672,39 +808,51 @@ function renderQueue() {
 
 // Remove item from queue (via background script)
 async function removeFromQueue(id) {
+  logQueue(`Removing item from queue: ${id}`);
   try {
     const result = await browser.runtime.sendMessage({
       type: "REMOVE_FROM_QUEUE",
       id: id
     });
+    logQueue("Remove result:", result);
     if (result && result.success) {
+      logSuccess(`Removed from queue: ${id}`);
       loadQueueFromBackground();
+    } else {
+      logWarn("Remove failed:", result?.error);
     }
   } catch (error) {
-    console.error("Error removing from queue:", error);
+    logError("Error removing from queue:", { message: error.message });
   }
 }
 
 // Clear completed/failed items from queue (via background script)
 async function clearCompletedFromQueue() {
+  logQueue("Clearing completed/failed items...");
   try {
     const result = await browser.runtime.sendMessage({
       type: "CLEAR_COMPLETED"
     });
+    logQueue("Clear result:", result);
     if (result && result.success) {
+      logSuccess(`Queue cleared, ${result.queueLength} items remaining`);
       loadQueueFromBackground();
     }
   } catch (error) {
-    console.error("Error clearing queue:", error);
+    logError("Error clearing queue:", { message: error.message });
   }
 }
 
 // Load queue from background script
 async function loadQueueFromBackground() {
   try {
-    console.log("Loading queue from background...");
+    logQueue("Loading queue from background...");
     const state = await browser.runtime.sendMessage({ type: "GET_QUEUE" });
-    console.log("Got queue state:", state);
+    logQueue("Got queue state from background:", { 
+      queueLength: state?.queue?.length || 0, 
+      isProcessing: state?.isProcessing,
+      items: state?.queue?.map(i => ({ id: i.id, title: i.title?.substring(0, 30), status: i.status }))
+    });
     if (state && state.queue) {
       downloadQueue = state.queue;
       isProcessingQueue = state.isProcessing;
@@ -714,7 +862,7 @@ async function loadQueueFromBackground() {
     }
     renderQueue();
   } catch (error) {
-    console.error("Error loading queue from background:", error);
+    logError("Error loading queue from background:", { message: error.message });
     downloadQueue = [];
     renderQueue();
   }
@@ -723,6 +871,11 @@ async function loadQueueFromBackground() {
 // Listen for queue updates from background script
 browser.runtime.onMessage.addListener((message) => {
   if (message.type === "QUEUE_UPDATED") {
+    logQueue("📩 Received QUEUE_UPDATED from background", {
+      queueLength: message.queue?.length || 0,
+      isProcessing: message.isProcessing,
+      items: message.queue?.map(i => ({ title: i.title?.substring(0, 25), status: i.status }))
+    });
     downloadQueue = message.queue || [];
     isProcessingQueue = message.isProcessing || false;
     renderQueue();
@@ -732,11 +885,13 @@ browser.runtime.onMessage.addListener((message) => {
 // Load queue from browser storage (for collapsed state)
 async function loadQueueFromStorage() {
   try {
+    logUI("Loading queue settings from storage...");
     const data = await browser.storage.local.get(["queueCollapsed"]);
     
     // Restore collapsed state
     if (data.queueCollapsed !== undefined) {
       queueCollapsed = data.queueCollapsed;
+      logUI("Queue collapsed state:", queueCollapsed);
       if (queueListContainer) {
         queueListContainer.classList.toggle("collapsed", queueCollapsed);
       }
@@ -748,7 +903,7 @@ async function loadQueueFromStorage() {
     // Load actual queue from background script
     await loadQueueFromBackground();
   } catch (e) {
-    console.error("Error loading queue:", e);
+    logError("Error loading queue settings:", { message: e.message });
     renderQueue();
   }
 }
@@ -768,7 +923,7 @@ function toggleQueue() {
 
 // Event listeners for queue
 if (queueEnabled) {
-  console.log("Setting up queue event listeners");
+  logUI("Setting up queue event listeners...");
   
   addToQueueBtn.addEventListener("click", addToQueue);
   
@@ -793,14 +948,63 @@ if (queueEnabled) {
     });
   }
   
+  logSuccess("Queue event listeners ready");
+  
   // Load queue on popup open
   loadQueueFromStorage();
 } else {
-  console.warn("Queue UI elements not found - queue disabled");
+  logWarn("Queue UI elements not found - queue disabled");
   // Hide queue section if elements are missing
   if (queueSection) {
     queueSection.style.display = "none";
   }
 }
 
+// ==================== LOG CONTROLS ====================
+const exportLogsBtn = document.getElementById("export-logs-btn");
+const clearLogsBtn = document.getElementById("clear-logs-btn");
+const logCountEl = document.getElementById("log-count");
+
+// Update log count display
+async function updateLogCount() {
+  const count = await getLogCount();
+  if (logCountEl) {
+    logCountEl.textContent = count;
+  }
+}
+
+// Set up log control event listeners
+if (exportLogsBtn) {
+  exportLogsBtn.addEventListener("click", async () => {
+    exportLogsBtn.disabled = true;
+    exportLogsBtn.textContent = "📤 Exporting...";
+    const result = await exportLogs();
+    exportLogsBtn.disabled = false;
+    exportLogsBtn.textContent = "📤 Export";
+    if (result.success) {
+      status.textContent = "Logs exported!";
+      status.style.color = "#4CAF50";
+      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
+    }
+  });
+}
+
+if (clearLogsBtn) {
+  clearLogsBtn.addEventListener("click", async () => {
+    if (confirm("Clear all logs? This cannot be undone.")) {
+      const result = await clearAllLogs();
+      if (result.success) {
+        updateLogCount();
+        status.textContent = "Logs cleared!";
+        status.style.color = "#4CAF50";
+        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
+      }
+    }
+  });
+}
+
+// Update log count on popup open
+updateLogCount();
+
+logInfo("Loading video info...");
 loadVideoInfo();

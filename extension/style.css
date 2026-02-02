@@ -591,3 +591,72 @@ body {
     cursor: not-allowed;
 }
 
+/* ==================== LOG SECTION ==================== */
+#log-section {
+    margin-top: 12px;
+    padding: 10px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+#log-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+#log-icon {
+    font-size: 14px;
+}
+
+#log-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ccc;
+}
+
+#log-count {
+    background: #444;
+    color: #aaa;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+#log-controls {
+    display: flex;
+    gap: 8px;
+}
+
+#log-controls button {
+    flex: 1;
+    background: #333;
+    color: #ccc;
+    border: 1px solid #444;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#log-controls button:hover {
+    background: #444;
+    color: #fff;
+    border-color: #555;
+}
+
+#export-logs-btn:hover {
+    background: #2d4a5c;
+    border-color: #2196F3;
+}
+
+#clear-logs-btn:hover {
+    background: #4a2d2d;
+    border-color: #F44336;
+}
+
