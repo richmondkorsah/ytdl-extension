@@ -245,6 +245,44 @@ def get_log_file():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+def format_timestamp(seconds):
+    """Format seconds to HH:MM:SS or MM:SS"""
+    if seconds is None:
+        return "00:00"
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+    return f"{minutes:02d}:{secs:02d}"
+
+
+def extract_chapters(info_dict):
+    """Extract chapter information from video metadata"""
+    chapters_raw = info_dict.get("chapters", [])
+    
+    if not chapters_raw:
+        logger.info("No chapters found in video")
+        return None
+    
+    chapters = []
+    for i, ch in enumerate(chapters_raw):
+        chapter = {
+            "index": i,
+            "title": ch.get("title", f"Chapter {i + 1}"),
+            "start_time": ch.get("start_time", 0),
+            "end_time": ch.get("end_time", 0),
+            "start_formatted": format_timestamp(ch.get("start_time")),
+            "end_formatted": format_timestamp(ch.get("end_time")),
+            "duration": (ch.get("end_time", 0) - ch.get("start_time", 0)),
+            "duration_formatted": format_timestamp(ch.get("end_time", 0) - ch.get("start_time", 0))
+        }
+        chapters.append(chapter)
+    
+    logger.info(f"Extracted {len(chapters)} chapters from video")
+    return chapters
+
+
 @app.route("/info", methods=["GET"])
 def info():
     """Get video metadata without downloading"""
@@ -353,7 +391,8 @@ def info():
                 "view_count": info_dict.get("view_count"),
                 "upload_date": info_dict.get("upload_date"),
                 "formats": formats,
-                "available_qualities": unique_qualities
+                "available_qualities": unique_qualities,
+                "chapters": extract_chapters(info_dict)
             }
             
             # Cache the result

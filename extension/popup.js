@@ -126,6 +126,13 @@ const historyFooter = document.getElementById("history-footer");
 const historyStats = document.getElementById("history-stats");
 const retryAllBtn = document.getElementById("retry-all-btn");
 
+// Chapters elements
+const chaptersSection = document.getElementById("chapters-section");
+const chaptersList = document.getElementById("chapters-list");
+const chaptersBadge = document.getElementById("chapters-badge");
+const toggleChaptersBtn = document.getElementById("toggle-chapters-btn");
+const chaptersListContainer = document.getElementById("chapters-list-container");
+
 // Download queue state
 let downloadQueue = [];
 let isProcessingQueue = false;
@@ -135,9 +142,14 @@ let queueCollapsed = false;
 let downloadHistory = [];
 let historyCollapsed = true;
 
+// Chapters state
+let videoChapters = [];
+let chaptersCollapsed = false;
+
 // Check if queue UI elements exist (only check essential elements)
 const queueEnabled = !!(addToQueueBtn && queueList && queueSection);
 const historyEnabled = !!(historySection && historyList);
+const chaptersEnabled = !!(chaptersSection && chaptersList);
 
 logUI("Queue UI elements check:", {
   enabled: queueEnabled,
@@ -396,6 +408,15 @@ async function loadVideoInfo() {
           }
         };
         thumbnailImg.src = infoData.thumbnail;
+      }
+      
+      // Handle chapters
+      if (infoData.chapters && infoData.chapters.length > 0) {
+        videoChapters = infoData.chapters;
+        renderChapters();
+      } else {
+        videoChapters = [];
+        hideChapters();
       }
       
       // Populate quality dropdown with actual available qualities
@@ -1241,6 +1262,102 @@ async function loadHistorySettings() {
   }
 }
 
+// ==================== CHAPTERS SYSTEM ====================
+
+// Render chapters UI
+function renderChapters() {
+  if (!chaptersEnabled || !videoChapters || videoChapters.length === 0) {
+    hideChapters();
+    return;
+  }
+  
+  logUI("Rendering chapters", { count: videoChapters.length });
+  
+  // Show chapters section
+  chaptersSection.classList.remove("hidden");
+  
+  // Update badge
+  if (chaptersBadge) {
+    chaptersBadge.textContent = videoChapters.length;
+  }
+  
+  // Render chapter items
+  chaptersList.innerHTML = "";
+  
+  for (const chapter of videoChapters) {
+    const chapterEl = document.createElement("div");
+    chapterEl.className = "chapter-item";
+    chapterEl.dataset.index = chapter.index;
+    chapterEl.dataset.startTime = chapter.start_time;
+    chapterEl.dataset.endTime = chapter.end_time;
+    
+    chapterEl.innerHTML = `
+      <div class="chapter-time">${chapter.start_formatted}</div>
+      <div class="chapter-info">
+        <div class="chapter-title">${escapeHtml(chapter.title)}</div>
+        <div class="chapter-duration">${chapter.duration_formatted}</div>
+      </div>
+    `;
+    
+    // Click to seek (opens YouTube at timestamp)
+    chapterEl.addEventListener("click", () => {
+      openChapterInYouTube(chapter.start_time);
+    });
+    
+    chaptersList.appendChild(chapterEl);
+  }
+}
+
+// Hide chapters section
+function hideChapters() {
+  if (chaptersSection) {
+    chaptersSection.classList.add("hidden");
+  }
+  videoChapters = [];
+}
+
+// Open YouTube video at specific timestamp
+async function openChapterInYouTube(startTime) {
+  if (!currentVideoInfo || !currentVideoInfo.videoId) {
+    logWarn("No video info available");
+    return;
+  }
+  
+  const url = `https://www.youtube.com/watch?v=${currentVideoInfo.videoId}&t=${Math.floor(startTime)}s`;
+  
+  try {
+    // Get the active tab
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    if (tabs[0] && tabs[0].url && tabs[0].url.includes("youtube.com/watch")) {
+      // Update the current YouTube tab
+      await browser.tabs.update(tabs[0].id, { url: url });
+    } else {
+      // Open in new tab if not on YouTube
+      await browser.tabs.create({ url: url });
+    }
+  } catch (e) {
+    logError("Error opening chapter:", { message: e.message });
+  }
+}
+
+// Toggle chapters collapse
+function toggleChapters() {
+  chaptersCollapsed = !chaptersCollapsed;
+  if (chaptersListContainer) {
+    chaptersListContainer.classList.toggle("collapsed", chaptersCollapsed);
+  }
+  if (toggleChaptersBtn) {
+    toggleChaptersBtn.classList.toggle("collapsed", chaptersCollapsed);
+  }
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Event listeners for queue
 if (queueEnabled) {
   logUI("Setting up queue event listeners...");
@@ -1318,6 +1435,30 @@ if (historyEnabled) {
   if (historySection) {
     historySection.style.display = "none";
   }
+}
+
+// Event listeners for chapters
+if (chaptersEnabled) {
+  logUI("Setting up chapters event listeners...");
+  
+  if (toggleChaptersBtn) {
+    toggleChaptersBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleChapters();
+    });
+  }
+  
+  // Click header to toggle (except buttons)
+  const chaptersHeader = document.getElementById("chapters-header");
+  if (chaptersHeader) {
+    chaptersHeader.addEventListener("click", (e) => {
+      if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
+        toggleChapters();
+      }
+    });
+  }
+  
+  logSuccess("Chapters event listeners ready");
 }
 
 // ==================== LOG CONTROLS ====================

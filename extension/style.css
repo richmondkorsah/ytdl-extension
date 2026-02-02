@@ -47,6 +47,160 @@ body {
     display: block;
 }
 
+/* ==================== CHAPTERS SECTION ==================== */
+#chapters-section {
+    margin: 10px 0;
+    padding: 8px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+#chapters-section.hidden {
+    display: none;
+}
+
+#chapters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+#chapters-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#chapters-icon {
+    font-size: 14px;
+}
+
+#chapters-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ccc;
+}
+
+#chapters-badge {
+    background: #4CAF50;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+}
+
+#chapters-header-right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+#toggle-chapters-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 6px;
+    transition: transform 0.2s ease;
+}
+
+#toggle-chapters-btn.collapsed {
+    transform: rotate(-90deg);
+}
+
+#chapters-list-container {
+    max-height: 180px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+    margin-top: 8px;
+}
+
+#chapters-list-container.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0;
+}
+
+#chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chapter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background: #2a2a2a;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid #4CAF50;
+}
+
+.chapter-item:hover {
+    background: #363636;
+    border-left-color: #81C784;
+}
+
+.chapter-time {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11px;
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.15);
+    padding: 3px 6px;
+    border-radius: 4px;
+    min-width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.chapter-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.chapter-title {
+    font-size: 12px;
+    color: #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chapter-duration {
+    font-size: 10px;
+    color: #777;
+    margin-top: 1px;
+}
+
+/* Scrollbar for chapters list */
+#chapters-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chapters-list-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 3px;
+}
+
+#chapters-list-container::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+
+#chapters-list-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 #quality-container {
     display: flex;
     align-items: center;
