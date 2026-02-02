@@ -56,8 +56,82 @@
         </select>
     </div>
     
-    <button id="download-btn" disabled>Download</button>
+    <div id="button-row">
+        <button id="download-btn" disabled>
+            <span class="btn-icon">⬇️</span>
+            <span class="btn-text">Download</span>
+        </button>
+        <button id="add-to-queue-btn" disabled title="Add to download queue">
+            <span class="btn-icon">+</span>
+        </button>
+    </div>
     <div id="status"></div>
+    
+    <!-- Download Queue Section -->
+    <div id="queue-section">
+        <div id="queue-header">
+            <div id="queue-header-left">
+                <span id="queue-icon">📥</span>
+                <span id="queue-title">Queue</span>
+                <span id="queue-badge">0</span>
+            </div>
+            <div id="queue-header-right">
+                <button id="clear-queue-btn" title="Clear completed">Clear</button>
+                <button id="toggle-queue-btn" title="Toggle queue">▼</button>
+            </div>
+        </div>
+        <div id="queue-list-container">
+            <div id="queue-empty">
+                <span class="empty-icon">📭</span>
+                <span class="empty-text">Queue is empty</span>
+                <span class="empty-hint">Add videos to download them sequentially</span>
+            </div>
+            <div id="queue-list"></div>
+        </div>
+        <div id="queue-footer">
+            <span id="queue-stats"></span>
+        </div>
+    </div>
+    
+    <!-- Download History Section -->
+    <div id="history-section">
+        <div id="history-header">
+            <div id="history-header-left">
+                <span id="history-icon">📜</span>
+                <span id="history-title">History</span>
+                <span id="history-badge">0</span>
+            </div>
+            <div id="history-header-right">
+                <button id="retry-all-btn" title="Retry all failed" class="hidden">🔄 Retry All</button>
+                <button id="clear-history-btn" title="Clear history">Clear</button>
+                <button id="toggle-history-btn" title="Toggle history">▼</button>
+            </div>
+        </div>
+        <div id="history-list-container" class="collapsed">
+            <div id="history-empty">
+                <span class="empty-icon">📭</span>
+                <span class="empty-text">No download history</span>
+                <span class="empty-hint">Completed and failed downloads will appear here</span>
+            </div>
+            <div id="history-list"></div>
+        </div>
+        <div id="history-footer">
+            <span id="history-stats"></span>
+        </div>
+    </div>
+    
+    <!-- Log Controls Section -->
+    <div id="log-section">
+        <div id="log-header">
+            <span id="log-icon">📋</span>
+            <span id="log-title">Logs</span>
+            <span id="log-count">0</span>
+        </div>
+        <div id="log-controls">
+            <button id="export-logs-btn" title="Export logs to file">📤 Export</button>
+            <button id="clear-logs-btn" title="Clear all logs">🗑️ Clear</button>
+        </div>
+    </div>
     
     <script src="popup.js"></script>
 </body>
