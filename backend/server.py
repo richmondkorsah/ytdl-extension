@@ -283,6 +283,64 @@ def extract_chapters(info_dict):
     return chapters
 
 
+def embed_chapters_in_video(video_path, chapters, temp_dir):
+    """Embed chapter metadata into video file using FFmpeg"""
+    if not chapters or not FFMPEG_AVAILABLE:
+        return video_path
+    
+    try:
+        # Create FFmpeg metadata file
+        metadata_path = os.path.join(temp_dir, "chapters_metadata.txt")
+        
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            f.write(";FFMETADATA1\n")
+            
+            for chapter in chapters:
+                start_ms = int(chapter["start_time"] * 1000)
+                end_ms = int(chapter["end_time"] * 1000)
+                title = chapter["title"].replace("=", "\\=").replace(";", "\\;").replace("#", "\\#").replace("\\", "\\\\").replace("\n", " ")
+                
+                f.write("\n[CHAPTER]\n")
+                f.write("TIMEBASE=1/1000\n")
+                f.write(f"START={start_ms}\n")
+                f.write(f"END={end_ms}\n")
+                f.write(f"title={title}\n")
+        
+        # Create output filename
+        base, ext = os.path.splitext(video_path)
+        output_path = os.path.join(temp_dir, f"chaptered_video{ext}")
+        
+        # Run FFmpeg to embed chapters
+        cmd = [
+            "ffmpeg",
+            "-i", video_path,
+            "-i", metadata_path,
+            "-map_metadata", "1",
+            "-codec", "copy",
+            "-y",  # Overwrite output file if exists
+            output_path
+        ]
+        
+        logger.info(f"Embedding {len(chapters)} chapters into video...")
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        
+        if result.returncode == 0 and os.path.exists(output_path):
+            # Remove original file and use the chaptered version
+            os.remove(video_path)
+            logger.info(f"Successfully embedded {len(chapters)} chapters")
+            return output_path
+        else:
+            logger.warning(f"FFmpeg chapter embedding failed: {result.stderr[:500] if result.stderr else 'Unknown error'}")
+            return video_path
+            
+    except subprocess.TimeoutExpired:
+        logger.warning("FFmpeg chapter embedding timed out, using original file")
+        return video_path
+    except Exception as e:
+        logger.warning(f"Chapter embedding failed: {e}, using original file")
+        return video_path
+
+
 @app.route("/info", methods=["GET"])
 def info():
     """Get video metadata without downloading"""
@@ -513,6 +571,11 @@ def download():
             if temp_dir:
                 shutil.rmtree(temp_dir, ignore_errors=True)
             return jsonify({"error": "Download failed - no file created"}), 500
+        
+        # Embed chapters if available and FFmpeg is present
+        chapters = extract_chapters(info)
+        if chapters and FFMPEG_AVAILABLE:
+            downloaded_file = embed_chapters_in_video(downloaded_file, chapters, temp_dir)
         
         file_size = os.path.getsize(downloaded_file)
         ext = os.path.splitext(downloaded_file)[1] or ".mp4"

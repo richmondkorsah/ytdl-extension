@@ -147,3 +147,459 @@
 [2026-02-02T23:29:43.051Z] [BACKGROUND] [INFO] Cache HIT for video: QCo44FuNOxg
 [2026-02-02T23:29:43.060Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Using cached video info!","data":[{"title":"Bus Tour Through a Peaceful Village | Cities: Skylines II #bus #cs2 #citiesskylines2 #citybuilder","qualities":8}]}]
 [2026-02-02T23:29:43.061Z] [POPUP] [SUCCESS] Using cached video info! | [{"title":"Bus Tour Through a Peaceful Village | Cities: Skylines II #bus #cs2 #citiesskylines2 #citybuilder","qualities":8}]
+[2026-02-02T23:43:16.371Z] [BACKGROUND] [INFO] Cache EXPIRED for video: QCo44FuNOxg
+[2026-02-02T23:43:16.371Z] [BACKGROUND] [INFO] Tab activated - triggering prefetch for: QCo44FuNOxg
+[2026-02-02T23:43:16.371Z] [BACKGROUND] [INFO] Starting prefetch for: QCo44FuNOxg
+[2026-02-02T23:43:20.433Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:43:20.433Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:43:20.433Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-02T23:43:20.433Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-02T23:43:20.434Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:43:20.434Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:43:20.434Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
+[2026-02-02T23:43:20.434Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
+[2026-02-02T23:43:20.434Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
+[2026-02-02T23:43:20.434Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
+[2026-02-02T23:43:20.434Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-02T23:43:20.434Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-02T23:43:20.434Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-02T23:43:20.435Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-02T23:43:20.435Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
+[2026-02-02T23:43:20.435Z] [POPUP] [UI] Loading queue settings from storage...
+[2026-02-02T23:43:20.436Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-02T23:43:20.436Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-02T23:43:20.436Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-02T23:43:20.436Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-02T23:43:20.436Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up chapters event listeners...","data":null}]
+[2026-02-02T23:43:20.436Z] [POPUP] [UI] Setting up chapters event listeners...
+[2026-02-02T23:43:20.436Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Chapters event listeners ready","data":null}]
+[2026-02-02T23:43:20.436Z] [POPUP] [SUCCESS] Chapters event listeners ready
+[2026-02-02T23:43:20.436Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-02T23:43:20.446Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:43:20.446Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:43:20.446Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:43:20.446Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:43:20.513Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=QCo44FuNOxg","id":1}]}]
+[2026-02-02T23:43:20.513Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=QCo44FuNOxg","id":1}]
+[2026-02-02T23:43:20.514Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"QCo44FuNOxg","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-02T23:43:20.514Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"QCo44FuNOxg","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-02T23:43:20.514Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-02T23:43:20.514Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-02T23:43:20.514Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-02T23:43:20.514Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-02T23:43:20.524Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-02T23:43:20.524Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-02T23:43:20.524Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-02T23:43:20.524Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-02T23:43:20.524Z] [POPUP] [INFO] Loading history from background...
+[2026-02-02T23:43:20.524Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-02T23:43:20.576Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-02T23:43:20.576Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-02T23:43:20.576Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:43:20.576Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-02T23:43:20.576Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-02T23:43:20.576Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-02T23:43:20.576Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:43:20.577Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-02T23:43:20.677Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=QCo44FuNOxg","videoId":"QCo44FuNOxg","videoTitle":"Relaxing Bus Tour Through a Peaceful Village | Cities: Skylines II #gaming #citybuilder #cs2 #viral","channelName":"EngineerX","duration":"2:25","thumbnail":"https://img.youtube.com/vi/QCo44FuNOxg/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-02T23:43:20.677Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=QCo44FuNOxg","videoId":"QCo44FuNOxg","videoTitle":"Relaxing Bus Tour Through a Peaceful Village | Cities: Skylines II #gaming #citybuilder #cs2 #viral","channelName":"EngineerX","duration":"2:25","thumbnail":"https://img.youtube.com/vi/QCo44FuNOxg/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-02T23:43:20.677Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-02T23:43:20.677Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-02T23:43:20.678Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"QCo44FuNOxg"}]
+[2026-02-02T23:43:20.678Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:20.886Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:21.102Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:21.306Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:21.509Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:21.711Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:21.916Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:22.118Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:22.321Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:22.525Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:22.728Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:22.930Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:23.133Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:23.340Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:23.554Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:23.757Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:23.961Z] [BACKGROUND] [INFO] Cache PENDING for video: QCo44FuNOxg
+[2026-02-02T23:43:24.008Z] [BACKGROUND] [SUCCESS] Prefetch complete: "Bus Tour Through a Peaceful Village | Cities: Skylines II #bus #cs2 #citiesskylines2 #citybuilder" (QCo44FuNOxg) | [{"qualities":8,"duration":146}]
+[2026-02-02T23:43:24.164Z] [BACKGROUND] [INFO] Cache HIT for video: QCo44FuNOxg
+[2026-02-02T23:43:28.006Z] [BACKGROUND] [INFO] Cache MISS for video: vTnE_JMg54M
+[2026-02-02T23:43:28.007Z] [BACKGROUND] [INFO] Tab updated - triggering prefetch for: vTnE_JMg54M
+[2026-02-02T23:43:28.007Z] [BACKGROUND] [INFO] Starting prefetch for: vTnE_JMg54M
+[2026-02-02T23:43:28.083Z] [BACKGROUND] [INFO] 📩 Message received [PREFETCH_INFO] from Tab 1 | [{"type":"PREFETCH_INFO","url":"https://www.youtube.com/watch?v=vTnE_JMg54M","videoId":"vTnE_JMg54M"}]
+[2026-02-02T23:43:28.083Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): vTnE_JMg54M
+[2026-02-02T23:43:35.663Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:43:35.663Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:43:35.663Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-02T23:43:35.663Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-02T23:43:35.663Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:43:35.664Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
+[2026-02-02T23:43:35.664Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
+[2026-02-02T23:43:35.664Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-02T23:43:35.664Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-02T23:43:35.664Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
+[2026-02-02T23:43:35.664Z] [POPUP] [UI] Loading queue settings from storage...
+[2026-02-02T23:43:35.664Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-02T23:43:35.664Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-02T23:43:35.665Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-02T23:43:35.665Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-02T23:43:35.665Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up chapters event listeners...","data":null}]
+[2026-02-02T23:43:35.665Z] [POPUP] [UI] Setting up chapters event listeners...
+[2026-02-02T23:43:35.665Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Chapters event listeners ready","data":null}]
+[2026-02-02T23:43:35.665Z] [POPUP] [SUCCESS] Chapters event listeners ready
+[2026-02-02T23:43:35.665Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-02T23:43:35.667Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:43:35.668Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:43:35.668Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:43:35.668Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:43:35.683Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=vTnE_JMg54M","id":1}]}]
+[2026-02-02T23:43:35.683Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=vTnE_JMg54M","id":1}]
+[2026-02-02T23:43:35.683Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"vTnE_JMg54M","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-02T23:43:35.683Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"vTnE_JMg54M","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-02T23:43:35.683Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-02T23:43:35.683Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-02T23:43:35.683Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-02T23:43:35.683Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-02T23:43:35.684Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-02T23:43:35.685Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-02T23:43:35.686Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-02T23:43:35.687Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-02T23:43:35.687Z] [POPUP] [INFO] Loading history from background...
+[2026-02-02T23:43:35.687Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-02T23:43:35.689Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-02T23:43:35.689Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-02T23:43:35.689Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:43:35.689Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-02T23:43:35.689Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-02T23:43:35.689Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-02T23:43:35.690Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:43:35.690Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-02T23:43:35.914Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=vTnE_JMg54M","videoId":"vTnE_JMg54M","videoTitle":"I upgraded the water simulation in Magnolia County... | MC 59","channelName":"City Planner Plays","duration":"55:28","thumbnail":"https://img.youtube.com/vi/vTnE_JMg54M/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-02T23:43:35.914Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=vTnE_JMg54M","videoId":"vTnE_JMg54M","videoTitle":"I upgraded the water simulation in Magnolia County... | MC 59","channelName":"City Planner Plays","duration":"55:28","thumbnail":"https://img.youtube.com/vi/vTnE_JMg54M/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-02T23:43:35.914Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-02T23:43:35.914Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-02T23:43:35.914Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"vTnE_JMg54M"}]
+[2026-02-02T23:43:35.914Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:36.119Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:36.320Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:36.523Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:36.738Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:36.953Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:37.156Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:37.370Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:37.572Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:37.774Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:37.977Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:38.179Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:38.380Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:38.583Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:38.786Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:39.002Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:39.217Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:39.419Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:39.634Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:39.835Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:40.038Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:40.240Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:40.443Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:40.647Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:40.849Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:41.050Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:41.251Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:41.486Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:41.689Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:41.892Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:42.094Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:42.297Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:42.499Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:42.703Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:42.905Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:43.105Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:43.309Z] [BACKGROUND] [INFO] Cache PENDING for video: vTnE_JMg54M
+[2026-02-02T23:43:43.360Z] [BACKGROUND] [SUCCESS] Prefetch complete: "I upgraded the water simulation in Magnolia County... | MC 59" (vTnE_JMg54M) | [{"qualities":8,"duration":3328}]
+[2026-02-02T23:43:43.513Z] [BACKGROUND] [INFO] Cache HIT for video: vTnE_JMg54M
+[2026-02-02T23:43:43.525Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Using cached video info!","data":[{"title":"I upgraded the water simulation in Magnolia County... | MC 59","qualities":8}]}]
+[2026-02-02T23:43:43.525Z] [POPUP] [SUCCESS] Using cached video info! | [{"title":"I upgraded the water simulation in Magnolia County... | MC 59","qualities":8}]
+[2026-02-02T23:43:43.526Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering chapters","data":[{"count":6}]}]
+[2026-02-02T23:43:43.526Z] [POPUP] [UI] Rendering chapters | [{"count":6}]
+[2026-02-02T23:50:37.917Z] [BACKGROUND] [INFO] Cache EXPIRED for video: vTnE_JMg54M
+[2026-02-02T23:50:37.918Z] [BACKGROUND] [INFO] Tab activated - triggering prefetch for: vTnE_JMg54M
+[2026-02-02T23:50:37.918Z] [BACKGROUND] [INFO] Starting prefetch for: vTnE_JMg54M
+[2026-02-02T23:50:47.094Z] [BACKGROUND] [SUCCESS] Prefetch complete: "I upgraded the water simulation in Magnolia County... | MC 59" (vTnE_JMg54M) | [{"qualities":8,"duration":3328}]
+[2026-02-02T23:50:54.500Z] [BACKGROUND] [INFO] 📩 Message received [PREFETCH_INFO] from Tab 4 | [{"type":"PREFETCH_INFO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A"}]
+[2026-02-02T23:50:54.500Z] [BACKGROUND] [INFO] Starting prefetch for: iY3FBMTA15A
+[2026-02-02T23:50:54.531Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:50:54.531Z] [BACKGROUND] [INFO] Tab updated - triggering prefetch for: iY3FBMTA15A
+[2026-02-02T23:50:54.531Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): iY3FBMTA15A
+[2026-02-02T23:51:03.780Z] [BACKGROUND] [SUCCESS] Prefetch complete: "Top 15 Best Android Apps - February 2026!" (iY3FBMTA15A) | [{"qualities":8,"duration":1012}]
+[2026-02-02T23:51:22.690Z] [BACKGROUND] [INFO] Cache HIT for video: iY3FBMTA15A
+[2026-02-02T23:51:50.633Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:51:50.633Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:51:50.633Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-02T23:51:50.633Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-02T23:51:50.633Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:51:50.634Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:51:50.634Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
+[2026-02-02T23:51:50.634Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
+[2026-02-02T23:51:50.634Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
+[2026-02-02T23:51:50.634Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
+[2026-02-02T23:51:50.635Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-02T23:51:50.635Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-02T23:51:50.640Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-02T23:51:50.640Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-02T23:51:50.640Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
+[2026-02-02T23:51:50.640Z] [POPUP] [UI] Loading queue settings from storage...
+[2026-02-02T23:51:50.640Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-02T23:51:50.640Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-02T23:51:50.641Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-02T23:51:50.641Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-02T23:51:50.641Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-02T23:51:50.644Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:51:50.644Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:51:50.644Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:51:50.644Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:51:50.669Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]}]
+[2026-02-02T23:51:50.669Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]
+[2026-02-02T23:51:50.670Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-02T23:51:50.670Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-02T23:51:50.670Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-02T23:51:50.670Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-02T23:51:50.670Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-02T23:51:50.670Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-02T23:51:50.672Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-02T23:51:50.672Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-02T23:51:50.672Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-02T23:51:50.672Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-02T23:51:50.672Z] [POPUP] [INFO] Loading history from background...
+[2026-02-02T23:51:50.672Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-02T23:51:50.675Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-02T23:51:50.675Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-02T23:51:50.675Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:51:50.675Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-02T23:51:50.675Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-02T23:51:50.675Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-02T23:51:50.675Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:51:50.675Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-02T23:51:51.871Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-02T23:51:51.871Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-02T23:51:51.871Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-02T23:51:51.872Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-02T23:51:51.886Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"iY3FBMTA15A"}]
+[2026-02-02T23:51:51.887Z] [BACKGROUND] [INFO] Cache HIT for video: iY3FBMTA15A
+[2026-02-02T23:51:51.894Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Using cached video info!","data":[{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]}]
+[2026-02-02T23:51:51.894Z] [POPUP] [SUCCESS] Using cached video info! | [{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]
+[2026-02-02T23:52:01.042Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]}]
+[2026-02-02T23:52:01.042Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:01.042Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":"en"}]
+[2026-02-02T23:52:01.043Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:01.044Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:52:01.074Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:52:01.074Z] [BACKGROUND] [ERROR] Download error | [{"message":"can't access lexical declaration 'filename' before initialization","stack":"handleDownload@moz-extension://d8858edf-2c57-4575-8521-0f568736bd87/background.js:1025:62\n"}]
+[2026-02-02T23:52:01.077Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"ERROR","message":"Video download error:","data":[{"message":"can't access lexical declaration 'filename' before initialization"}]}]
+[2026-02-02T23:52:01.078Z] [POPUP] [ERROR] Video download error: | [{"message":"can't access lexical declaration 'filename' before initialization"}]
+[2026-02-02T23:52:05.610Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]}]
+[2026-02-02T23:52:05.612Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:05.612Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":"en"}]
+[2026-02-02T23:52:05.612Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:05.613Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:52:05.624Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:52:05.624Z] [BACKGROUND] [ERROR] Download error | [{"message":"can't access lexical declaration 'filename' before initialization","stack":"handleDownload@moz-extension://d8858edf-2c57-4575-8521-0f568736bd87/background.js:1025:62\n"}]
+[2026-02-02T23:52:05.626Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"ERROR","message":"Video download error:","data":[{"message":"can't access lexical declaration 'filename' before initialization"}]}]
+[2026-02-02T23:52:05.626Z] [POPUP] [ERROR] Video download error: | [{"message":"can't access lexical declaration 'filename' before initialization"}]
+[2026-02-02T23:52:09.997Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]}]
+[2026-02-02T23:52:09.998Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:09.998Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":"en"}]
+[2026-02-02T23:52:10.000Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:52:10.000Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:52:10.008Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:52:10.008Z] [BACKGROUND] [ERROR] Download error | [{"message":"can't access lexical declaration 'filename' before initialization","stack":"handleDownload@moz-extension://d8858edf-2c57-4575-8521-0f568736bd87/background.js:1025:62\n"}]
+[2026-02-02T23:52:10.012Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"ERROR","message":"Video download error:","data":[{"message":"can't access lexical declaration 'filename' before initialization"}]}]
+[2026-02-02T23:52:10.012Z] [POPUP] [ERROR] Video download error: | [{"message":"can't access lexical declaration 'filename' before initialization"}]
+[2026-02-02T23:54:10.164Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:54:10.164Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:54:10.189Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-02T23:54:10.189Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-02T23:54:10.189Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:54:10.189Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:54:10.190Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
+[2026-02-02T23:54:10.190Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
+[2026-02-02T23:54:10.190Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
+[2026-02-02T23:54:10.190Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
+[2026-02-02T23:54:10.190Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-02T23:54:10.190Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-02T23:54:10.190Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-02T23:54:10.190Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-02T23:54:10.191Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
+[2026-02-02T23:54:10.191Z] [POPUP] [UI] Loading queue settings from storage...
+[2026-02-02T23:54:10.191Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-02T23:54:10.191Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-02T23:54:10.191Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-02T23:54:10.191Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-02T23:54:10.191Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-02T23:54:10.196Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:54:10.196Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:54:10.196Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:54:10.196Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:54:10.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]}]
+[2026-02-02T23:54:10.204Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]
+[2026-02-02T23:54:10.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-02T23:54:10.204Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-02T23:54:10.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-02T23:54:10.204Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-02T23:54:10.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-02T23:54:10.204Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-02T23:54:10.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-02T23:54:10.205Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-02T23:54:10.205Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-02T23:54:10.205Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-02T23:54:10.205Z] [POPUP] [INFO] Loading history from background...
+[2026-02-02T23:54:10.205Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-02T23:54:10.208Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-02T23:54:10.208Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-02T23:54:10.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:54:10.209Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-02T23:54:10.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-02T23:54:10.209Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-02T23:54:10.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:54:10.209Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-02T23:54:11.424Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-02T23:54:11.424Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-02T23:54:11.424Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-02T23:54:11.425Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-02T23:54:11.425Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"iY3FBMTA15A"}]
+[2026-02-02T23:54:11.425Z] [BACKGROUND] [INFO] Cache HIT for video: iY3FBMTA15A
+[2026-02-02T23:54:11.431Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Using cached video info!","data":[{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]}]
+[2026-02-02T23:54:11.431Z] [POPUP] [SUCCESS] Using cached video info! | [{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]
+[2026-02-02T23:54:21.526Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]}]
+[2026-02-02T23:54:21.526Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:54:21.526Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":"en"}]
+[2026-02-02T23:54:21.527Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:54:21.527Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:54:21.539Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:54:21.539Z] [BACKGROUND] [ERROR] Download error | [{"message":"can't access lexical declaration 'filename' before initialization","stack":"handleDownload@moz-extension://d8858edf-2c57-4575-8521-0f568736bd87/background.js:1025:62\n"}]
+[2026-02-02T23:54:21.542Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"ERROR","message":"Video download error:","data":[{"message":"can't access lexical declaration 'filename' before initialization"}]}]
+[2026-02-02T23:54:21.542Z] [POPUP] [ERROR] Video download error: | [{"message":"can't access lexical declaration 'filename' before initialization"}]
+[2026-02-02T23:54:26.370Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":null}]}]
+[2026-02-02T23:54:26.370Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":null}]
+[2026-02-02T23:54:26.370Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":null}]
+[2026-02-02T23:54:26.370Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":null}]
+[2026-02-02T23:54:26.370Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:54:26.377Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:54:26.377Z] [BACKGROUND] [ERROR] Download error | [{"message":"can't access lexical declaration 'filename' before initialization","stack":"handleDownload@moz-extension://d8858edf-2c57-4575-8521-0f568736bd87/background.js:1025:62\n"}]
+[2026-02-02T23:54:26.380Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"ERROR","message":"Video download error:","data":[{"message":"can't access lexical declaration 'filename' before initialization"}]}]
+[2026-02-02T23:54:26.380Z] [POPUP] [ERROR] Video download error: | [{"message":"can't access lexical declaration 'filename' before initialization"}]
+[2026-02-02T23:56:31.814Z] [BACKGROUND] [INFO] No existing history found in storage
+[2026-02-02T23:56:31.815Z] [BACKGROUND] [QUEUE] No existing queue found in storage
+[2026-02-02T23:56:32.834Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:32.834Z] [BACKGROUND] [INFO] Tab activated - triggering prefetch for: iY3FBMTA15A
+[2026-02-02T23:56:32.834Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): iY3FBMTA15A
+[2026-02-02T23:56:36.542Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:56:36.542Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:56:36.542Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-02T23:56:36.542Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-02T23:56:36.542Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-02T23:56:36.542Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-02T23:56:36.542Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
+[2026-02-02T23:56:36.542Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
+[2026-02-02T23:56:36.543Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
+[2026-02-02T23:56:36.543Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
+[2026-02-02T23:56:36.543Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-02T23:56:36.543Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-02T23:56:36.543Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-02T23:56:36.543Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-02T23:56:36.543Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
+[2026-02-02T23:56:36.543Z] [POPUP] [UI] Loading queue settings from storage...
+[2026-02-02T23:56:36.543Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-02T23:56:36.543Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-02T23:56:36.544Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-02T23:56:36.544Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-02T23:56:36.544Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-02T23:56:36.550Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:56:36.550Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:56:36.550Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-02T23:56:36.550Z] [POPUP] [INFO] Loading video info...
+[2026-02-02T23:56:36.559Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]}]
+[2026-02-02T23:56:36.559Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","id":4}]
+[2026-02-02T23:56:36.559Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-02T23:56:36.559Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"iY3FBMTA15A","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-02T23:56:36.559Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-02T23:56:36.560Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-02T23:56:36.560Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-02T23:56:36.560Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-02T23:56:36.561Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-02T23:56:36.561Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-02T23:56:36.561Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-02T23:56:36.561Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-02T23:56:36.561Z] [POPUP] [INFO] Loading history from background...
+[2026-02-02T23:56:36.561Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-02T23:56:36.582Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-02T23:56:36.583Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-02T23:56:36.583Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:56:36.583Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-02T23:56:36.584Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-02T23:56:36.584Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-02T23:56:36.584Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-02T23:56:36.584Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-02T23:56:37.789Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-02T23:56:37.789Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=iY3FBMTA15A","videoId":"iY3FBMTA15A","videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","duration":"16:52","thumbnail":"https://img.youtube.com/vi/iY3FBMTA15A/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-02T23:56:37.789Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-02T23:56:37.789Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-02T23:56:37.791Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"iY3FBMTA15A"}]
+[2026-02-02T23:56:37.791Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:38.001Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:38.202Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:38.404Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:38.605Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:38.807Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:39.008Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:39.211Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:39.412Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:39.614Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:39.817Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:40.031Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:40.233Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:40.434Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:40.666Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:40.868Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:41.083Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:41.313Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:41.517Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:41.720Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:41.925Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:42.128Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:42.331Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:42.534Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:42.558Z] [BACKGROUND] [SUCCESS] Prefetch complete: "I upgraded the water simulation in Magnolia County... | MC 59" (vTnE_JMg54M) | [{"qualities":8,"duration":3328}]
+[2026-02-02T23:56:42.740Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:42.945Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:43.149Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:43.351Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:43.553Z] [BACKGROUND] [INFO] Cache PENDING for video: iY3FBMTA15A
+[2026-02-02T23:56:43.619Z] [BACKGROUND] [SUCCESS] Prefetch complete: "Top 15 Best Android Apps - February 2026!" (iY3FBMTA15A) | [{"qualities":8,"duration":1012}]
+[2026-02-02T23:56:43.755Z] [BACKGROUND] [INFO] Cache HIT for video: iY3FBMTA15A
+[2026-02-02T23:56:43.766Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Using cached video info!","data":[{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]}]
+[2026-02-02T23:56:43.766Z] [POPUP] [SUCCESS] Using cached video info! | [{"title":"Top 15 Best Android Apps - February 2026!","qualities":8}]
+[2026-02-02T23:56:47.909Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]}]
+[2026-02-02T23:56:47.910Z] [POPUP] [INFO] Starting video download | [{"title":"Top 15 Best Android Apps - February 2026!","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:56:47.910Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"videoTitle":"Top 15 Best Android Apps - February 2026!","channelName":"HowToMen","subtitles":"en"}]
+[2026-02-02T23:56:47.911Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Top 15 Best Android Apps - February 2026!","channel":"HowToMen","url":"https://www.youtube.com/watch?v=iY3FBMTA15A","quality":{"height":128,"codec":"h264","vcodec":"avc1.4D400C"},"subtitles":"en"}]
+[2026-02-02T23:56:47.911Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-02T23:56:47.922Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-02T23:56:47.923Z] [BACKGROUND] [DOWNLOAD] Starting download | [{"url":"http://localhost:5000/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DiY3FBMTA15A&format=bestvideo%5Bheight%3C%3D128%5D%2Bbestaudio%2Fbest%5Bheight%3C%3D128%5D%2Fbest&title=Top+15+Best+Android+Apps+-+February+2026%21&channel=HowToMen&resolution=128p&codec=h264&subtitles=en","filename":"Top 15 Best Android Apps - February 2026! - HowToMen (128p, h264).mp4"}]
+[2026-02-02T23:56:47.968Z] [BACKGROUND] [DOWNLOAD] Browser download initiated (ID: 1) | [{"filename":"Top 15 Best Android Apps - February 2026! - HowToMen (128p, h264).mp4"}]
+[2026-02-02T23:56:47.968Z] [BACKGROUND] [DOWNLOAD] Waiting for download 1 to complete...
+[2026-02-02T23:56:57.055Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #10)...
+[2026-02-02T23:57:07.332Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #20)...
+[2026-02-02T23:57:17.521Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #30)...
+[2026-02-02T23:57:27.797Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #40)...
+[2026-02-02T23:57:37.999Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #50)...
+[2026-02-02T23:57:48.267Z] [BACKGROUND] [DOWNLOAD] Download 1 still in progress (check #60)...
+[2026-02-02T23:57:58.079Z] [BACKGROUND] [SUCCESS] Download 1 completed successfully!
+[2026-02-02T23:57:58.455Z] [BACKGROUND] [SUCCESS] Download 1 completed: C:\Users\richmond\Downloads\Top 15 Best Android Apps - February 2026! - HowToMen (128p, h264).mp4

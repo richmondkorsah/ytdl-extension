@@ -1029,8 +1029,6 @@ async function handleDownload(message) {
         }
         
         const downloadUrl = `${SERVER_URL}/download?${params.toString()}`;
-        
-        logDownload("Starting download", { url: downloadUrl, filename: filename });
 
         // Build filename: "Title - Channel (Resolution, Codec).mp4"
         let filename = sanitizeFilename(videoTitle || "video");
@@ -1043,6 +1041,8 @@ async function handleDownload(message) {
             filename += ` (${resolution})`;
         }
         filename += ".mp4";
+
+        logDownload("Starting download", { url: downloadUrl, filename: filename });
 
         // Trigger browser download - streams directly from Flask server
         // saveAs: false uses browser's default download location without prompting
@@ -1146,8 +1146,6 @@ async function handlePlaylistDownload(message) {
         }
         
         const downloadUrl = `${SERVER_URL}/download-playlist?${params.toString()}`;
-        
-        logDownload("Starting playlist download", { url: downloadUrl, filename: filename });
 
         // Build filename for ZIP
         let filename = sanitizeFilename(playlistTitle || "playlist");
@@ -1155,6 +1153,8 @@ async function handlePlaylistDownload(message) {
             filename += ` (${resolution})`;
         }
         filename += ".zip";
+
+        logDownload("Starting playlist download", { url: downloadUrl, filename: filename });
 
         // Trigger browser download - streams directly from Flask server
         const downloadId = await browser.downloads.download({
