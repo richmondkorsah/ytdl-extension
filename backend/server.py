@@ -160,6 +160,91 @@ def health_check():
     }), 200
 
 
+# Log file path in project folder
+LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "extension_logs.txt")
+
+@app.route("/save-logs", methods=["POST"])
+def save_logs():
+    """Save extension logs to a file in the project folder"""
+    try:
+        data = request.get_json()
+        logs = data.get("logs", [])
+        append = data.get("append", False)
+        
+        if not logs:
+            return jsonify({"success": False, "error": "No logs provided"}), 400
+        
+        # Format logs as text
+        log_lines = []
+        for entry in logs:
+            timestamp = entry.get("timestamp", "")
+            source = entry.get("source", "unknown").upper()
+            log_type = entry.get("type", "INFO")
+            message = entry.get("message", "")
+            data_str = entry.get("data", "")
+            
+            line = f"[{timestamp}] [{source}] [{log_type}] {message}"
+            if data_str:
+                line += f" | {data_str}"
+            log_lines.append(line)
+        
+        log_text = "\n".join(log_lines)
+        
+        # Write to file
+        mode = "a" if append else "w"
+        with open(LOG_FILE_PATH, mode, encoding="utf-8") as f:
+            if append and os.path.exists(LOG_FILE_PATH) and os.path.getsize(LOG_FILE_PATH) > 0:
+                f.write("\n")
+            f.write(log_text)
+        
+        logger.info(f"Saved {len(logs)} log entries to {LOG_FILE_PATH}")
+        return jsonify({
+            "success": True, 
+            "path": LOG_FILE_PATH,
+            "entries": len(logs)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error saving logs: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/clear-log-file", methods=["POST"])
+def clear_log_file():
+    """Clear the log file"""
+    try:
+        if os.path.exists(LOG_FILE_PATH):
+            os.remove(LOG_FILE_PATH)
+            logger.info(f"Cleared log file: {LOG_FILE_PATH}")
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        logger.error(f"Error clearing log file: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/get-log-file", methods=["GET"])
+def get_log_file():
+    """Get the contents of the log file"""
+    try:
+        if os.path.exists(LOG_FILE_PATH):
+            with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
+                content = f.read()
+            return jsonify({
+                "success": True,
+                "content": content,
+                "path": LOG_FILE_PATH
+            }), 200
+        else:
+            return jsonify({
+                "success": True,
+                "content": "",
+                "path": LOG_FILE_PATH
+            }), 200
+    except Exception as e:
+        logger.error(f"Error reading log file: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route("/info", methods=["GET"])
 def info():
     """Get video metadata without downloading"""

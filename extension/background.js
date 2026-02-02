@@ -81,8 +81,41 @@ function log(type, message, ...data) {
         logBuffer = logBuffer.slice(-MAX_LOG_ENTRIES);
     }
     
-    // Schedule save
+    // Schedule save to browser storage
     scheduleSaveLogs();
+    
+    // Also save to server file (debounced)
+    scheduleServerLogSave();
+}
+
+// Server file logging
+let serverLogSaveTimeout = null;
+
+function scheduleServerLogSave() {
+    if (serverLogSaveTimeout) {
+        clearTimeout(serverLogSaveTimeout);
+    }
+    // Save to server file every 2 seconds (debounced)
+    serverLogSaveTimeout = setTimeout(saveLogsToServer, 2000);
+}
+
+async function saveLogsToServer() {
+    if (logBuffer.length === 0) return;
+    
+    try {
+        const response = await fetch(`${SERVER_URL}/save-logs`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ logs: logBuffer, append: false })
+        });
+        
+        if (!response.ok) {
+            console.error("Failed to save logs to server:", response.status);
+        }
+    } catch (e) {
+        // Server might not be running, ignore
+        console.log("Could not save logs to server (server may be offline)");
+    }
 }
 
 function logInfo(message, ...data) { log("info", message, ...data); }
@@ -97,39 +130,260 @@ function getLogs() {
     return logBuffer;
 }
 
-// Clear all logs
+// Clear all logs (both browser storage and server file)
 async function clearLogs() {
     logBuffer = [];
     await browser.storage.local.remove("extensionLogs");
+    
+    // Also clear server log file
+    try {
+        await fetch(`${SERVER_URL}/clear-log-file`, { method: "POST" });
+    } catch (e) {
+        // Server might not be running
+    }
+    
     return { success: true };
 }
 
-// Export logs as downloadable file
+// Export logs to server file and trigger download
 async function exportLogs() {
+    console.log("exportLogs called, buffer size:", logBuffer.length);
+    
+    let serverSaved = false;
+    let serverPath = null;
+    
+    // Try to save to server first (may fail if server is offline)
+    try {
+        const saveResponse = await fetch(`${SERVER_URL}/save-logs`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ logs: logBuffer, append: false })
+        });
+        
+        if (saveResponse.ok) {
+            const saveResult = await saveResponse.json();
+            console.log("Logs saved to server:", saveResult.path);
+            serverSaved = true;
+            serverPath = saveResult.path;
+        }
+    } catch (e) {
+        console.warn("Could not save to server (may be offline):", e.message);
+    }
+    
+    // Always try browser download as backup/alternative
     const logText = logBuffer.map(entry => {
         const dataStr = entry.data ? ` | ${entry.data}` : "";
         return `[${entry.timestamp}] [${entry.source.toUpperCase()}] [${entry.type}] ${entry.message}${dataStr}`;
     }).join("\n");
+    
+    if (logText.length === 0) {
+        return { success: true, entries: 0, message: "No logs to export" };
+    }
     
     const blob = new Blob([logText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const filename = `yt_downloader_logs_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.txt`;
     
     try {
-        await browser.downloads.download({
+        const downloadId = await browser.downloads.download({
             url: url,
             filename: filename,
             saveAs: true
         });
-        return { success: true, filename };
-    } catch (e) {
-        return { success: false, error: e.message };
+        console.log("Download started with ID:", downloadId);
+        
+        return { 
+            success: true, 
+            path: serverPath || "Downloads folder", 
+            entries: logBuffer.length,
+            serverSaved: serverSaved
+        };
+    } catch (downloadError) {
+        console.error("Browser download failed:", downloadError);
+        
+        // If server save worked, still consider it a success
+        if (serverSaved) {
+            return { 
+                success: true, 
+                path: serverPath, 
+                entries: logBuffer.length,
+                serverSaved: true,
+                downloadFailed: true
+            };
+        }
+        
+        return { success: false, error: downloadError.message || "Download failed" };
     }
 }
 
 // Cache for video info - keyed by video ID
 const videoInfoCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+
+// ==================== DOWNLOAD HISTORY ====================
+const MAX_HISTORY_ENTRIES = 100;
+let downloadHistory = [];
+
+// Load history from storage on startup
+async function initializeHistory() {
+    logInfo("Initializing download history from storage...");
+    try {
+        const data = await browser.storage.local.get("downloadHistory");
+        if (data.downloadHistory && Array.isArray(data.downloadHistory)) {
+            downloadHistory = data.downloadHistory;
+            logInfo(`History loaded: ${downloadHistory.length} entries`);
+        } else {
+            logInfo("No existing history found in storage");
+        }
+    } catch (e) {
+        logError("Error loading history:", e);
+    }
+}
+
+// Save history to storage
+async function saveHistory() {
+    try {
+        await browser.storage.local.set({ downloadHistory: downloadHistory });
+        logInfo(`History saved (${downloadHistory.length} entries)`);
+    } catch (e) {
+        logError("Error saving history:", e);
+    }
+}
+
+// Add entry to download history
+async function addToHistory(item, status) {
+    const historyEntry = {
+        id: item.id,
+        videoId: item.videoId,
+        title: item.title,
+        channel: item.channel,
+        thumbnail: item.thumbnail,
+        url: item.url,
+        quality: item.quality,
+        qualityLabel: item.qualityLabel,
+        subtitles: item.subtitles,
+        status: status, // "completed" or "failed"
+        error: item.error || null,
+        completedAt: new Date().toISOString(),
+        retryCount: item.retryCount || 0
+    };
+    
+    // Add to beginning of history (most recent first)
+    downloadHistory.unshift(historyEntry);
+    
+    // Limit history size
+    if (downloadHistory.length > MAX_HISTORY_ENTRIES) {
+        downloadHistory = downloadHistory.slice(0, MAX_HISTORY_ENTRIES);
+    }
+    
+    await saveHistory();
+    logInfo(`Added to history: "${item.title}" (${status})`);
+    
+    return historyEntry;
+}
+
+// Get download history
+function getHistory() {
+    return {
+        history: downloadHistory,
+        totalCompleted: downloadHistory.filter(h => h.status === "completed").length,
+        totalFailed: downloadHistory.filter(h => h.status === "failed").length
+    };
+}
+
+// Clear download history
+async function clearHistory() {
+    const count = downloadHistory.length;
+    downloadHistory = [];
+    await saveHistory();
+    logInfo(`Cleared ${count} history entries`);
+    return { success: true, cleared: count };
+}
+
+// Clear only failed entries from history
+async function clearFailedFromHistory() {
+    const failedCount = downloadHistory.filter(h => h.status === "failed").length;
+    downloadHistory = downloadHistory.filter(h => h.status !== "failed");
+    await saveHistory();
+    logInfo(`Cleared ${failedCount} failed entries from history`);
+    return { success: true, cleared: failedCount };
+}
+
+// Remove single history entry
+async function removeFromHistory(id) {
+    const index = downloadHistory.findIndex(h => h.id === id);
+    if (index !== -1) {
+        const item = downloadHistory[index];
+        downloadHistory.splice(index, 1);
+        await saveHistory();
+        logInfo(`Removed from history: "${item.title}"`);
+        return { success: true };
+    }
+    return { success: false, error: "Item not found in history" };
+}
+
+// Retry a failed download from history
+async function retryFromHistory(id) {
+    const historyItem = downloadHistory.find(h => h.id === id);
+    if (!historyItem) {
+        return { success: false, error: "Item not found in history" };
+    }
+    
+    if (historyItem.status !== "failed") {
+        return { success: false, error: "Only failed downloads can be retried" };
+    }
+    
+    // Create new queue item from history entry
+    const newQueueItem = {
+        id: `retry_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        videoId: historyItem.videoId,
+        title: historyItem.title,
+        channel: historyItem.channel,
+        thumbnail: historyItem.thumbnail,
+        url: historyItem.url,
+        quality: historyItem.quality,
+        qualityLabel: historyItem.qualityLabel,
+        subtitles: historyItem.subtitles,
+        status: "pending",
+        addedAt: new Date().toISOString(),
+        retryCount: (historyItem.retryCount || 0) + 1
+    };
+    
+    // Remove from history (it will be re-added when download completes)
+    await removeFromHistory(id);
+    
+    // Add to queue
+    const result = await addToQueue(newQueueItem);
+    
+    if (result.success) {
+        logSuccess(`Retrying failed download: "${historyItem.title}" (attempt ${newQueueItem.retryCount + 1})`);
+    }
+    
+    return result;
+}
+
+// Retry all failed downloads from history
+async function retryAllFailed() {
+    const failedItems = downloadHistory.filter(h => h.status === "failed");
+    
+    if (failedItems.length === 0) {
+        return { success: true, retried: 0, message: "No failed downloads to retry" };
+    }
+    
+    let retriedCount = 0;
+    for (const item of failedItems) {
+        const result = await retryFromHistory(item.id);
+        if (result.success) {
+            retriedCount++;
+        }
+    }
+    
+    logSuccess(`Retried ${retriedCount}/${failedItems.length} failed downloads`);
+    return { success: true, retried: retriedCount, total: failedItems.length };
+}
+
+// Initialize history on startup
+initializeHistory();
 
 // ==================== QUEUE MANAGEMENT ====================
 let downloadQueue = [];
@@ -288,16 +542,22 @@ async function processQueue() {
         if (result && result.success) {
             nextItem.status = "completed";
             logSuccess(`✓ Queue item completed: "${nextItem.title}" (${elapsed}s)`);
+            // Add to history
+            await addToHistory(nextItem, "completed");
         } else {
             nextItem.status = "failed";
             nextItem.error = (result && result.error) || "Download failed";
             logError(`✗ Queue item failed: "${nextItem.title}"`, { error: nextItem.error, elapsed: `${elapsed}s` });
+            // Add to history
+            await addToHistory(nextItem, "failed");
         }
     } catch (error) {
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         logError(`✗ Queue download exception: "${nextItem.title}"`, { error: error.message, elapsed: `${elapsed}s`, stack: error.stack });
         nextItem.status = "failed";
         nextItem.error = error.message || "Unknown error";
+        // Add to history
+        await addToHistory(nextItem, "failed");
     }
     
     await saveQueue();
@@ -329,6 +589,14 @@ function notifyPopup() {
         type: "QUEUE_UPDATED",
         queue: downloadQueue,
         isProcessing: isProcessingQueue
+    }).catch(() => {
+        // Popup might not be open, ignore error
+    });
+    
+    // Also notify of history update
+    browser.runtime.sendMessage({
+        type: "HISTORY_UPDATED",
+        history: downloadHistory
     }).catch(() => {
         // Popup might not be open, ignore error
     });
@@ -440,6 +708,47 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         scheduleSaveLogs();
         sendResponse({ success: true });
         return false;
+    }
+
+    // ==================== HISTORY MESSAGES ====================
+    if (message.type === "GET_HISTORY") {
+        sendResponse(getHistory());
+        return false;
+    }
+
+    if (message.type === "CLEAR_HISTORY") {
+        clearHistory()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "CLEAR_FAILED_HISTORY") {
+        clearFailedFromHistory()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "REMOVE_FROM_HISTORY") {
+        removeFromHistory(message.id)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "RETRY_DOWNLOAD") {
+        retryFromHistory(message.id)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
+    }
+
+    if (message.type === "RETRY_ALL_FAILED") {
+        retryAllFailed()
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true;
     }
 
     return false;

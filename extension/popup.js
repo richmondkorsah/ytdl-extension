@@ -46,12 +46,13 @@ function logError(message, ...data) { log("error", message, ...data); }
 function logQueue(message, ...data) { log("queue", message, ...data); }
 function logUI(message, ...data) { log("ui", message, ...data); }
 
-// Export logs to file
+// Export logs to file (saves to project folder)
 async function exportLogs() {
     try {
+        logInfo("Exporting logs...");
         const result = await browser.runtime.sendMessage({ type: "EXPORT_LOGS" });
         if (result.success) {
-            logSuccess("Logs exported to: " + result.filename);
+            logSuccess(`Logs exported: ${result.entries} entries saved to ${result.path}`);
         } else {
             logError("Failed to export logs: " + result.error);
         }
@@ -65,6 +66,7 @@ async function exportLogs() {
 // Clear all logs
 async function clearAllLogs() {
     try {
+        logInfo("Clearing logs...");
         const result = await browser.runtime.sendMessage({ type: "CLEAR_LOGS" });
         if (result.success) {
             logInfo("Logs cleared");
@@ -112,13 +114,30 @@ const queueEmpty = document.getElementById("queue-empty");
 const queueFooter = document.getElementById("queue-footer");
 const queueStats = document.getElementById("queue-stats");
 
+// History elements
+const historySection = document.getElementById("history-section");
+const historyList = document.getElementById("history-list");
+const historyBadge = document.getElementById("history-badge");
+const clearHistoryBtn = document.getElementById("clear-history-btn");
+const toggleHistoryBtn = document.getElementById("toggle-history-btn");
+const historyListContainer = document.getElementById("history-list-container");
+const historyEmpty = document.getElementById("history-empty");
+const historyFooter = document.getElementById("history-footer");
+const historyStats = document.getElementById("history-stats");
+const retryAllBtn = document.getElementById("retry-all-btn");
+
 // Download queue state
 let downloadQueue = [];
 let isProcessingQueue = false;
 let queueCollapsed = false;
 
+// Download history state
+let downloadHistory = [];
+let historyCollapsed = true;
+
 // Check if queue UI elements exist (only check essential elements)
 const queueEnabled = !!(addToQueueBtn && queueList && queueSection);
+const historyEnabled = !!(historySection && historyList);
 
 logUI("Queue UI elements check:", {
   enabled: queueEnabled,
@@ -127,6 +146,12 @@ logUI("Queue UI elements check:", {
   queueSection: !!queueSection,
   queueBadge: !!queueBadge,
   clearQueueBtn: !!clearQueueBtn
+});
+
+logUI("History UI elements check:", {
+  enabled: historyEnabled,
+  historySection: !!historySection,
+  historyList: !!historyList
 });
 
 // Format bytes to human-readable size
@@ -880,6 +905,14 @@ browser.runtime.onMessage.addListener((message) => {
     isProcessingQueue = message.isProcessing || false;
     renderQueue();
   }
+  
+  if (message.type === "HISTORY_UPDATED") {
+    logInfo("📩 Received HISTORY_UPDATED from background", {
+      historyLength: message.history?.length || 0
+    });
+    downloadHistory = message.history || [];
+    renderHistory();
+  }
 });
 
 // Load queue from browser storage (for collapsed state)
@@ -921,6 +954,293 @@ function toggleQueue() {
   browser.storage.local.set({ queueCollapsed: queueCollapsed }).catch(console.error);
 }
 
+// ==================== HISTORY SYSTEM ====================
+
+// Load history from background script
+async function loadHistoryFromBackground() {
+  try {
+    logInfo("Loading history from background...");
+    const result = await browser.runtime.sendMessage({ type: "GET_HISTORY" });
+    if (result && result.history) {
+      downloadHistory = result.history;
+      logInfo(`History loaded: ${downloadHistory.length} entries`);
+    } else {
+      downloadHistory = [];
+    }
+    renderHistory();
+  } catch (error) {
+    logError("Error loading history:", { message: error.message });
+    downloadHistory = [];
+    renderHistory();
+  }
+}
+
+// Render the history UI
+function renderHistory() {
+  if (!historyEnabled) {
+    return;
+  }
+  
+  const completedCount = downloadHistory.filter(h => h.status === "completed").length;
+  const failedCount = downloadHistory.filter(h => h.status === "failed").length;
+  
+  logUI("Rendering history", { total: downloadHistory.length, completed: completedCount, failed: failedCount });
+  
+  // Update badge count
+  if (historyBadge) {
+    historyBadge.textContent = downloadHistory.length;
+    historyBadge.classList.toggle("empty", downloadHistory.length === 0);
+  }
+  
+  // Show/hide empty state
+  if (historyEmpty) {
+    historyEmpty.classList.toggle("hidden", downloadHistory.length > 0);
+  }
+  
+  // Show/hide retry all button (only if there are failed items)
+  if (retryAllBtn) {
+    retryAllBtn.classList.toggle("hidden", failedCount === 0);
+  }
+  
+  // Update stats
+  if (historyStats && historyFooter) {
+    if (downloadHistory.length > 0) {
+      const parts = [];
+      if (completedCount > 0) parts.push(`${completedCount} completed`);
+      if (failedCount > 0) parts.push(`${failedCount} failed`);
+      historyStats.textContent = parts.join(" • ");
+      historyFooter.classList.add("visible");
+    } else {
+      historyFooter.classList.remove("visible");
+    }
+  }
+  
+  // Render history items
+  historyList.innerHTML = "";
+  
+  for (const item of downloadHistory) {
+    const itemEl = document.createElement("div");
+    itemEl.className = `history-item ${item.status}`;
+    itemEl.dataset.id = item.id;
+    
+    const thumbnailUrl = item.thumbnail || 
+      (item.videoId ? `https://img.youtube.com/vi/${item.videoId}/default.jpg` : "");
+    
+    let statusIcon = "";
+    let statusText = "";
+    switch (item.status) {
+      case "completed":
+        statusIcon = "✓";
+        statusText = "Completed";
+        break;
+      case "failed":
+        statusIcon = "✕";
+        statusText = item.error ? `Failed: ${item.error.substring(0, 20)}...` : "Failed";
+        break;
+      default:
+        statusIcon = "?";
+        statusText = "Unknown";
+    }
+    
+    // Format date
+    const completedDate = item.completedAt ? new Date(item.completedAt) : null;
+    const dateStr = completedDate ? formatRelativeTime(completedDate) : "";
+    
+    // Truncate title if too long
+    const truncatedTitle = item.title && item.title.length > 35 
+      ? item.title.substring(0, 35) + "..." 
+      : (item.title || "Unknown");
+    
+    // Build action buttons
+    let actionButtons = `<button class="history-item-remove" title="Remove" data-id="${item.id}">×</button>`;
+    if (item.status === "failed") {
+      actionButtons = `<button class="history-item-retry" title="Retry download" data-id="${item.id}">🔄</button>` + actionButtons;
+    }
+    
+    itemEl.innerHTML = `
+      ${thumbnailUrl ? `<img class="history-item-thumbnail" src="${thumbnailUrl}" alt="">` : ""}
+      <div class="history-item-info">
+        <div class="history-item-title" title="${item.title || ''}">${truncatedTitle}</div>
+        <div class="history-item-details">
+          <span class="history-item-quality">${item.qualityLabel || ""}</span>
+          ${dateStr ? `<span class="history-item-date">${dateStr}</span>` : ""}
+        </div>
+      </div>
+      <span class="history-item-status ${item.status}">${statusIcon} ${statusText}</span>
+      <div class="history-item-actions">
+        ${actionButtons}
+      </div>
+    `;
+    
+    historyList.appendChild(itemEl);
+  }
+  
+  // Add click handlers for retry buttons
+  historyList.querySelectorAll(".history-item-retry").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      retryDownload(btn.dataset.id);
+    });
+  });
+  
+  // Add click handlers for remove buttons
+  historyList.querySelectorAll(".history-item-remove").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFromHistory(btn.dataset.id);
+    });
+  });
+}
+
+// Format relative time (e.g., "2 hours ago")
+function formatRelativeTime(date) {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  
+  if (diffDay > 0) return diffDay === 1 ? "1 day ago" : `${diffDay} days ago`;
+  if (diffHour > 0) return diffHour === 1 ? "1 hour ago" : `${diffHour} hours ago`;
+  if (diffMin > 0) return diffMin === 1 ? "1 min ago" : `${diffMin} mins ago`;
+  return "Just now";
+}
+
+// Retry a failed download
+async function retryDownload(id) {
+  logInfo(`Retrying download: ${id}`);
+  try {
+    const result = await browser.runtime.sendMessage({
+      type: "RETRY_DOWNLOAD",
+      id: id
+    });
+    
+    if (result && result.success) {
+      logSuccess(`Download queued for retry: ${id}`);
+      status.textContent = "Added to queue for retry!";
+      status.style.color = "#4CAF50";
+      // Refresh both queue and history
+      loadQueueFromBackground();
+      loadHistoryFromBackground();
+    } else {
+      logWarn("Retry failed:", result?.error);
+      status.textContent = result?.error || "Retry failed";
+      status.style.color = "#ff9800";
+    }
+  } catch (error) {
+    logError("Error retrying download:", { message: error.message });
+    status.textContent = "Error retrying download";
+    status.style.color = "#f44336";
+  }
+  
+  setTimeout(() => {
+    status.textContent = "";
+    status.style.color = "";
+  }, 3000);
+}
+
+// Retry all failed downloads
+async function retryAllFailed() {
+  logInfo("Retrying all failed downloads...");
+  try {
+    const result = await browser.runtime.sendMessage({ type: "RETRY_ALL_FAILED" });
+    
+    if (result && result.success) {
+      if (result.retried > 0) {
+        logSuccess(`Queued ${result.retried} downloads for retry`);
+        status.textContent = `Queued ${result.retried} downloads for retry!`;
+        status.style.color = "#4CAF50";
+      } else {
+        status.textContent = "No failed downloads to retry";
+        status.style.color = "#ff9800";
+      }
+      loadQueueFromBackground();
+      loadHistoryFromBackground();
+    } else {
+      status.textContent = result?.error || "Retry all failed";
+      status.style.color = "#f44336";
+    }
+  } catch (error) {
+    logError("Error retrying all failed:", { message: error.message });
+    status.textContent = "Error retrying downloads";
+    status.style.color = "#f44336";
+  }
+  
+  setTimeout(() => {
+    status.textContent = "";
+    status.style.color = "";
+  }, 3000);
+}
+
+// Remove item from history
+async function removeFromHistory(id) {
+  logInfo(`Removing from history: ${id}`);
+  try {
+    const result = await browser.runtime.sendMessage({
+      type: "REMOVE_FROM_HISTORY",
+      id: id
+    });
+    
+    if (result && result.success) {
+      logSuccess(`Removed from history: ${id}`);
+      loadHistoryFromBackground();
+    } else {
+      logWarn("Remove from history failed:", result?.error);
+    }
+  } catch (error) {
+    logError("Error removing from history:", { message: error.message });
+  }
+}
+
+// Clear all history
+async function clearAllHistory() {
+  logInfo("Clearing all history...");
+  try {
+    const result = await browser.runtime.sendMessage({ type: "CLEAR_HISTORY" });
+    
+    if (result && result.success) {
+      logSuccess(`Cleared ${result.cleared} history entries`);
+      loadHistoryFromBackground();
+    }
+  } catch (error) {
+    logError("Error clearing history:", { message: error.message });
+  }
+}
+
+// Toggle history collapse
+function toggleHistory() {
+  historyCollapsed = !historyCollapsed;
+  if (historyListContainer) {
+    historyListContainer.classList.toggle("collapsed", historyCollapsed);
+  }
+  if (toggleHistoryBtn) {
+    toggleHistoryBtn.classList.toggle("collapsed", historyCollapsed);
+  }
+  // Save collapsed state
+  browser.storage.local.set({ historyCollapsed: historyCollapsed }).catch(console.error);
+}
+
+// Load history collapsed state from storage
+async function loadHistorySettings() {
+  try {
+    const data = await browser.storage.local.get(["historyCollapsed"]);
+    if (data.historyCollapsed !== undefined) {
+      historyCollapsed = data.historyCollapsed;
+      if (historyListContainer) {
+        historyListContainer.classList.toggle("collapsed", historyCollapsed);
+      }
+      if (toggleHistoryBtn) {
+        toggleHistoryBtn.classList.toggle("collapsed", historyCollapsed);
+      }
+    }
+    await loadHistoryFromBackground();
+  } catch (e) {
+    logError("Error loading history settings:", { message: e.message });
+    renderHistory();
+  }
+}
+
 // Event listeners for queue
 if (queueEnabled) {
   logUI("Setting up queue event listeners...");
@@ -960,6 +1280,46 @@ if (queueEnabled) {
   }
 }
 
+// Event listeners for history
+if (historyEnabled) {
+  logUI("Setting up history event listeners...");
+  
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener("click", clearAllHistory);
+  }
+  
+  if (retryAllBtn) {
+    retryAllBtn.addEventListener("click", retryAllFailed);
+  }
+  
+  if (toggleHistoryBtn) {
+    toggleHistoryBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleHistory();
+    });
+  }
+  
+  // Click header to toggle (except buttons)
+  const historyHeader = document.getElementById("history-header");
+  if (historyHeader) {
+    historyHeader.addEventListener("click", (e) => {
+      if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
+        toggleHistory();
+      }
+    });
+  }
+  
+  logSuccess("History event listeners ready");
+  
+  // Load history on popup open
+  loadHistorySettings();
+} else {
+  logWarn("History UI elements not found - history disabled");
+  if (historySection) {
+    historySection.style.display = "none";
+  }
+}
+
 // ==================== LOG CONTROLS ====================
 const exportLogsBtn = document.getElementById("export-logs-btn");
 const clearLogsBtn = document.getElementById("clear-logs-btn");
@@ -976,15 +1336,40 @@ async function updateLogCount() {
 // Set up log control event listeners
 if (exportLogsBtn) {
   exportLogsBtn.addEventListener("click", async () => {
+    logUI("Export button clicked");
     exportLogsBtn.disabled = true;
-    exportLogsBtn.textContent = "📤 Exporting...";
-    const result = await exportLogs();
-    exportLogsBtn.disabled = false;
-    exportLogsBtn.textContent = "📤 Export";
-    if (result.success) {
-      status.textContent = "Logs exported!";
-      status.style.color = "#4CAF50";
-      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 2000);
+    exportLogsBtn.textContent = "📤 Saving...";
+    
+    try {
+      const result = await browser.runtime.sendMessage({ type: "EXPORT_LOGS" });
+      console.log("Export result:", result);
+      
+      exportLogsBtn.disabled = false;
+      exportLogsBtn.textContent = "📤 Export";
+      
+      if (result && result.success) {
+        const msg = result.entries > 0 
+          ? `✓ Exported ${result.entries} log entries`
+          : "No logs to export";
+        status.textContent = msg;
+        status.style.color = "#4CAF50";
+        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+      } else if (result) {
+        status.textContent = "Error: " + (result.error || "Export failed");
+        status.style.color = "#f44336";
+        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+      } else {
+        status.textContent = "Error: No response from background";
+        status.style.color = "#f44336";
+        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+      }
+    } catch (e) {
+      console.error("Export error:", e);
+      exportLogsBtn.disabled = false;
+      exportLogsBtn.textContent = "📤 Export";
+      status.textContent = "Error: " + e.message;
+      status.style.color = "#f44336";
+      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
     }
   });
 }
@@ -992,6 +1377,7 @@ if (exportLogsBtn) {
 if (clearLogsBtn) {
   clearLogsBtn.addEventListener("click", async () => {
     if (confirm("Clear all logs? This cannot be undone.")) {
+      logUI("Clear logs button clicked");
       const result = await clearAllLogs();
       if (result.success) {
         updateLogCount();
