@@ -32,3 +32,6 @@ test_video.mp4
 # Temp files
 *.tmp
 *.temp
+
+
+extension_logs.txt
