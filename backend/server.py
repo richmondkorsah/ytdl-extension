@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from yt_dlp import YoutubeDL
 import os
 import tempfile
@@ -15,6 +17,25 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Setup rate limiting
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+# Error handler for rate limit exceeded
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    """Handle rate limit exceeded"""
+    return jsonify({
+        "success": False,
+        "error": "Rate limit exceeded",
+        "message": "You have made too many requests. Please try again later.",
+        "retry_after": e.description
+    }), 429
 
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
@@ -152,6 +173,7 @@ def get_ydl_opts(for_download=False, format_str="best"):
     return opts
 
 @app.route("/health", methods=["GET"])
+@limiter.limit("30 per minute")
 def health_check():
     return jsonify({
         "status": "ok",
@@ -342,6 +364,7 @@ def embed_chapters_in_video(video_path, chapters, temp_dir):
 
 
 @app.route("/info", methods=["GET"])
+@limiter.limit("30 per minute")
 def info():
     """Get video metadata without downloading"""
     url = request.args.get("url")
@@ -463,6 +486,7 @@ def info():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/download", methods=["GET"])
+@limiter.limit("10 per hour")
 def download():
     """Download video and stream to client"""
     url = request.args.get("url")
@@ -656,6 +680,7 @@ def download():
 
 
 @app.route("/playlist-info", methods=["GET"])
+@limiter.limit("20 per minute")
 def playlist_info():
     """Get playlist metadata without downloading"""
     url = request.args.get("url")
@@ -704,6 +729,7 @@ def playlist_info():
 
 
 @app.route("/download-playlist", methods=["GET"])
+@limiter.limit("5 per hour")
 def download_playlist():
     """Download entire playlist and stream as ZIP"""
     url = request.args.get("url")
