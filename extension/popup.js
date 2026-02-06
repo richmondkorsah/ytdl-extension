@@ -260,6 +260,17 @@ async function loadVideoInfo() {
 
     logInfo("Detected video page, loading video info...");
 
+    // Immediately trigger high-priority prefetch in background
+    try {
+      await browser.runtime.sendMessage({
+        type: "IMMEDIATE_PREFETCH",
+        url: tab.url
+      });
+      logInfo("Immediate prefetch triggered for popup");
+    } catch (e) {
+      logWarn("Failed to trigger immediate prefetch:", e.message);
+    }
+
     // Show video mode UI
     isPlaylistMode = false;
     playlistContainer.style.display = "none";
@@ -398,43 +409,8 @@ async function loadVideoInfo() {
         thumbnailImg.src = infoData.thumbnail;
       }
       
-      // Populate quality dropdown with actual available qualities
-      qualitySelect.innerHTML = "";
-      
-      for (const quality of availableQualities) {
-        const option = document.createElement("option");
-        option.value = JSON.stringify({
-          height: quality.height,
-          codec: quality.codec,
-          vcodec: quality.vcodec
-        });
-        
-        // Show quality label with file size if available
-        let label = quality.label;
-        if (quality.filesize) {
-          const sizeStr = formatFileSize(quality.filesize);
-          label += ` (${sizeStr})`;
-        }
-        option.textContent = label;
-        
-        // Default to 720p if available, otherwise first option
-        if (quality.height === 720) {
-          option.selected = true;
-        }
-        qualitySelect.appendChild(option);
-      }
-      
-      // Add audio-only option
-      const audioOption = document.createElement("option");
-      audioOption.value = JSON.stringify({ height: 0, codec: "mp3", isAudio: true });
-      audioOption.textContent = "Audio Only (MP3)";
-      qualitySelect.appendChild(audioOption);
-      
-      // Enable the dropdown and download button
-      qualitySelect.disabled = false;
-      downloadBtn.disabled = false;
-      if (addToQueueBtn) addToQueueBtn.disabled = false;
-      status.textContent = "";
+      // Smoothly upgrade from fallback to real qualities
+      upgradeQualities(availableQualities);
     } else {
       // Fallback to default qualities if server fetch fails
       console.warn("Could not fetch qualities from server, using defaults");
@@ -454,13 +430,103 @@ async function loadVideoInfo() {
 
 function populateFallbackQualities() {
   qualitySelect.innerHTML = "";
-  // Show "Loading..." as first option while fetching real qualities
-  const loadingOption = document.createElement("option");
-  loadingOption.value = JSON.stringify({ height: 720, codec: "", isLoading: true });
-  loadingOption.textContent = "Loading qualities...";
-  loadingOption.disabled = true;
-  loadingOption.selected = true;
-  qualitySelect.appendChild(loadingOption);
+  
+  // Provide immediate quality options based on common YouTube formats
+  const fallbackQualities = [
+    { height: 1080, label: "1080p (HD)", codec: "h264" },
+    { height: 720, label: "720p (HD)", codec: "h264" },
+    { height: 480, label: "480p", codec: "h264" },
+    { height: 360, label: "360p", codec: "h264" },
+    { height: 240, label: "240p", codec: "h264" },
+  ];
+  
+  for (const q of fallbackQualities) {
+    const option = document.createElement("option");
+    option.value = JSON.stringify({ 
+      height: q.height, 
+      codec: q.codec,
+      isFallback: true 
+    });
+    option.textContent = q.label;
+    if (q.height === 720) option.selected = true; // Default to 720p
+    qualitySelect.appendChild(option);
+  }
+  
+  // Add audio-only option
+  const audioOption = document.createElement("option");
+  audioOption.value = JSON.stringify({ 
+    height: 0, 
+    codec: "mp3", 
+    isAudio: true,
+    isFallback: true 
+  });
+  audioOption.textContent = "Audio Only (MP3)";
+  qualitySelect.appendChild(audioOption);
+  
+  logInfo("Fallback qualities loaded - UI ready for interaction");
+}
+
+// Upgrade from fallback to real qualities smoothly
+function upgradeQualities(realQualities) {
+  logInfo("Upgrading from fallback to real qualities", { count: realQualities.length });
+  
+  // Remember current selection
+  const currentSelection = qualitySelect.value;
+  let currentQuality = null;
+  try {
+    currentQuality = JSON.parse(currentSelection);
+  } catch (e) {
+    // Invalid selection, ignore
+  }
+  
+  // Clear and populate with real qualities
+  qualitySelect.innerHTML = "";
+  
+  for (const quality of realQualities) {
+    const option = document.createElement("option");
+    option.value = JSON.stringify({
+      height: quality.height,
+      codec: quality.codec,
+      vcodec: quality.vcodec
+    });
+    
+    // Show quality label with file size if available
+    let label = quality.label;
+    if (quality.filesize) {
+      const sizeStr = formatFileSize(quality.filesize);
+      label += ` (${sizeStr})`;
+    }
+    option.textContent = label;
+    
+    // Try to maintain similar selection
+    if (currentQuality && quality.height === currentQuality.height) {
+      option.selected = true;
+    } else if (!currentQuality && quality.height === 720) {
+      option.selected = true; // Default to 720p
+    }
+    
+    qualitySelect.appendChild(option);
+  }
+  
+  // Add audio-only option
+  const audioOption = document.createElement("option");
+  audioOption.value = JSON.stringify({ height: 0, codec: "mp3", isAudio: true });
+  audioOption.textContent = "Audio Only (MP3)";
+  if (currentQuality && currentQuality.isAudio) {
+    audioOption.selected = true;
+  }
+  qualitySelect.appendChild(audioOption);
+  
+  // Ensure buttons remain enabled
+  qualitySelect.disabled = false;
+  downloadBtn.disabled = false;
+  if (addToQueueBtn) addToQueueBtn.disabled = false;
+  
+  // Clear any loading status
+  status.textContent = "";
+  status.style.color = "";
+  
+  logSuccess("Quality upgrade complete - real qualities loaded");
 }
 
 // Load playlist information

@@ -634,8 +634,18 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "PREFETCH_INFO") {
         // Trigger prefetch without waiting
-        prefetchVideoInfo(message.url, message.videoId);
+        prefetchVideoInfo(message.url, message.videoId, { priority: message.priority || 'normal' });
         sendResponse({ acknowledged: true });
+        return false;
+    }
+
+    if (message.type === "IMMEDIATE_PREFETCH") {
+        // High priority prefetch for popup opening
+        const videoId = extractVideoId(message.url);
+        if (videoId) {
+            prefetchVideoInfo(message.url, videoId, { priority: 'high' });
+        }
+        sendResponse({ acknowledged: true, videoId: videoId });
         return false;
     }
 
@@ -754,34 +764,64 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
 });
 
-// Listen for tab updates to prefetch video info
+// Enhanced tab listeners for immediate video info prefetching
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // Only act when the page has finished loading
-    if (changeInfo.status === "complete" && tab.url) {
-        if (tab.url.includes("youtube.com/watch")) {
-            const videoId = extractVideoId(tab.url);
-            if (videoId && !getCachedInfo(videoId)) {
-                logInfo(`Tab updated - triggering prefetch for: ${videoId}`);
+    // Start prefetching as soon as URL is available (don't wait for complete status)
+    if (tab.url && tab.url.includes("youtube.com/watch")) {
+        const videoId = extractVideoId(tab.url);
+        if (videoId && !getCachedInfo(videoId)) {
+            // Check if we should prefetch based on loading state
+            if (changeInfo.status === "loading" || changeInfo.status === "complete") {
+                logInfo(`Tab ${tabId} ${changeInfo.status} - immediate prefetch for: ${videoId}`);
+                // Start prefetching immediately
                 prefetchVideoInfo(tab.url, videoId);
             }
         }
     }
+    
+    // Also handle URL changes (navigation within same tab)
+    if (changeInfo.url && changeInfo.url.includes("youtube.com/watch")) {
+        const videoId = extractVideoId(changeInfo.url);
+        if (videoId && !getCachedInfo(videoId)) {
+            logInfo(`Tab ${tabId} URL changed - immediate prefetch for: ${videoId}`);
+            prefetchVideoInfo(changeInfo.url, videoId);
+        }
+    }
 });
 
-// Also listen for tab activation (switching tabs)
+// Enhanced tab activation listener - prioritize active tabs
 browser.tabs.onActivated.addListener(async (activeInfo) => {
     try {
         const tab = await browser.tabs.get(activeInfo.tabId);
         if (tab.url && tab.url.includes("youtube.com/watch")) {
             const videoId = extractVideoId(tab.url);
-            if (videoId && !getCachedInfo(videoId)) {
-                logInfo(`Tab activated - triggering prefetch for: ${videoId}`);
-                prefetchVideoInfo(tab.url, videoId);
+            if (videoId) {
+                const cached = getCachedInfo(videoId);
+                if (!cached) {
+                    logInfo(`Tab ${activeInfo.tabId} activated - high priority prefetch for: ${videoId}`);
+                    // High priority prefetch for active tab
+                    prefetchVideoInfo(tab.url, videoId, { priority: 'high' });
+                } else {
+                    logInfo(`Tab ${activeInfo.tabId} activated - already cached: ${videoId}`);
+                }
             }
         }
     } catch (e) {
         // Tab might not exist anymore
         logWarn("Tab activation error (tab may not exist):", e.message);
+    }
+});
+
+// Listen for new tabs being created with YouTube videos
+browser.tabs.onCreated.addListener(async (tab) => {
+    // New tabs might not have URL immediately, we'll catch them in onUpdated
+    // But if they do have a YouTube URL, start prefetching right away
+    if (tab.url && tab.url.includes("youtube.com/watch")) {
+        const videoId = extractVideoId(tab.url);
+        if (videoId && !getCachedInfo(videoId)) {
+            logInfo(`New tab ${tab.id} created with YouTube video - immediate prefetch for: ${videoId}`);
+            prefetchVideoInfo(tab.url, videoId);
+        }
     }
 });
 
@@ -852,9 +892,23 @@ async function getCachedInfoAsync(videoId) {
 }
 
 // Prefetch video info from server and cache it
-async function prefetchVideoInfo(url, videoId) {
-    // Don't prefetch if already cached or currently fetching
-    if (videoInfoCache.has(videoId)) {
+async function prefetchVideoInfo(url, videoId, options = {}) {
+    const priority = options.priority || 'normal';
+    
+    // For high priority (active tab), allow override of current fetches
+    if (priority === 'high' && videoInfoCache.has(videoId)) {
+        const cached = videoInfoCache.get(videoId);
+        if (cached.fetching) {
+            logInfo(`High priority override for ongoing fetch: ${videoId}`);
+            // Don't duplicate, but log that it's prioritized
+        } else if (Date.now() - cached.timestamp < CACHE_TTL) {
+            logInfo(`High priority but already cached: ${videoId}`);
+            return;
+        }
+    }
+    
+    // Don't prefetch if already cached or currently fetching (for normal priority)
+    if (priority === 'normal' && videoInfoCache.has(videoId)) {
         const cached = videoInfoCache.get(videoId);
         if (cached.fetching || (Date.now() - cached.timestamp < CACHE_TTL)) {
             logInfo(`Skipping prefetch (already ${cached.fetching ? 'fetching' : 'cached'}): ${videoId}`);
@@ -864,15 +918,25 @@ async function prefetchVideoInfo(url, videoId) {
 
     // Mark as fetching to prevent duplicate requests
     videoInfoCache.set(videoId, { fetching: true, timestamp: Date.now() });
-    logInfo(`Starting prefetch for: ${videoId}`);
+    logInfo(`Starting ${priority} priority prefetch for: ${videoId}`);
 
     try {
         const cleanUrl = cleanYouTubeUrl(url);
         
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+            logWarn(`Prefetch timeout for: ${videoId}`);
+        }, 10000); // 10 second timeout for prefetch
+        
         const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
             method: "GET",
             mode: "cors",
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
 
         if (response.ok) {
             const data = await response.json();
@@ -895,7 +959,11 @@ async function prefetchVideoInfo(url, videoId) {
             videoInfoCache.delete(videoId);
         }
     } catch (error) {
-        logError(`Prefetch exception for ${videoId}:`, { message: error.message });
+        if (error.name === 'AbortError') {
+            logWarn(`Prefetch aborted for ${videoId} (timeout)`);
+        } else {
+            logError(`Prefetch exception for ${videoId}:`, { message: error.message });
+        }
         videoInfoCache.delete(videoId);
     }
 }
@@ -1181,7 +1249,43 @@ async function handlePlaylistDownload(message) {
 // Optional: Listen for extension install/update
 browser.runtime.onInstalled.addListener((details) => {
     console.log("Extension installed/updated:", details.reason);
+    // Prefetch for existing YouTube tabs after install/update
+    setTimeout(prefetchExistingYouTubeTabs, 1000);
 });
+
+// Listen for extension startup
+browser.runtime.onStartup.addListener(() => {
+    logInfo("Extension startup detected");
+    // Prefetch for existing YouTube tabs on startup
+    setTimeout(prefetchExistingYouTubeTabs, 1000);
+});
+
+// Function to prefetch info for all existing YouTube video tabs
+async function prefetchExistingYouTubeTabs() {
+    try {
+        logInfo("Scanning existing tabs for YouTube videos...");
+        const tabs = await browser.tabs.query({ url: "*://www.youtube.com/watch*" });
+        
+        if (tabs.length > 0) {
+            logInfo(`Found ${tabs.length} existing YouTube video tabs - starting prefetch`);
+            
+            for (const tab of tabs) {
+                const videoId = extractVideoId(tab.url);
+                if (videoId && !getCachedInfo(videoId)) {
+                    logInfo(`Startup prefetch for existing tab ${tab.id}: ${videoId}`);
+                    // Stagger the requests to avoid overwhelming the server
+                    setTimeout(() => {
+                        prefetchVideoInfo(tab.url, videoId);
+                    }, Math.random() * 2000); // Random delay 0-2 seconds
+                }
+            }
+        } else {
+            logInfo("No existing YouTube video tabs found");
+        }
+    } catch (error) {
+        logError("Error scanning existing tabs:", error.message);
+    }
+}
 
 // Monitor download progress
 browser.downloads.onChanged.addListener((delta) => {

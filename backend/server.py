@@ -44,7 +44,7 @@ import time
 
 # Simple in-memory cache with TTL
 class VideoInfoCache:
-    def __init__(self, ttl=300):  # 5 minute TTL
+    def __init__(self, ttl=180):  # Reduced to 3 minutes for faster updates during development
         self.cache = {}
         self.ttl = ttl
         self.lock = Lock()
@@ -66,8 +66,8 @@ class VideoInfoCache:
                 'data': data,
                 'timestamp': time.time()
             }
-            # Limit cache size to 100 entries
-            if len(self.cache) > 100:
+            # Limit cache size to 50 entries for faster access
+            if len(self.cache) > 50:
                 oldest_key = min(self.cache.keys(), key=lambda k: self.cache[k]['timestamp'])
                 del self.cache[oldest_key]
 
@@ -136,16 +136,33 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "extractor_args": {
             "youtube": {
                 "remote_components": ["ejs:github"],
+                # Performance optimizations for faster metadata extraction
+                "player_skip_js_fetch": True,
+                "skip_dash_manifest": not for_download,  # Skip DASH for info requests
             }
         },
-        # Network settings to handle timeouts
-        "socket_timeout": 60,  # 60 seconds timeout
-        "retries": 5,  # Retry up to 5 times
-        "fragment_retries": 5,
-        "file_access_retries": 5,
+        # Network settings optimized for speed
+        "socket_timeout": 30,  # Reduced from 60 seconds
+        "retries": 2,  # Reduced retries for faster failure
+        "fragment_retries": 2,
+        "file_access_retries": 2,
         # HTTP settings
         "http_chunk_size": 10485760,  # 10MB chunks
     }
+    
+    # Additional optimizations for info requests
+    if not for_download:
+        opts.update({
+            # Skip thumbnail extraction for faster loading
+            "writethumbnail": False,
+            "writeinfojson": False,
+            # Reduce format processing overhead
+            "listformats": False,
+            # Skip subtitle info for faster metadata
+            "listsubtitles": False,
+            "writeautomaticsub": False,
+            "writesubtitles": False,
+        })
     
     if for_download:
         # Simplify format - let yt-dlp choose the best available
@@ -180,6 +197,12 @@ def health_check():
         "deno": DENO_AVAILABLE,
         "ffmpeg": FFMPEG_AVAILABLE
     }), 200
+
+@app.route("/ping", methods=["GET"])
+@limiter.limit("60 per minute") 
+def ping():
+    """Lightweight server status check"""
+    return jsonify({"status": "ok"}), 200
 
 
 # Log file path in project folder
@@ -395,70 +418,68 @@ def info():
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(url, download=False)
             
-            # Get available formats and extract unique resolutions
-            formats = []
-            resolutions_seen = set()
+            # Fast format processing - focus on video qualities only
             available_qualities = []
-            
-            # Track best filesize for each resolution (combine video + audio estimates)
             resolution_filesizes = {}
+            seen_heights = set()
             
-            for f in info_dict.get("formats", []):
+            # Process formats more efficiently - skip full format details for speed
+            video_formats = [f for f in info_dict.get("formats", []) 
+                           if f.get("height") and f.get("vcodec") != "none"]
+            
+            # Quick processing of video formats only
+            for f in video_formats:
                 height = f.get("height")
-                vcodec = f.get("vcodec", "none")
-                acodec = f.get("acodec", "none")
+                vcodec = f.get("vcodec", "")
                 filesize = f.get("filesize") or f.get("filesize_approx") or 0
                 
-                formats.append({
-                    "format_id": f.get("format_id"),
-                    "ext": f.get("ext"),
-                    "resolution": f.get("resolution", "audio only"),
-                    "height": height,
-                    "filesize": f.get("filesize"),
-                    "filesize_approx": f.get("filesize_approx"),
-                    "vcodec": vcodec,
-                    "acodec": acodec,
-                })
-                
-                # Track filesize per resolution (video streams)
-                if height and vcodec != "none" and filesize:
-                    if height not in resolution_filesizes or filesize > resolution_filesizes[height]:
+                # Skip if we already have this resolution
+                if height in seen_heights:
+                    # Update filesize if this format has better estimate
+                    if filesize and (height not in resolution_filesizes or filesize > resolution_filesizes[height]):
                         resolution_filesizes[height] = filesize
+                    continue
+                    
+                seen_heights.add(height)
                 
-                # Collect unique video resolutions (with video codec)
-                if height and vcodec != "none":
-                    if height not in resolutions_seen:
-                        resolutions_seen.add(height)
-                        # Simplify codec name for display
-                        codec_display = "h264" if "avc" in vcodec.lower() else \
-                                       "h265" if "hevc" in vcodec.lower() or "hev" in vcodec.lower() else \
-                                       "vp9" if "vp9" in vcodec.lower() or "vp09" in vcodec.lower() else \
-                                       "av1" if "av01" in vcodec.lower() or "av1" in vcodec.lower() else \
-                                       vcodec.split(".")[0]
-                        available_qualities.append({
-                            "height": height,
-                            "label": f"{height}p",
-                            "codec": codec_display,
-                            "vcodec": vcodec,
-                        })
+                # Quick codec detection
+                codec_display = (
+                    "h264" if "avc" in vcodec.lower() else
+                    "h265" if "hevc" in vcodec.lower() or "hev" in vcodec.lower() else
+                    "vp9" if "vp9" in vcodec.lower() or "vp09" in vcodec.lower() else
+                    "av1" if "av01" in vcodec.lower() or "av1" in vcodec.lower() else
+                    "mp4"  # Default fallback
+                )
+                
+                quality_info = {
+                    "height": height,
+                    "label": f"{height}p",
+                    "codec": codec_display,
+                    "vcodec": vcodec,
+                }
+                
+                # Add filesize if available
+                if filesize:
+                    resolution_filesizes[height] = filesize
+                    quality_info["filesize"] = int(filesize * 1.1)  # Add audio estimate
+                    
+                available_qualities.append(quality_info)
             
-            # Sort qualities by height (highest first)
+            # Sort by height (highest first)
             available_qualities.sort(key=lambda x: x["height"], reverse=True)
             
-            # Remove duplicates keeping highest quality codec for each resolution
-            # and add filesize estimates
-            unique_qualities = []
-            seen_heights = set()
-            for q in available_qualities:
-                if q["height"] not in seen_heights:
-                    seen_heights.add(q["height"])
-                    # Add filesize estimate for this resolution
-                    if q["height"] in resolution_filesizes:
-                        # Add ~10% for audio stream estimate
-                        video_size = resolution_filesizes[q["height"]]
-                        estimated_total = int(video_size * 1.1)
-                        q["filesize"] = estimated_total
-                    unique_qualities.append(q)
+            # Use available_qualities directly (already unique)
+            unique_qualities = available_qualities
+            
+            # Simplified formats array for compatibility (optional)
+            formats = [{
+                "format_id": "best",
+                "ext": "mp4", 
+                "resolution": f"{max(seen_heights) if seen_heights else 720}p",
+                "height": max(seen_heights) if seen_heights else 720,
+                "vcodec": "h264",
+                "acodec": "aac",
+            }] if seen_heights else []
             
             logger.info(f"Found {len(unique_qualities)} unique resolutions for: {info_dict.get('title')}")
             
