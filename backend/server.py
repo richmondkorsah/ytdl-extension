@@ -204,6 +204,35 @@ def ping():
     """Lightweight server status check"""
     return jsonify({"status": "ok"}), 200
 
+@app.route("/disk-space", methods=["GET"])
+@limiter.limit("30 per minute")
+def disk_space():
+    """Return free disk space for the downloads directory"""
+    try:
+        download_dir = os.path.expanduser("~/Downloads")
+        if not os.path.exists(download_dir):
+            download_dir = os.path.expanduser("~")
+        usage = shutil.disk_usage(download_dir)
+        free_bytes = usage.free
+        
+        # Human-readable format
+        if free_bytes >= 1024 ** 3:
+            free_human = f"{free_bytes / (1024 ** 3):.1f} GB"
+        elif free_bytes >= 1024 ** 2:
+            free_human = f"{free_bytes / (1024 ** 2):.1f} MB"
+        else:
+            free_human = f"{free_bytes / 1024:.1f} KB"
+        
+        return jsonify({
+            "free_bytes": free_bytes,
+            "free_human": free_human,
+            "total_bytes": usage.total,
+            "used_bytes": usage.used
+        }), 200
+    except Exception as e:
+        logger.error(f"Error getting disk space: {e}")
+        return jsonify({"error": str(e)}), 500
+
 
 # Log file path in project folder
 LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "extension_logs.txt")

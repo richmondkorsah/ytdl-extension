@@ -6,8 +6,163 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- App Header -->
+    <div id="app-header">
+        <div id="app-logo">
+            <div id="app-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="12" fill="#ff0000"/>
+                    <polygon points="10,7 10,17 17,12" fill="white"/>
+                </svg>
+            </div>
+            <span id="app-title">YT Downloader</span>
+        </div>
+        <div id="header-controls">
+            <button id="queue-btn" class="header-btn" title="Queue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"/>
+                    <line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/>
+                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                <span id="queue-header-badge" class="header-badge hidden">0</span>
+            </button>
+            <button id="history-btn" class="header-btn" title="History">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12,6 12,12 16,14"/>
+                </svg>
+            </button>
+            <button id="settings-btn" class="header-btn" title="Settings">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- History Overlay Panel -->
+    <div id="history-overlay" class="overlay-panel">
+        <div id="history-panel">
+            <div id="history-panel-header">
+                <div class="panel-header-left">
+                    <span class="panel-icon">📜</span>
+                    <h2 class="panel-title">Download History</h2>
+                    <span id="history-badge">0</span>
+                </div>
+                <button id="close-history-btn" class="close-panel-btn" title="Close">✕</button>
+            </div>
+            <div id="history-panel-content">
+                <div id="history-list-container">
+                    <div id="history-empty">
+                        <span class="empty-icon">📭</span>
+                        <span class="empty-text">No download history</span>
+                        <span class="empty-hint">Completed and failed downloads will appear here</span>
+                    </div>
+                    <div id="history-list"></div>
+                </div>
+            </div>
+            <div id="history-panel-footer">
+                <button id="retry-all-btn" title="Retry all failed" class="hidden">🔄 Retry All</button>
+                <button id="clear-history-btn" title="Clear history">Clear History</button>
+                <span id="history-stats"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue Overlay Panel -->
+    <div id="queue-overlay" class="overlay-panel">
+        <div id="queue-panel">
+            <div id="queue-panel-header">
+                <div class="panel-header-left">
+                    <span class="panel-icon">📥</span>
+                    <h2 class="panel-title">Download Queue</h2>
+                </div>
+                <button id="close-queue-btn" class="close-panel-btn" title="Close">✕</button>
+            </div>
+            <div id="queue-controls">
+                <div class="queue-controls-left">
+                    <button id="pause-all-btn" class="queue-control-btn pause-btn">
+                        <span class="btn-icon">⏸</span>
+                        <span class="btn-text">Pause All</span>
+                    </button>
+                    <button id="clear-completed-btn" class="queue-control-btn">
+                        <span class="btn-icon">🗑️</span>
+                        <span class="btn-text">Clear Completed</span>
+                    </button>
+                </div>
+                <div class="queue-controls-right">
+                    <span id="queue-count">3 ITEMS</span>
+                </div>
+            </div>
+            <div id="queue-tabs">
+                <button class="queue-tab active" data-filter="all">All</button>
+                <button class="queue-tab" data-filter="active">Active</button>
+                <button class="queue-tab" data-filter="finished">Finished</button>
+            </div>
+            <div id="queue-panel-content">
+                <div id="queue-list-container">
+                    <div id="queue-empty">
+                        <span class="empty-icon">📭</span>
+                        <span class="empty-text">Queue is empty</span>
+                        <span class="empty-hint">Add videos to download them sequentially</span>
+                    </div>
+                    <div id="queue-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Overlay Panel -->
+    <div id="settings-overlay" class="overlay-panel">
+        <div id="settings-panel">
+            <div id="settings-panel-header">
+                <div class="panel-header-left">
+                    <span class="panel-icon">⚙️</span>
+                    <h2 class="panel-title">Settings</h2>
+                </div>
+                <button id="close-settings-btn" class="close-panel-btn" title="Close">✕</button>
+            </div>
+            <div id="settings-panel-content">
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Logs</h3>
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-label">Export Logs</span>
+                            <span class="settings-hint">Download all logs to a file</span>
+                        </div>
+                        <button id="export-logs-btn" class="settings-action-btn">
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">Export</span>
+                        </button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-label">Clear Logs</span>
+                            <span class="settings-hint">Remove all log entries</span>
+                        </div>
+                        <button id="clear-logs-btn" class="settings-action-btn">
+                            <span class="btn-icon">🗑️</span>
+                            <span class="btn-text">Clear</span>
+                        </button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-label">Log Count</span>
+                            <span class="settings-hint">Total number of log entries</span>
+                        </div>
+                        <span id="log-count" class="settings-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Playlist Mode UI (hidden by default) -->
-    <div id="playlist-container">
+    <div id="playlist-container" style="display: none;">
         <div id="playlist-header">
             <div id="playlist-icon">📋</div>
             <div id="playlist-info">
@@ -21,117 +176,109 @@
     <div id="video-container">
         <div id="video-thumbnail">
             <img id="thumbnail-img" src="" alt="Video Thumbnail" style="display: none;">
+            <div id="play-overlay">
+                <div id="play-btn">▶</div>
+            </div>
+            <div id="video-duration-overlay">14:02</div>
         </div>
-        <div id="video-title">Loading...</div>
-        <div id="channel-row">
-            <span id="channel-name"></span>
-            <span id="video-duration"></span>
+        
+        <div id="video-status">
+            <span id="video-status-text">VIDEO DETECTED</span>
+        </div>
+        
+        <div id="video-info">
+            <div id="video-title">Loading...</div>
+            <div id="video-meta">
+                <span id="video-views">1.2M views</span>
+                <span id="meta-separator">•</span>
+                <span id="channel-name">Channel Name</span>
+            </div>
         </div>
     </div>
     
-    <div id="quality-container">
-        <label for="quality-select">Quality:</label>
-        <select id="quality-select" disabled>
-            <option value="">Loading qualities...</option>
-        </select>
-    </div>
+    <div id="download-options">
+        <div id="download-quality">
+            <label class="option-label">DOWNLOAD QUALITY</label>
+            <select id="quality-select" disabled>
+                <option value="">Loading...</option>
+            </select>
+        </div>
 
-    <div id="subtitle-container">
-        <label>
-            <input type="checkbox" id="subtitle-checkbox">
-            Download subtitles
-        </label>
-        <select id="subtitle-lang" disabled>
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="pt">Portuguese</option>
-            <option value="ja">Japanese</option>
-            <option value="ko">Korean</option>
-            <option value="zh">Chinese</option>
-            <option value="ar">Arabic</option>
-            <option value="hi">Hindi</option>
-            <option value="auto">Auto-generated</option>
-        </select>
+        <div id="subtitle-section">
+            <div id="subtitle-toggle">
+                <div class="subtitle-text-group">
+                    <span class="option-text">Download Subtitles</span>
+                    <span class="subtitle-hint">Include captions in the file</span>
+                </div>
+                <div id="subtitle-switch">
+                    <input type="checkbox" id="subtitle-checkbox">
+                    <span class="slider"></span>
+                </div>
+            </div>
+            
+            <div class="language-section">
+                <label class="option-label">LANGUAGE</label>
+                <select id="subtitle-lang" disabled>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ar">Arabic</option>
+                    <option value="hi">Hindi</option>
+                    <option value="auto">Auto-generated</option>
+                </select>
+            </div>
+        </div>
     </div>
     
-    <div id="button-row">
+    <div id="action-buttons">
+        <button id="add-to-queue-btn" disabled>
+            <span class="btn-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="8" y1="6" x2="21" y2="6"/>
+                    <line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/>
+                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+            </span>
+            <span class="btn-text">Add to Queue</span>
+        </button>
         <button id="download-btn" disabled>
-            <span class="btn-icon">⬇️</span>
-            <span class="btn-text">Download</span>
-        </button>
-        <button id="add-to-queue-btn" disabled title="Add to download queue">
-            <span class="btn-icon">+</span>
+            <span class="btn-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </span>
+            <span class="btn-text">Download Now</span>
         </button>
     </div>
+    
+    <div id="server-status">
+        <div id="storage-info">
+            <span class="storage-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="2" y="2" width="20" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="6" cy="17" r="1" fill="currentColor"/>
+                </svg>
+            </span>
+            <span id="storage-text">Free Space: 42.8 GB</span>
+        </div>
+        <div id="server-indicator">
+            <span id="server-status-dot"></span>
+            <span id="server-status-text">SERVER READY</span>
+        </div>
+    </div>
+    
     <div id="status"></div>
-    
-    <!-- Download Queue Section -->
-    <div id="queue-section">
-        <div id="queue-header">
-            <div id="queue-header-left">
-                <span id="queue-icon">📥</span>
-                <span id="queue-title">Queue</span>
-                <span id="queue-badge">0</span>
-            </div>
-            <div id="queue-header-right">
-                <button id="clear-queue-btn" title="Clear completed">Clear</button>
-                <button id="toggle-queue-btn" title="Toggle queue">▼</button>
-            </div>
-        </div>
-        <div id="queue-list-container">
-            <div id="queue-empty">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">Queue is empty</span>
-                <span class="empty-hint">Add videos to download them sequentially</span>
-            </div>
-            <div id="queue-list"></div>
-        </div>
-        <div id="queue-footer">
-            <span id="queue-stats"></span>
-        </div>
-    </div>
-    
-    <!-- Download History Section -->
-    <div id="history-section">
-        <div id="history-header">
-            <div id="history-header-left">
-                <span id="history-icon">📜</span>
-                <span id="history-title">History</span>
-                <span id="history-badge">0</span>
-            </div>
-            <div id="history-header-right">
-                <button id="retry-all-btn" title="Retry all failed" class="hidden">🔄 Retry All</button>
-                <button id="clear-history-btn" title="Clear history">Clear</button>
-                <button id="toggle-history-btn" title="Toggle history">▼</button>
-            </div>
-        </div>
-        <div id="history-list-container" class="collapsed">
-            <div id="history-empty">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">No download history</span>
-                <span class="empty-hint">Completed and failed downloads will appear here</span>
-            </div>
-            <div id="history-list"></div>
-        </div>
-        <div id="history-footer">
-            <span id="history-stats"></span>
-        </div>
-    </div>
-    
-    <!-- Log Controls Section -->
-    <div id="log-section">
-        <div id="log-header">
-            <span id="log-icon">📋</span>
-            <span id="log-title">Logs</span>
-            <span id="log-count">0</span>
-        </div>
-        <div id="log-controls">
-            <button id="export-logs-btn" title="Export logs to file">📤 Export</button>
-            <button id="clear-logs-btn" title="Clear all logs">🗑️ Clear</button>
-        </div>
-    </div>
     
     <script src="popup.js"></script>
 </body>

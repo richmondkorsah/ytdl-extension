@@ -388,6 +388,7 @@ initializeHistory();
 // ==================== QUEUE MANAGEMENT ====================
 let downloadQueue = [];
 let isProcessingQueue = false;
+let isQueuePaused = false;
 
 // Load queue from storage on startup
 async function initializeQueue() {
@@ -494,7 +495,8 @@ async function clearCompletedFromQueue() {
 function getQueueState() {
     return {
         queue: downloadQueue,
-        isProcessing: isProcessingQueue
+        isProcessing: isProcessingQueue,
+        isPaused: isQueuePaused
     };
 }
 
@@ -502,6 +504,11 @@ function getQueueState() {
 async function processQueue() {
     if (isProcessingQueue) {
         logQueue("Queue already processing, skipping");
+        return;
+    }
+    
+    if (isQueuePaused) {
+        logQueue("Queue is paused, skipping processing");
         return;
     }
     
@@ -677,8 +684,26 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === "START_QUEUE") {
+        isQueuePaused = false;
         processQueue();
         sendResponse({ success: true });
+        return false;
+    }
+
+    if (message.type === "PAUSE_QUEUE") {
+        isQueuePaused = true;
+        logQueue("Queue paused by user");
+        notifyPopup();
+        sendResponse({ success: true, isPaused: true });
+        return false;
+    }
+
+    if (message.type === "RESUME_QUEUE") {
+        isQueuePaused = false;
+        logQueue("Queue resumed by user");
+        notifyPopup();
+        processQueue();
+        sendResponse({ success: true, isPaused: false });
         return false;
     }
 
