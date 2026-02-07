@@ -136,9 +136,8 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "extractor_args": {
             "youtube": {
                 "remote_components": ["ejs:github"],
-                # Performance optimizations for faster metadata extraction
-                "player_skip_js_fetch": True,
-                "skip_dash_manifest": not for_download,  # Skip DASH for info requests
+                # Performance: skip DASH manifest for info-only requests
+                "skip_dash_manifest": not for_download,
             }
         },
         # Network settings optimized for speed
