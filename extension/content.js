@@ -95,6 +95,77 @@ async function getVideoInfo() {
     const durationElement = document.querySelector(".ytp-time-duration");
     const duration = durationElement?.innerText.trim() || "";
 
+    // Get video view count
+    let views = null;
+    try {
+        // Method 1: Try DOM selectors (YouTube updates these, so try multiple)
+        const viewSelectors = [
+            'ytd-watch-metadata #info span.bold.style-scope.yt-formatted-string',
+            'ytd-video-primary-info-renderer .view-count',
+            '#info-text .view-count',
+            'ytd-watch-metadata ytd-video-view-count-renderer span.view-count',
+            '#count ytd-video-view-count-renderer .view-count'
+        ];
+        for (const selector of viewSelectors) {
+            const el = document.querySelector(selector);
+            if (el) {
+                const text = el.innerText.trim();
+                const match = text.replace(/,/g, '').match(/(\d+)/);
+                if (match) {
+                    views = parseInt(match[1], 10);
+                    break;
+                }
+            }
+        }
+
+        // Method 2: Try ytInitialPlayerResponse via page context injection
+        if (!views) {
+            const script = document.createElement('script');
+            script.textContent = `
+                (function() {
+                    let vc = null;
+                    try {
+                        vc = window.ytInitialPlayerResponse?.videoDetails?.viewCount;
+                        if (!vc) {
+                            const contents = window.ytInitialData?.contents?.twoColumnWatchNextResults
+                                ?.results?.results?.contents;
+                            if (contents) {
+                                for (const c of contents) {
+                                    const vcr = c.videoPrimaryInfoRenderer?.viewCount
+                                        ?.videoViewCountRenderer?.viewCount?.simpleText;
+                                    if (vcr) { vc = vcr; break; }
+                                }
+                            }
+                        }
+                    } catch(e) {}
+                    window.postMessage({ type: 'YT_VIEW_COUNT', viewCount: vc }, '*');
+                })();
+            `;
+            document.documentElement.appendChild(script);
+            script.remove();
+
+            views = await new Promise((resolve) => {
+                const handler = (event) => {
+                    if (event.data && event.data.type === 'YT_VIEW_COUNT') {
+                        window.removeEventListener('message', handler);
+                        const vc = event.data.viewCount;
+                        if (vc) {
+                            const num = parseInt(String(vc).replace(/[^0-9]/g, ''), 10);
+                            resolve(isNaN(num) ? null : num);
+                        } else {
+                            resolve(null);
+                        }
+                    }
+                };
+                window.addEventListener('message', handler);
+                setTimeout(() => {
+                    window.removeEventListener('message', handler);
+                    resolve(null);
+                }, 500);
+            });
+        }
+    } catch(e) {}
+
     const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;  // More reliable than maxresdefault
     const qualities = await getAvailableQualities();
 
@@ -104,6 +175,7 @@ async function getVideoInfo() {
         videoTitle,
         channelName,
         duration,
+        views,
         thumbnail,
         qualities
     };

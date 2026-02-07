@@ -184,6 +184,10 @@ const playlistCount = document.getElementById("playlist-count");
 // Enable/disable subtitle language dropdown based on checkbox
 subtitleCheckbox.addEventListener("change", () => {
   subtitleLang.disabled = !subtitleCheckbox.checked;
+  const langSection = document.querySelector('.language-section');
+  if (langSection) {
+    langSection.classList.toggle('visible', subtitleCheckbox.checked);
+  }
 });
 
 const SERVER_URL = "http://localhost:5000";
@@ -329,7 +333,12 @@ async function loadVideoInfo() {
       
       // Update views if available
       if (contentResponse.views && videoViewsElement) {
-        videoViewsElement.textContent = contentResponse.views;
+        videoViewsElement.textContent = formatViews(contentResponse.views);
+      }
+      // Show/hide separator based on views
+      const metaSep = document.getElementById('meta-separator');
+      if (metaSep) {
+        metaSep.classList.toggle('hidden', !contentResponse.views);
       }
 
       if (contentResponse.thumbnail) {
@@ -425,11 +434,12 @@ async function loadVideoInfo() {
       }
       if (infoData.duration) {
         videoDurationOverlay.textContent = formatDuration(infoData.duration);
-        
-        // Update views if available  
-        if (infoData.views && videoViewsElement) {
-          videoViewsElement.textContent = formatViews(infoData.views);
-        }
+      }
+      // Update views if available  
+      if (infoData.view_count && videoViewsElement) {
+        videoViewsElement.textContent = formatViews(infoData.view_count);
+        const metaSep = document.getElementById('meta-separator');
+        if (metaSep) metaSep.classList.remove('hidden');
       }
       if (infoData.thumbnail) {
         thumbnailImg.onload = () => {
@@ -648,7 +658,8 @@ downloadBtn.addEventListener("click", async () => {
     }
     
     logInfo("Starting playlist download", { title: currentPlaylistInfo.title, quality: qualityData });
-    status.textContent = "Starting playlist download...";
+    const subtitleInfo = subtitleCheckbox.checked ? ` (with ${subtitleLang.options[subtitleLang.selectedIndex].text} subtitles)` : "";
+    status.textContent = `Starting playlist download${subtitleInfo}...`;
     downloadBtn.textContent = "Downloading...";
     
     try {
@@ -687,7 +698,8 @@ downloadBtn.addEventListener("click", async () => {
     }
     
     logInfo("Starting video download", { title: currentVideoInfo.videoTitle, quality: qualityData, subtitles: subtitleCheckbox.checked ? subtitleLang.value : null });
-    status.textContent = "Downloading...";
+    const subtitleInfo = subtitleCheckbox.checked ? ` (with ${subtitleLang.options[subtitleLang.selectedIndex].text} subtitles)` : "";
+    status.textContent = `Downloading${subtitleInfo}...`;
     downloadBtn.textContent = "Downloading...";
 
     try {
@@ -910,7 +922,7 @@ function renderQueue() {
     
     // Add badges
     if (item.subtitles) {
-      detailsHTML += `<span class="queue-item-badge">🔊 SUBTITLES INCLUDED</span>`;
+      detailsHTML += `<span class="queue-item-badge subtitle-badge">CC ${item.subtitles.toUpperCase()}</span>`;
     }
     
     // Add position for waiting items

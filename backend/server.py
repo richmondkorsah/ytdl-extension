@@ -632,13 +632,35 @@ def download():
                                "av1" if "av01" in vcodec.lower() else \
                                vcodec.split(".")[0] if vcodec else ""
         
-        # Find the downloaded file
+        # Find the downloaded file - prefer video files over subtitle files
         downloaded_file = None
+        video_extensions = {'.mp4', '.webm', '.mkv', '.avi', '.mov', '.flv', '.m4v'}
+        audio_extensions = {'.mp3', '.m4a', '.opus', '.ogg', '.wav', '.flac', '.aac'}
+        subtitle_extensions = {'.srt', '.vtt', '.ass', '.ssa', '.sub', '.lrc'}
+        media_extensions = video_extensions | audio_extensions
+        
+        all_files = []
         for f in os.listdir(temp_dir):
             filepath = os.path.join(temp_dir, f)
             if os.path.isfile(filepath):
-                downloaded_file = filepath
-                break
+                all_files.append(filepath)
+        
+        if all_files:
+            # First try: find a media file (video/audio)
+            for filepath in all_files:
+                ext_lower = os.path.splitext(filepath)[1].lower()
+                if ext_lower in media_extensions:
+                    downloaded_file = filepath
+                    break
+            
+            # Second try: pick the largest file (likely the video)
+            if not downloaded_file:
+                downloaded_file = max(all_files, key=os.path.getsize)
+            
+            # Log subtitle files found
+            subtitle_files = [f for f in all_files if os.path.splitext(f)[1].lower() in subtitle_extensions]
+            if subtitle_files:
+                logger.info(f"Subtitle files found: {[os.path.basename(f) for f in subtitle_files]}")
         
         if not downloaded_file or not os.path.exists(downloaded_file):
             logger.error("Download failed - no file found")

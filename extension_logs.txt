@@ -1,427 +1,3 @@
-[2026-02-07T21:41:54.793Z] [BACKGROUND] [INFO] Initializing download history from storage...
-[2026-02-07T21:41:54.793Z] [BACKGROUND] [QUEUE] Initializing queue from storage...
-[2026-02-07T21:41:54.797Z] [BACKGROUND] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:41:54.797Z] [BACKGROUND] [INFO] Background script loaded
-[2026-02-07T21:41:54.797Z] [BACKGROUND] [INFO] Flask server URL: http://localhost:5000
-[2026-02-07T21:41:54.797Z] [BACKGROUND] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:41:54.803Z] [BACKGROUND] [INFO] 📩 Message received [PREFETCH_INFO] from Tab 2 | [{"type":"PREFETCH_INFO","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk"}]
-[2026-02-07T21:41:54.803Z] [BACKGROUND] [INFO] Starting normal priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:41:54.821Z] [BACKGROUND] [INFO] No existing history found in storage
-[2026-02-07T21:41:54.822Z] [BACKGROUND] [QUEUE] No existing queue found in storage
-[2026-02-07T21:41:55.810Z] [BACKGROUND] [INFO] Scanning existing tabs for YouTube videos...
-[2026-02-07T21:41:55.814Z] [BACKGROUND] [INFO] Found 1 existing YouTube video tabs - starting prefetch
-[2026-02-07T21:41:55.815Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:41:55.815Z] [BACKGROUND] [INFO] Startup prefetch for existing tab 2: SVVnkNZWJhk
-[2026-02-07T21:41:56.041Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): SVVnkNZWJhk
-[2026-02-07T21:41:57.949Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:41:57.949Z] [BACKGROUND] [INFO] Tab 2 activated - high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:41:57.949Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
-[2026-02-07T21:41:57.949Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:42:01.210Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:42:01.210Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:42:01.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
-[2026-02-07T21:42:01.211Z] [POPUP] [INFO] Popup script initializing...
-[2026-02-07T21:42:01.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:42:01.211Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:42:01.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
-[2026-02-07T21:42:01.211Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
-[2026-02-07T21:42:01.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
-[2026-02-07T21:42:01.212Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
-[2026-02-07T21:42:01.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
-[2026-02-07T21:42:01.212Z] [POPUP] [UI] Setting up queue event listeners...
-[2026-02-07T21:42:01.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
-[2026-02-07T21:42:01.212Z] [POPUP] [SUCCESS] Queue event listeners ready
-[2026-02-07T21:42:01.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
-[2026-02-07T21:42:01.212Z] [POPUP] [UI] Loading queue settings from storage...
-[2026-02-07T21:42:01.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
-[2026-02-07T21:42:01.213Z] [POPUP] [UI] Setting up history event listeners...
-[2026-02-07T21:42:01.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
-[2026-02-07T21:42:01.213Z] [POPUP] [SUCCESS] History event listeners ready
-[2026-02-07T21:42:01.213Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
-[2026-02-07T21:42:01.214Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:42:01.214Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:42:01.214Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:42:01.214Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:42:01.254Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
-[2026-02-07T21:42:01.254Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
-[2026-02-07T21:42:01.255Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
-[2026-02-07T21:42:01.255Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
-[2026-02-07T21:42:01.256Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
-[2026-02-07T21:42:01.256Z] [POPUP] [INFO] Detected video page, loading video info...
-[2026-02-07T21:42:01.258Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:42:01.258Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
-[2026-02-07T21:42:01.258Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:42:01.261Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
-[2026-02-07T21:42:01.261Z] [POPUP] [QUEUE] Loading queue from background...
-[2026-02-07T21:42:01.261Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
-[2026-02-07T21:42:01.266Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
-[2026-02-07T21:42:01.266Z] [POPUP] [INFO] Loading history from background...
-[2026-02-07T21:42:01.267Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
-[2026-02-07T21:42:01.268Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
-[2026-02-07T21:42:01.268Z] [POPUP] [INFO] Immediate prefetch triggered for popup
-[2026-02-07T21:42:01.268Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
-[2026-02-07T21:42:01.268Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
-[2026-02-07T21:42:01.269Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
-[2026-02-07T21:42:01.269Z] [POPUP] [INFO] Requesting video info from content script...
-[2026-02-07T21:42:01.271Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
-[2026-02-07T21:42:01.271Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
-[2026-02-07T21:42:01.271Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:42:01.271Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
-[2026-02-07T21:42:01.271Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
-[2026-02-07T21:42:01.271Z] [POPUP] [INFO] History loaded: 0 entries
-[2026-02-07T21:42:01.271Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:42:01.272Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
-[2026-02-07T21:42:02.483Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
-[2026-02-07T21:42:02.484Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
-[2026-02-07T21:42:02.484Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
-[2026-02-07T21:42:02.484Z] [POPUP] [INFO] Checking for cached video info...
-[2026-02-07T21:42:02.484Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
-[2026-02-07T21:42:02.485Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:02.699Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:02.901Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:03.120Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:03.323Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:03.528Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:03.732Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:03.933Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:04.136Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:42:04.200Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
-[2026-02-07T21:42:04.339Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:42:04.343Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
-[2026-02-07T21:42:04.344Z] [POPUP] [INFO] No cached info available
-[2026-02-07T21:42:04.345Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
-[2026-02-07T21:42:04.345Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:42:08.075Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:42:08.075Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:42:11.272Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:42:11.272Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:42:59.912Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:42:59.912Z] [BACKGROUND] [INFO] Tab 2 activated - high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:42:59.912Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:43:06.724Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
-[2026-02-07T21:55:05.032Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:55:05.032Z] [BACKGROUND] [INFO] Tab 2 activated - high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:05.033Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:09.117Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:09.117Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:09.119Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
-[2026-02-07T21:55:09.119Z] [POPUP] [INFO] Popup script initializing...
-[2026-02-07T21:55:09.119Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:09.119Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:09.120Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
-[2026-02-07T21:55:09.120Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
-[2026-02-07T21:55:09.121Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
-[2026-02-07T21:55:09.121Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
-[2026-02-07T21:55:09.121Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
-[2026-02-07T21:55:09.121Z] [POPUP] [UI] Setting up queue event listeners...
-[2026-02-07T21:55:09.121Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
-[2026-02-07T21:55:09.121Z] [POPUP] [SUCCESS] Queue event listeners ready
-[2026-02-07T21:55:09.122Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
-[2026-02-07T21:55:09.122Z] [POPUP] [UI] Loading queue settings from storage...
-[2026-02-07T21:55:09.122Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
-[2026-02-07T21:55:09.123Z] [POPUP] [UI] Setting up history event listeners...
-[2026-02-07T21:55:09.123Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
-[2026-02-07T21:55:09.123Z] [POPUP] [SUCCESS] History event listeners ready
-[2026-02-07T21:55:09.124Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
-[2026-02-07T21:55:09.126Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:09.126Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:09.126Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:09.126Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:09.134Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
-[2026-02-07T21:55:09.135Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
-[2026-02-07T21:55:09.168Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
-[2026-02-07T21:55:09.169Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
-[2026-02-07T21:55:09.169Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
-[2026-02-07T21:55:09.169Z] [POPUP] [INFO] Detected video page, loading video info...
-[2026-02-07T21:55:09.171Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:55:09.171Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
-[2026-02-07T21:55:09.171Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:09.177Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
-[2026-02-07T21:55:09.177Z] [POPUP] [QUEUE] Loading queue from background...
-[2026-02-07T21:55:09.177Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
-[2026-02-07T21:55:09.203Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
-[2026-02-07T21:55:09.203Z] [POPUP] [INFO] Loading history from background...
-[2026-02-07T21:55:09.203Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
-[2026-02-07T21:55:09.203Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
-[2026-02-07T21:55:09.204Z] [POPUP] [INFO] Immediate prefetch triggered for popup
-[2026-02-07T21:55:09.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
-[2026-02-07T21:55:09.204Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
-[2026-02-07T21:55:09.204Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
-[2026-02-07T21:55:09.204Z] [POPUP] [INFO] Requesting video info from content script...
-[2026-02-07T21:55:09.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
-[2026-02-07T21:55:09.209Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
-[2026-02-07T21:55:09.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:09.209Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:09.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
-[2026-02-07T21:55:09.209Z] [POPUP] [INFO] History loaded: 0 entries
-[2026-02-07T21:55:09.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:09.209Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:10.461Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
-[2026-02-07T21:55:10.461Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
-[2026-02-07T21:55:10.463Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
-[2026-02-07T21:55:10.463Z] [POPUP] [INFO] Checking for cached video info...
-[2026-02-07T21:55:10.464Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
-[2026-02-07T21:55:10.465Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:10.668Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:10.869Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:11.084Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:11.300Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:11.505Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:11.708Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:11.909Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:12.113Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:12.314Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:12.518Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:12.718Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:12.920Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:13.121Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:13.324Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:13.540Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:13.740Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:13.942Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:14.157Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:14.358Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:14.562Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:14.776Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:14.979Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:15.043Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:55:15.043Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:55:15.182Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:55:18.100Z] [BACKGROUND] [INFO] No existing history found in storage
-[2026-02-07T21:55:18.100Z] [BACKGROUND] [QUEUE] No existing queue found in storage
-[2026-02-07T21:55:19.105Z] [BACKGROUND] [INFO] Scanning existing tabs for YouTube videos...
-[2026-02-07T21:55:19.109Z] [BACKGROUND] [INFO] Found 1 existing YouTube video tabs - starting prefetch
-[2026-02-07T21:55:19.110Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:19.110Z] [BACKGROUND] [INFO] Startup prefetch for existing tab 2: SVVnkNZWJhk
-[2026-02-07T21:55:19.852Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): SVVnkNZWJhk
-[2026-02-07T21:55:22.131Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:22.132Z] [BACKGROUND] [INFO] Tab 2 activated - high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:22.132Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
-[2026-02-07T21:55:22.132Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:25.176Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:25.177Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:25.177Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
-[2026-02-07T21:55:25.178Z] [POPUP] [INFO] Popup script initializing...
-[2026-02-07T21:55:25.178Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:25.178Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:25.178Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
-[2026-02-07T21:55:25.178Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
-[2026-02-07T21:55:25.179Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
-[2026-02-07T21:55:25.179Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
-[2026-02-07T21:55:25.179Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
-[2026-02-07T21:55:25.179Z] [POPUP] [UI] Setting up queue event listeners...
-[2026-02-07T21:55:25.179Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
-[2026-02-07T21:55:25.180Z] [POPUP] [SUCCESS] Queue event listeners ready
-[2026-02-07T21:55:25.180Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
-[2026-02-07T21:55:25.180Z] [POPUP] [UI] Loading queue settings from storage...
-[2026-02-07T21:55:25.180Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
-[2026-02-07T21:55:25.180Z] [POPUP] [UI] Setting up history event listeners...
-[2026-02-07T21:55:25.180Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
-[2026-02-07T21:55:25.181Z] [POPUP] [SUCCESS] History event listeners ready
-[2026-02-07T21:55:25.181Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
-[2026-02-07T21:55:25.230Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:25.230Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:25.231Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:25.231Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
-[2026-02-07T21:55:25.238Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
-[2026-02-07T21:55:25.238Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
-[2026-02-07T21:55:25.238Z] [POPUP] [INFO] Detected video page, loading video info...
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
-[2026-02-07T21:55:25.238Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:25.243Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
-[2026-02-07T21:55:25.243Z] [POPUP] [QUEUE] Loading queue from background...
-[2026-02-07T21:55:25.243Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
-[2026-02-07T21:55:25.244Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
-[2026-02-07T21:55:25.244Z] [POPUP] [INFO] Loading history from background...
-[2026-02-07T21:55:25.244Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
-[2026-02-07T21:55:25.244Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
-[2026-02-07T21:55:25.244Z] [POPUP] [INFO] Immediate prefetch triggered for popup
-[2026-02-07T21:55:25.244Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
-[2026-02-07T21:55:25.244Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
-[2026-02-07T21:55:25.244Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
-[2026-02-07T21:55:25.244Z] [POPUP] [INFO] Requesting video info from content script...
-[2026-02-07T21:55:25.247Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
-[2026-02-07T21:55:25.247Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
-[2026-02-07T21:55:25.247Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:25.247Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:25.248Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
-[2026-02-07T21:55:25.248Z] [POPUP] [INFO] History loaded: 0 entries
-[2026-02-07T21:55:25.248Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:25.249Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:26.472Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
-[2026-02-07T21:55:26.472Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
-[2026-02-07T21:55:26.474Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
-[2026-02-07T21:55:26.475Z] [POPUP] [INFO] Checking for cached video info...
-[2026-02-07T21:55:26.476Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
-[2026-02-07T21:55:26.476Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:26.678Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:26.896Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:27.117Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:27.318Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:27.535Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:27.753Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:27.984Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:28.107Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:55:28.107Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:55:28.200Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:55:28.203Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
-[2026-02-07T21:55:28.203Z] [POPUP] [INFO] No cached info available
-[2026-02-07T21:55:28.203Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
-[2026-02-07T21:55:28.204Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:55:32.150Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:55:32.150Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:55:35.242Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
-[2026-02-07T21:55:35.243Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
-[2026-02-07T21:55:41.744Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:41.745Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:41.745Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
-[2026-02-07T21:55:41.745Z] [POPUP] [INFO] Popup script initializing...
-[2026-02-07T21:55:41.745Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T21:55:41.745Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T21:55:41.745Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]}]
-[2026-02-07T21:55:41.745Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueSection":true,"queueBadge":true,"clearQueueBtn":true}]
-[2026-02-07T21:55:41.745Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
-[2026-02-07T21:55:41.745Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
-[2026-02-07T21:55:41.746Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
-[2026-02-07T21:55:41.746Z] [POPUP] [UI] Setting up queue event listeners...
-[2026-02-07T21:55:41.753Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
-[2026-02-07T21:55:41.753Z] [POPUP] [SUCCESS] Queue event listeners ready
-[2026-02-07T21:55:41.754Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue settings from storage...","data":null}]
-[2026-02-07T21:55:41.754Z] [POPUP] [UI] Loading queue settings from storage...
-[2026-02-07T21:55:41.754Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
-[2026-02-07T21:55:41.754Z] [POPUP] [UI] Setting up history event listeners...
-[2026-02-07T21:55:41.754Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
-[2026-02-07T21:55:41.754Z] [POPUP] [SUCCESS] History event listeners ready
-[2026-02-07T21:55:41.754Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
-[2026-02-07T21:55:41.757Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:41.758Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:41.758Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T21:55:41.758Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T21:55:41.764Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
-[2026-02-07T21:55:41.764Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
-[2026-02-07T21:55:41.764Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
-[2026-02-07T21:55:41.764Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
-[2026-02-07T21:55:41.764Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
-[2026-02-07T21:55:41.764Z] [POPUP] [INFO] Detected video page, loading video info...
-[2026-02-07T21:55:41.764Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T21:55:41.764Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T21:55:41.768Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
-[2026-02-07T21:55:41.768Z] [POPUP] [QUEUE] Loading queue from background...
-[2026-02-07T21:55:41.768Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
-[2026-02-07T21:55:41.769Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
-[2026-02-07T21:55:41.769Z] [POPUP] [INFO] Loading history from background...
-[2026-02-07T21:55:41.769Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
-[2026-02-07T21:55:41.769Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
-[2026-02-07T21:55:41.769Z] [POPUP] [INFO] Immediate prefetch triggered for popup
-[2026-02-07T21:55:41.769Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
-[2026-02-07T21:55:41.769Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
-[2026-02-07T21:55:41.770Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
-[2026-02-07T21:55:41.770Z] [POPUP] [INFO] Requesting video info from content script...
-[2026-02-07T21:55:41.773Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
-[2026-02-07T21:55:41.773Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
-[2026-02-07T21:55:41.773Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:41.773Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:41.773Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
-[2026-02-07T21:55:41.773Z] [POPUP] [INFO] History loaded: 0 entries
-[2026-02-07T21:55:41.773Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
-[2026-02-07T21:55:41.773Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
-[2026-02-07T21:55:42.986Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
-[2026-02-07T21:55:42.987Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
-[2026-02-07T21:55:42.987Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
-[2026-02-07T21:55:42.987Z] [POPUP] [INFO] Checking for cached video info...
-[2026-02-07T21:55:42.988Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
-[2026-02-07T21:55:42.988Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:43.198Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:43.417Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:43.619Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:43.822Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:44.025Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:44.227Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:44.430Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:44.633Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:44.836Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:45.037Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:45.240Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:45.441Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:45.656Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:45.861Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:46.065Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:46.266Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:46.472Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:46.688Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:46.904Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:47.106Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:47.308Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:47.510Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:47.711Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:47.926Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:48.140Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:48.342Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:48.547Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:48.748Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:48.961Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:49.166Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:49.369Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:49.571Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:49.774Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:49.975Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:50.180Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:50.383Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:50.586Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:50.821Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
-[2026-02-07T21:55:50.911Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
-[2026-02-07T21:55:51.023Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
-[2026-02-07T21:55:51.033Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
-[2026-02-07T21:55:51.033Z] [POPUP] [INFO] No cached info available
-[2026-02-07T21:55:51.034Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
-[2026-02-07T21:55:51.034Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T22:01:12.028Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T22:01:12.028Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T22:01:12.029Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
-[2026-02-07T22:01:12.029Z] [POPUP] [INFO] Popup script initializing...
-[2026-02-07T22:01:12.029Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
-[2026-02-07T22:01:12.029Z] [POPUP] [INFO] ═══════════════════════════════════════
-[2026-02-07T22:01:12.029Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":false,"addToQueueBtn":true,"queueList":true,"queueSection":false,"queueBadge":true,"clearQueueBtn":true}]}]
-[2026-02-07T22:01:12.029Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":false,"addToQueueBtn":true,"queueList":true,"queueSection":false,"queueBadge":true,"clearQueueBtn":true}]
-[2026-02-07T22:01:12.030Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historySection":true,"historyList":true}]}]
-[2026-02-07T22:01:12.030Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historySection":true,"historyList":true}]
-[2026-02-07T22:01:12.030Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"WARN","message":"Queue UI elements not found - queue disabled","data":null}]
-[2026-02-07T22:01:12.030Z] [POPUP] [WARN] Queue UI elements not found - queue disabled
-[2026-02-07T22:01:12.030Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
-[2026-02-07T22:01:12.030Z] [POPUP] [UI] Setting up history event listeners...
-[2026-02-07T22:01:12.031Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
-[2026-02-07T22:01:12.031Z] [POPUP] [SUCCESS] History event listeners ready
-[2026-02-07T22:01:12.032Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
-[2026-02-07T22:01:12.093Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T22:01:12.093Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T22:01:12.093Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
-[2026-02-07T22:01:12.094Z] [POPUP] [INFO] Loading video info...
-[2026-02-07T22:01:12.102Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
-[2026-02-07T22:01:12.102Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
-[2026-02-07T22:01:12.102Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
-[2026-02-07T22:01:12.102Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
-[2026-02-07T22:01:12.102Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
-[2026-02-07T22:01:12.102Z] [POPUP] [INFO] Detected video page, loading video info...
-[2026-02-07T22:01:12.102Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
-[2026-02-07T22:01:12.102Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
-[2026-02-07T22:01:12.110Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
-[2026-02-07T22:01:12.110Z] [POPUP] [INFO] Loading history from background...
-[2026-02-07T22:01:12.110Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
-[2026-02-07T22:01:12.110Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
-[2026-02-07T22:01:12.110Z] [POPUP] [INFO] Immediate prefetch triggered for popup
-[2026-02-07T22:01:12.110Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
-[2026-02-07T22:01:12.110Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
-[2026-02-07T22:01:12.111Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
-[2026-02-07T22:01:12.111Z] [POPUP] [INFO] Requesting video info from content script...
-[2026-02-07T22:01:12.112Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
-[2026-02-07T22:01:12.112Z] [POPUP] [INFO] History loaded: 0 entries
-[2026-02-07T22:01:12.112Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
-[2026-02-07T22:01:12.112Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
-[2026-02-07T22:01:13.331Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
 [2026-02-07T22:01:13.331Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
 [2026-02-07T22:01:13.331Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
 [2026-02-07T22:01:13.331Z] [POPUP] [INFO] Checking for cached video info...
@@ -911,3 +487,514 @@
 [2026-02-07T23:02:35.985Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
 [2026-02-07T23:02:38.855Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
 [2026-02-07T23:02:38.856Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
+[2026-02-07T23:07:06.061Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:07:06.061Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:07:06.062Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-07T23:07:06.062Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-07T23:07:06.062Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:07:06.062Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:07:06.062Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]}]
+[2026-02-07T23:07:06.062Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]
+[2026-02-07T23:07:06.063Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historyOverlay":true,"historyList":true}]}]
+[2026-02-07T23:07:06.063Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historyOverlay":true,"historyList":true}]
+[2026-02-07T23:07:06.063Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-07T23:07:06.063Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-07T23:07:06.063Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-07T23:07:06.064Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-07T23:07:06.064Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue from storage...","data":null}]
+[2026-02-07T23:07:06.064Z] [POPUP] [UI] Loading queue from storage...
+[2026-02-07T23:07:06.064Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-07T23:07:06.064Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-07T23:07:06.064Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-07T23:07:06.065Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-07T23:07:06.065Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-07T23:07:06.065Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-07T23:07:06.065Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-07T23:07:06.066Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-07T23:07:06.066Z] [POPUP] [INFO] Loading history from background...
+[2026-02-07T23:07:06.066Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-07T23:07:06.066Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Settings event listeners ready","data":null}]
+[2026-02-07T23:07:06.067Z] [POPUP] [SUCCESS] Settings event listeners ready
+[2026-02-07T23:07:06.067Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-07T23:07:06.075Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:07:06.076Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:07:06.076Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:07:06.076Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:07:06.086Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
+[2026-02-07T23:07:06.086Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
+[2026-02-07T23:07:06.086Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-07T23:07:06.086Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-07T23:07:06.086Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-07T23:07:06.086Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-07T23:07:06.087Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:07:06.088Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:07:06.088Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-07T23:07:06.088Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-07T23:07:06.089Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:07:06.089Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-07T23:07:06.089Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-07T23:07:06.089Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-07T23:07:06.089Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:07:06.089Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-07T23:07:06.095Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
+[2026-02-07T23:07:06.095Z] [POPUP] [INFO] Immediate prefetch triggered for popup
+[2026-02-07T23:07:06.097Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:07:06.097Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:07:06.097Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-07T23:07:06.097Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-07T23:07:06.097Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:07:06.097Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:07:07.328Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-07T23:07:07.328Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-07T23:07:07.343Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-07T23:07:07.344Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-07T23:07:07.344Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
+[2026-02-07T23:07:07.344Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:07.552Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:07.754Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:07.956Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:08.158Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:08.358Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:08.563Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:08.767Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:08.968Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:09.170Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:09.386Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:09.603Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:09.818Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:10.018Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:10.219Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:10.422Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:10.637Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:10.851Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:11.052Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:11.258Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:11.460Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:11.664Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:11.870Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:12.075Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:12.277Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:12.481Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:12.686Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:12.788Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
+[2026-02-07T23:07:12.892Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
+[2026-02-07T23:07:50.079Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:07:50.079Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:07:50.080Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-07T23:07:50.080Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:07:50.081Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]}]
+[2026-02-07T23:07:50.081Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historyOverlay":true,"historyList":true}]}]
+[2026-02-07T23:07:50.081Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historyOverlay":true,"historyList":true}]
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-07T23:07:50.081Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-07T23:07:50.081Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-07T23:07:50.081Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue from storage...","data":null}]
+[2026-02-07T23:07:50.081Z] [POPUP] [UI] Loading queue from storage...
+[2026-02-07T23:07:50.082Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-07T23:07:50.082Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-07T23:07:50.082Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-07T23:07:50.082Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-07T23:07:50.082Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-07T23:07:50.082Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-07T23:07:50.082Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-07T23:07:50.083Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-07T23:07:50.083Z] [POPUP] [INFO] Loading history from background...
+[2026-02-07T23:07:50.083Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-07T23:07:50.085Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Settings event listeners ready","data":null}]
+[2026-02-07T23:07:50.085Z] [POPUP] [SUCCESS] Settings event listeners ready
+[2026-02-07T23:07:50.085Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-07T23:07:50.095Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:07:50.095Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:07:50.096Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:07:50.096Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:07:50.103Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
+[2026-02-07T23:07:50.104Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
+[2026-02-07T23:07:50.104Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-07T23:07:50.104Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-07T23:07:50.104Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-07T23:07:50.104Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-07T23:07:50.104Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:07:50.104Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:07:50.105Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-07T23:07:50.105Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-07T23:07:50.105Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:07:50.107Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-07T23:07:50.107Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-07T23:07:50.107Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-07T23:07:50.107Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:07:50.107Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-07T23:07:50.113Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
+[2026-02-07T23:07:50.113Z] [POPUP] [INFO] Immediate prefetch triggered for popup
+[2026-02-07T23:07:50.113Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:07:50.113Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:07:50.114Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-07T23:07:50.114Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-07T23:07:50.114Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:07:50.114Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:07:51.329Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-07T23:07:51.330Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-07T23:07:51.340Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-07T23:07:51.340Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-07T23:07:51.341Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
+[2026-02-07T23:07:51.341Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:51.554Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:51.757Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:51.990Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:52.193Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:52.395Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:52.597Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:52.801Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:53.006Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:53.205Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:53.421Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:53.626Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:53.841Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:54.043Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:54.244Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:54.445Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:54.646Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:54.847Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:55.056Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:55.266Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:55.470Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:55.673Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:55.874Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:56.075Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:56.278Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:56.483Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:56.687Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:07:56.740Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
+[2026-02-07T23:07:56.890Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
+[2026-02-07T23:10:24.886Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:10:24.886Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:10:24.888Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-07T23:10:24.888Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-07T23:10:24.888Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:10:24.888Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:10:24.894Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]}]
+[2026-02-07T23:10:24.894Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]
+[2026-02-07T23:10:24.894Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historyOverlay":true,"historyList":true}]}]
+[2026-02-07T23:10:24.895Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historyOverlay":true,"historyList":true}]
+[2026-02-07T23:10:24.895Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-07T23:10:24.895Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-07T23:10:24.895Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-07T23:10:24.896Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-07T23:10:24.896Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue from storage...","data":null}]
+[2026-02-07T23:10:24.896Z] [POPUP] [UI] Loading queue from storage...
+[2026-02-07T23:10:24.896Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-07T23:10:24.896Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-07T23:10:24.897Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-07T23:10:24.897Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-07T23:10:24.897Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-07T23:10:24.898Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-07T23:10:24.898Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-07T23:10:24.898Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-07T23:10:24.898Z] [POPUP] [INFO] Loading history from background...
+[2026-02-07T23:10:24.898Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-07T23:10:24.898Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Settings event listeners ready","data":null}]
+[2026-02-07T23:10:24.898Z] [POPUP] [SUCCESS] Settings event listeners ready
+[2026-02-07T23:10:24.899Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-07T23:10:24.909Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:10:24.909Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:10:24.909Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:10:24.909Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:10:24.915Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
+[2026-02-07T23:10:24.915Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
+[2026-02-07T23:10:24.915Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-07T23:10:24.915Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-07T23:10:24.916Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-07T23:10:24.916Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-07T23:10:24.916Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:10:24.916Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:10:24.916Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-07T23:10:24.916Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-07T23:10:24.917Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:10:24.917Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-07T23:10:24.917Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-07T23:10:24.917Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-07T23:10:24.917Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:10:24.917Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-07T23:10:24.922Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
+[2026-02-07T23:10:24.922Z] [POPUP] [INFO] Immediate prefetch triggered for popup
+[2026-02-07T23:10:24.922Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:10:24.922Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:10:24.922Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-07T23:10:24.922Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-07T23:10:24.924Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:10:24.924Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:10:26.145Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-07T23:10:26.145Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-07T23:10:26.146Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-07T23:10:26.146Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-07T23:10:26.147Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
+[2026-02-07T23:10:26.147Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:26.352Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:26.552Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:26.756Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:26.957Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:27.158Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:27.376Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:27.581Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:27.798Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:28.000Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:28.201Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:28.404Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:28.606Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:28.825Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:29.025Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:29.227Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:29.430Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:29.646Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:29.848Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:30.064Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:30.265Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:30.467Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:30.668Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:30.870Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.084Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.289Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.494Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.699Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.848Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
+[2026-02-07T23:10:31.901Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
+[2026-02-07T23:10:31.911Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
+[2026-02-07T23:10:31.912Z] [POPUP] [INFO] No cached info available
+[2026-02-07T23:10:31.912Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
+[2026-02-07T23:10:31.912Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:10:40.192Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server response received","data":[{"success":false}]}]
+[2026-02-07T23:10:40.192Z] [POPUP] [SUCCESS] Server response received | [{"success":false}]
+[2026-02-07T23:10:40.193Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:10:40.193Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:10:54.932Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:10:54.932Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:11:25.366Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:11:25.366Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:11:55.597Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:11:55.598Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:12:22.572Z] [BACKGROUND] [INFO] No existing history found in storage
+[2026-02-07T23:12:22.573Z] [BACKGROUND] [QUEUE] No existing queue found in storage
+[2026-02-07T23:12:23.617Z] [BACKGROUND] [INFO] Scanning existing tabs for YouTube videos...
+[2026-02-07T23:12:23.620Z] [BACKGROUND] [INFO] Found 1 existing YouTube video tabs - starting prefetch
+[2026-02-07T23:12:23.621Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:23.621Z] [BACKGROUND] [INFO] Startup prefetch for existing tab 2: SVVnkNZWJhk
+[2026-02-07T23:12:23.810Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:23.810Z] [BACKGROUND] [INFO] Tab 2 activated - high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:12:23.810Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
+[2026-02-07T23:12:23.810Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:12:23.848Z] [BACKGROUND] [INFO] Skipping prefetch (already fetching): SVVnkNZWJhk
+[2026-02-07T23:12:26.209Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:12:26.209Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:12:26.210Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-07T23:12:26.210Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-07T23:12:26.210Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:12:26.210Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:12:26.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]}]
+[2026-02-07T23:12:26.211Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]
+[2026-02-07T23:12:26.211Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historyOverlay":true,"historyList":true}]}]
+[2026-02-07T23:12:26.211Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historyOverlay":true,"historyList":true}]
+[2026-02-07T23:12:26.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-07T23:12:26.212Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-07T23:12:26.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-07T23:12:26.212Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-07T23:12:26.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue from storage...","data":null}]
+[2026-02-07T23:12:26.212Z] [POPUP] [UI] Loading queue from storage...
+[2026-02-07T23:12:26.212Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-07T23:12:26.212Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-07T23:12:26.212Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-07T23:12:26.213Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-07T23:12:26.213Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-07T23:12:26.213Z] [POPUP] [INFO] Loading history from background...
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Settings event listeners ready","data":null}]
+[2026-02-07T23:12:26.213Z] [POPUP] [SUCCESS] Settings event listeners ready
+[2026-02-07T23:12:26.213Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-07T23:12:26.227Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:12:26.228Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:12:26.228Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:12:26.228Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:12:26.235Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
+[2026-02-07T23:12:26.235Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
+[2026-02-07T23:12:26.235Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-07T23:12:26.236Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-07T23:12:26.236Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-07T23:12:26.236Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-07T23:12:26.236Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:12:26.236Z] [BACKGROUND] [INFO] High priority override for ongoing fetch: SVVnkNZWJhk
+[2026-02-07T23:12:26.236Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:12:26.237Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-07T23:12:26.237Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-07T23:12:26.237Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:12:26.237Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-07T23:12:26.237Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-07T23:12:26.238Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-07T23:12:26.238Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:12:26.238Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-07T23:12:26.245Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
+[2026-02-07T23:12:26.245Z] [POPUP] [INFO] Immediate prefetch triggered for popup
+[2026-02-07T23:12:26.246Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:12:26.246Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:12:26.246Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-07T23:12:26.246Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-07T23:12:26.247Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:12:26.247Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:12:27.475Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","views":363987,"thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-07T23:12:27.475Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","views":363987,"thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-07T23:12:27.476Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-07T23:12:27.476Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-07T23:12:27.476Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
+[2026-02-07T23:12:27.476Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:27.688Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:27.903Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:28.118Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:28.334Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:28.535Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:28.735Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:28.960Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:29.166Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:29.382Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:29.586Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:29.789Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:30.019Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:30.222Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:30.458Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:30.670Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:30.903Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:31.104Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:31.319Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:31.519Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:31.720Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:31.935Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:32.149Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:32.365Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:32.578Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:12:32.579Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
+[2026-02-07T23:12:32.579Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
+[2026-02-07T23:12:32.780Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
+[2026-02-07T23:12:32.796Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
+[2026-02-07T23:12:32.796Z] [POPUP] [INFO] No cached info available
+[2026-02-07T23:12:32.797Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
+[2026-02-07T23:12:32.797Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:12:33.822Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
+[2026-02-07T23:12:33.823Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
+[2026-02-07T23:12:36.247Z] [BACKGROUND] [WARN] Prefetch timeout for: SVVnkNZWJhk
+[2026-02-07T23:12:36.247Z] [BACKGROUND] [WARN] Prefetch aborted for SVVnkNZWJhk (timeout)
+[2026-02-07T23:12:43.342Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server response received","data":[{"success":false}]}]
+[2026-02-07T23:12:43.343Z] [POPUP] [SUCCESS] Server response received | [{"success":false}]
+[2026-02-07T23:12:43.343Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:12:43.343Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:12:57.001Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:12:57.001Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:13:26.993Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:13:26.993Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:14:03.833Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:14:03.833Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:14:03.834Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Popup script initializing...","data":null}]
+[2026-02-07T23:14:03.834Z] [POPUP] [INFO] Popup script initializing...
+[2026-02-07T23:14:03.835Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"═══════════════════════════════════════","data":null}]
+[2026-02-07T23:14:03.835Z] [POPUP] [INFO] ═══════════════════════════════════════
+[2026-02-07T23:14:03.836Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Queue UI elements check:","data":[{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]}]
+[2026-02-07T23:14:03.836Z] [POPUP] [UI] Queue UI elements check: | [{"enabled":true,"addToQueueBtn":true,"queueList":true,"queueOverlay":true,"queueBadge":true}]
+[2026-02-07T23:14:03.836Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"History UI elements check:","data":[{"enabled":true,"historyOverlay":true,"historyList":true}]}]
+[2026-02-07T23:14:03.836Z] [POPUP] [UI] History UI elements check: | [{"enabled":true,"historyOverlay":true,"historyList":true}]
+[2026-02-07T23:14:03.836Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up queue event listeners...","data":null}]
+[2026-02-07T23:14:03.837Z] [POPUP] [UI] Setting up queue event listeners...
+[2026-02-07T23:14:03.837Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Queue event listeners ready","data":null}]
+[2026-02-07T23:14:03.837Z] [POPUP] [SUCCESS] Queue event listeners ready
+[2026-02-07T23:14:03.837Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Loading queue from storage...","data":null}]
+[2026-02-07T23:14:03.837Z] [POPUP] [UI] Loading queue from storage...
+[2026-02-07T23:14:03.837Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Loading queue from background...","data":null}]
+[2026-02-07T23:14:03.837Z] [POPUP] [QUEUE] Loading queue from background...
+[2026-02-07T23:14:03.838Z] [BACKGROUND] [INFO] 📩 Message received [GET_QUEUE] from Popup/Extension | [{"type":"GET_QUEUE"}]
+[2026-02-07T23:14:03.838Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Setting up history event listeners...","data":null}]
+[2026-02-07T23:14:03.838Z] [POPUP] [UI] Setting up history event listeners...
+[2026-02-07T23:14:03.838Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"History event listeners ready","data":null}]
+[2026-02-07T23:14:03.838Z] [POPUP] [SUCCESS] History event listeners ready
+[2026-02-07T23:14:03.838Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading history from background...","data":null}]
+[2026-02-07T23:14:03.838Z] [POPUP] [INFO] Loading history from background...
+[2026-02-07T23:14:03.838Z] [BACKGROUND] [INFO] 📩 Message received [GET_HISTORY] from Popup/Extension | [{"type":"GET_HISTORY"}]
+[2026-02-07T23:14:03.839Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Settings event listeners ready","data":null}]
+[2026-02-07T23:14:03.840Z] [POPUP] [SUCCESS] Settings event listeners ready
+[2026-02-07T23:14:03.840Z] [BACKGROUND] [INFO] 📩 Message received [GET_LOGS] from Popup/Extension | [{"type":"GET_LOGS"}]
+[2026-02-07T23:14:03.850Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:14:03.850Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:14:03.850Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Loading video info...","data":null}]
+[2026-02-07T23:14:03.850Z] [POPUP] [INFO] Loading video info...
+[2026-02-07T23:14:03.857Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Active tab:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]}]
+[2026-02-07T23:14:03.857Z] [POPUP] [INFO] Active tab: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","id":2}]
+[2026-02-07T23:14:03.857Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"URL analysis:","data":[{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]}]
+[2026-02-07T23:14:03.857Z] [POPUP] [INFO] URL analysis: | [{"playlistId":null,"videoId":"SVVnkNZWJhk","isPlaylistPage":false,"isVideoPage":true}]
+[2026-02-07T23:14:03.857Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Detected video page, loading video info...","data":null}]
+[2026-02-07T23:14:03.857Z] [POPUP] [INFO] Detected video page, loading video info...
+[2026-02-07T23:14:03.857Z] [BACKGROUND] [INFO] 📩 Message received [IMMEDIATE_PREFETCH] from Popup/Extension | [{"type":"IMMEDIATE_PREFETCH","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:14:03.858Z] [BACKGROUND] [INFO] Starting high priority prefetch for: SVVnkNZWJhk
+[2026-02-07T23:14:03.858Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"QUEUE","message":"Got queue state from background:","data":[{"queueLength":0,"isProcessing":false,"items":[]}]}]
+[2026-02-07T23:14:03.858Z] [POPUP] [QUEUE] Got queue state from background: | [{"queueLength":0,"isProcessing":false,"items":[]}]
+[2026-02-07T23:14:03.858Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering queue","data":[{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:14:03.858Z] [POPUP] [UI] Rendering queue | [{"total":0,"pending":0,"downloading":0,"completed":0,"failed":0}]
+[2026-02-07T23:14:03.858Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"History loaded: 0 entries","data":null}]
+[2026-02-07T23:14:03.858Z] [POPUP] [INFO] History loaded: 0 entries
+[2026-02-07T23:14:03.861Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"UI","message":"Rendering history","data":[{"total":0,"completed":0,"failed":0}]}]
+[2026-02-07T23:14:03.862Z] [POPUP] [UI] Rendering history | [{"total":0,"completed":0,"failed":0}]
+[2026-02-07T23:14:03.870Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Immediate prefetch triggered for popup","data":null}]
+[2026-02-07T23:14:03.870Z] [POPUP] [INFO] Immediate prefetch triggered for popup
+[2026-02-07T23:14:03.870Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fallback qualities loaded - UI ready for interaction","data":null}]
+[2026-02-07T23:14:03.870Z] [POPUP] [INFO] Fallback qualities loaded - UI ready for interaction
+[2026-02-07T23:14:03.870Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Requesting video info from content script...","data":null}]
+[2026-02-07T23:14:03.870Z] [POPUP] [INFO] Requesting video info from content script...
+[2026-02-07T23:14:03.871Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Server connected","data":[{"deno":true,"ffmpeg":true,"status":"ok"}]}]
+[2026-02-07T23:14:03.871Z] [POPUP] [SUCCESS] Server connected | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:14:05.096Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"SUCCESS","message":"Content script response:","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","views":363987,"thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]}]
+[2026-02-07T23:14:05.096Z] [POPUP] [SUCCESS] Content script response: | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","videoId":"SVVnkNZWJhk","videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","duration":"7:09","views":363987,"thumbnail":"https://img.youtube.com/vi/SVVnkNZWJhk/hqdefault.jpg","qualities":[{"value":"best","label":"Best Quality"},{"value":"1080","label":"1080p"},{"value":"720","label":"720p"},{"value":"480","label":"480p"},{"value":"360","label":"360p"},{"value":"audio","label":"Audio Only"}]}]
+[2026-02-07T23:14:05.096Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Checking for cached video info...","data":null}]
+[2026-02-07T23:14:05.096Z] [POPUP] [INFO] Checking for cached video info...
+[2026-02-07T23:14:05.097Z] [BACKGROUND] [INFO] 📩 Message received [GET_CACHED_INFO] from Popup/Extension | [{"type":"GET_CACHED_INFO","videoId":"SVVnkNZWJhk"}]
+[2026-02-07T23:14:05.098Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:05.309Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:05.511Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:05.714Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:05.917Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:06.117Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:06.320Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:06.524Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:06.728Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:06.930Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:07.135Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:07.349Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:07.549Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:07.751Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:07.966Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:08.168Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:08.369Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:08.581Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:08.782Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:08.983Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:09.184Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:09.386Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:09.588Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:09.792Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:09.995Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:10.198Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:10.401Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:10.605Z] [BACKGROUND] [INFO] Cache PENDING for video: SVVnkNZWJhk
+[2026-02-07T23:14:10.721Z] [BACKGROUND] [ERROR] Prefetch HTTP error for SVVnkNZWJhk: | [{"status":500}]
+[2026-02-07T23:14:10.810Z] [BACKGROUND] [INFO] Cache MISS for video: SVVnkNZWJhk
+[2026-02-07T23:14:10.819Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"No cached info available","data":null}]
+[2026-02-07T23:14:10.819Z] [POPUP] [INFO] No cached info available
+[2026-02-07T23:14:10.820Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Fetching video info from server...","data":[{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]}]
+[2026-02-07T23:14:10.820Z] [POPUP] [INFO] Fetching video info from server... | [{"url":"https://www.youtube.com/watch?v=SVVnkNZWJhk"}]
+[2026-02-07T23:14:13.383Z] [BACKGROUND] [INFO] 📩 Message received [ADD_LOG] from Popup/Extension | [{"type":"ADD_LOG","source":"popup","logType":"INFO","message":"Starting video download","data":[{"title":"Why Epstein emails have so many ='s","quality":{"height":720,"codec":"h264","isFallback":true},"subtitles":"en"}]}]
+[2026-02-07T23:14:13.383Z] [POPUP] [INFO] Starting video download | [{"title":"Why Epstein emails have so many ='s","quality":{"height":720,"codec":"h264","isFallback":true},"subtitles":"en"}]
+[2026-02-07T23:14:13.383Z] [BACKGROUND] [INFO] 📩 Message received [DOWNLOAD_VIDEO] from Popup/Extension | [{"type":"DOWNLOAD_VIDEO","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","quality":{"height":720,"codec":"h264","isFallback":true},"videoTitle":"Why Epstein emails have so many ='s","channelName":"The PrimeTime","subtitles":"en"}]
+[2026-02-07T23:14:13.384Z] [BACKGROUND] [DOWNLOAD] Processing download request | [{"title":"Why Epstein emails have so many ='s","channel":"The PrimeTime","url":"https://www.youtube.com/watch?v=SVVnkNZWJhk","quality":{"height":720,"codec":"h264","isFallback":true},"subtitles":"en"}]
+[2026-02-07T23:14:13.384Z] [BACKGROUND] [INFO] Checking server health...
+[2026-02-07T23:14:13.408Z] [BACKGROUND] [SUCCESS] Server health OK | [{"deno":true,"ffmpeg":true,"status":"ok"}]
+[2026-02-07T23:14:13.409Z] [BACKGROUND] [DOWNLOAD] Starting download | [{"url":"http://localhost:5000/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DSVVnkNZWJhk&format=bestvideo%5Bheight%3C%3D720%5D%2Bbestaudio%2Fbest%5Bheight%3C%3D720%5D%2Fbest&title=Why+Epstein+emails+have+so+many+%3D%27s&channel=The+PrimeTime&resolution=720p&codec=h264&subtitles=en","filename":"Why Epstein emails have so many ='s - The PrimeTime (720p, h264).mp4"}]
+[2026-02-07T23:14:13.434Z] [BACKGROUND] [DOWNLOAD] Browser download initiated (ID: 2) | [{"filename":"Why Epstein emails have so many ='s - The PrimeTime (720p, h264).mp4"}]
+[2026-02-07T23:14:13.435Z] [BACKGROUND] [DOWNLOAD] Waiting for download 2 to complete...

@@ -196,6 +196,11 @@ body {
     color: #999;
 }
 
+#video-views:empty ~ #meta-separator,
+#meta-separator.hidden {
+    display: none;
+}
+
 #meta-separator {
     color: #555;
 }
@@ -287,9 +292,15 @@ body {
 }
 
 #subtitle-checkbox {
+    position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    cursor: pointer;
+    margin: 0;
 }
 
 .slider {
@@ -328,6 +339,19 @@ body {
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid #2a2a2a;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.language-section.visible {
+    max-height: 80px;
+    opacity: 1;
+    margin-top: 14px;
+    padding-top: 12px;
 }
 
 #subtitle-lang {
@@ -1214,6 +1238,11 @@ body {
     padding: 2px 6px;
     border-radius: 3px;
     letter-spacing: 0.3px;
+}
+
+.queue-item-badge.subtitle-badge {
+    background: rgba(66, 165, 245, 0.15);
+    color: #42a5f5;
 }
 
 .queue-item-position {
