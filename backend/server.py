@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from rate_limiter import limiter, init_limiter
 from yt_dlp import YoutubeDL
 import os
 import tempfile
@@ -19,23 +18,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Setup rate limiting
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
-)
-
-# Error handler for rate limit exceeded
-@app.errorhandler(429)
-def ratelimit_handler(e):
-    """Handle rate limit exceeded"""
-    return jsonify({
-        "success": False,
-        "error": "Rate limit exceeded",
-        "message": "You have made too many requests. Please try again later.",
-        "retry_after": e.description
-    }), 429
+init_limiter(app)
 
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
