@@ -9,7 +9,7 @@
     <!-- Playlist Mode UI (hidden by default) -->
     <div id="playlist-container">
         <div id="playlist-header">
-            <div id="playlist-icon">📋</div>
+            <div id="playlist-icon">Playlist</div>
             <div id="playlist-info">
                 <div id="playlist-title">Loading playlist...</div>
                 <div id="playlist-count"></div>
@@ -28,7 +28,7 @@
             <span id="video-duration"></span>
         </div>
     </div>
-    
+
     <div id="quality-container">
         <label for="quality-select">Quality:</label>
         <select id="quality-select" disabled>
@@ -55,10 +55,10 @@
             <option value="auto">Auto-generated</option>
         </select>
     </div>
-    
+
     <div id="button-row">
         <button id="download-btn" disabled>
-            <span class="btn-icon">⬇️</span>
+            <span class="btn-icon">Download</span>
             <span class="btn-text">Download</span>
         </button>
         <button id="add-to-queue-btn" disabled title="Add to download queue">
@@ -66,12 +66,12 @@
         </button>
     </div>
     <div id="status"></div>
-    
+
     <!-- Download Queue Section -->
     <div id="queue-section">
         <div id="queue-header">
             <div id="queue-header-left">
-                <span id="queue-icon">📥</span>
+                <span id="queue-icon">Queue</span>
                 <span id="queue-title">Queue</span>
                 <span id="queue-badge">0</span>
             </div>
@@ -82,7 +82,7 @@
         </div>
         <div id="queue-list-container">
             <div id="queue-empty">
-                <span class="empty-icon">📭</span>
+                <span class="empty-icon">Queue</span>
                 <span class="empty-text">Queue is empty</span>
                 <span class="empty-hint">Add videos to download them sequentially</span>
             </div>
@@ -92,24 +92,24 @@
             <span id="queue-stats"></span>
         </div>
     </div>
-    
+
     <!-- Download History Section -->
     <div id="history-section">
         <div id="history-header">
             <div id="history-header-left">
-                <span id="history-icon">📜</span>
+                <span id="history-icon">History</span>
                 <span id="history-title">History</span>
                 <span id="history-badge">0</span>
             </div>
             <div id="history-header-right">
-                <button id="retry-all-btn" title="Retry all failed" class="hidden">🔄 Retry All</button>
+                <button id="retry-all-btn" title="Retry all failed" class="hidden">Retry All</button>
                 <button id="clear-history-btn" title="Clear history">Clear</button>
                 <button id="toggle-history-btn" title="Toggle history">▼</button>
             </div>
         </div>
         <div id="history-list-container" class="collapsed">
             <div id="history-empty">
-                <span class="empty-icon">📭</span>
+                <span class="empty-icon">History</span>
                 <span class="empty-text">No download history</span>
                 <span class="empty-hint">Completed and failed downloads will appear here</span>
             </div>
@@ -119,20 +119,20 @@
             <span id="history-stats"></span>
         </div>
     </div>
-    
+
     <!-- Log Controls Section -->
     <div id="log-section">
         <div id="log-header">
-            <span id="log-icon">📋</span>
+            <span id="log-icon">Logs</span>
             <span id="log-title">Logs</span>
             <span id="log-count">0</span>
         </div>
         <div id="log-controls">
-            <button id="export-logs-btn" title="Export logs to file">📤 Export</button>
-            <button id="clear-logs-btn" title="Clear all logs">🗑️ Clear</button>
+            <button id="export-logs-btn" title="Export logs to file">Export</button>
+            <button id="clear-logs-btn" title="Clear all logs">Clear</button>
         </div>
     </div>
-    
+
     <script src="popup.js"></script>
 </body>
 </html>

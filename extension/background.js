@@ -65,13 +65,24 @@ function log(type, message, ...data) {
         console.log(`%c${LOG_PREFIX} [${timestamp}] [${type.toUpperCase()}] ${message}`, style);
     }
     
-    // File log entry
+    // File log entry — serialize data safely for debugging
+    let serializedData = null;
+    if (data.length > 0) {
+        try {
+            // Flatten single-element arrays, stringify objects compactly
+            const val = data.length === 1 ? data[0] : data;
+            serializedData = typeof val === "string" ? val : JSON.stringify(val, null, 0);
+        } catch (e) {
+            serializedData = String(data);
+        }
+    }
+
     const logEntry = {
         timestamp: fullTimestamp,
         source: "background",
         type: type.toUpperCase(),
         message: message,
-        data: data.length > 0 ? JSON.stringify(data, null, 0) : null
+        data: serializedData
     };
     
     logBuffer.push(logEntry);
@@ -389,6 +400,10 @@ initializeHistory();
 let downloadQueue = [];
 let isProcessingQueue = false;
 
+// Download progress tracking: browser downloadId -> queue item id
+let activeDownloadMap = {};  // { downloadId: queueItemId }
+let lastProgressNotify = 0;  // throttle popup updates
+
 // Load queue from storage on startup
 async function initializeQueue() {
     logQueue("Initializing queue from storage...");
@@ -534,7 +549,8 @@ async function processQueue() {
             quality: nextItem.quality,
             videoTitle: nextItem.title,
             channelName: nextItem.channel,
-            subtitles: nextItem.subtitles
+            subtitles: nextItem.subtitles,
+            _queueItemId: nextItem.id
         });
         
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -576,19 +592,11 @@ async function processQueue() {
 
 // Notify popup of queue changes
 function notifyPopup() {
-    const stats = {
-        total: downloadQueue.length,
-        pending: downloadQueue.filter(i => i.status === "pending").length,
-        downloading: downloadQueue.filter(i => i.status === "downloading").length,
-        completed: downloadQueue.filter(i => i.status === "completed").length,
-        failed: downloadQueue.filter(i => i.status === "failed").length
-    };
-    logQueue("Notifying popup of queue update", stats);
-    
     browser.runtime.sendMessage({
         type: "QUEUE_UPDATED",
         queue: downloadQueue,
-        isProcessing: isProcessingQueue
+        isProcessing: isProcessingQueue,
+        isPaused: isQueuePaused
     }).catch(() => {
         // Popup might not be open, ignore error
     });
@@ -709,7 +717,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             source: message.source || "popup",
             type: message.logType || "INFO",
             message: message.message,
-            data: message.data ? JSON.stringify(message.data, null, 0) : null
+            data: message.data || null
         };
         logBuffer.push(entry);
         if (logBuffer.length > MAX_LOG_ENTRIES) {
@@ -1119,7 +1127,12 @@ async function handleDownload(message) {
             filename: filename,
             saveAs: false
         });
-        
+
+        // Track this download for progress updates
+        if (message._queueItemId) {
+            activeDownloadMap[downloadId] = message._queueItemId;
+        }
+
         logDownload(`Browser download initiated (ID: ${downloadId})`, { filename });
 
         // Wait for download to complete (for queue tracking)
@@ -1287,22 +1300,56 @@ async function prefetchExistingYouTubeTabs() {
     }
 }
 
-// Monitor download progress
-browser.downloads.onChanged.addListener((delta) => {
+// Format bytes for display
+function formatBytes(bytes) {
+    if (!bytes || bytes <= 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB"];
+    let i = 0;
+    let size = bytes;
+    while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+    return `${size.toFixed(1)} ${units[i]}`;
+}
+
+// Monitor download progress and push to queue items
+browser.downloads.onChanged.addListener(async (delta) => {
+    const queueItemId = activeDownloadMap[delta.id];
+
     if (delta.state) {
         const state = delta.state.current;
         if (state === "complete") {
             logSuccess(`Download ${delta.id} completed successfully!`);
+            delete activeDownloadMap[delta.id];
         } else if (state === "interrupted") {
             logError(`Download ${delta.id} was interrupted`);
-        } else {
-            logDownload(`Download ${delta.id} state: ${state}`);
+            delete activeDownloadMap[delta.id];
         }
     }
-    if (delta.bytesReceived && delta.totalBytes) {
-        const percent = ((delta.bytesReceived.current / delta.totalBytes.current) * 100).toFixed(1);
-        logDownload(`Download ${delta.id} progress: ${percent}%`);
+
+    // Update queue item progress if this download belongs to a queue item
+    if (queueItemId) {
+        // Query current download state for bytesReceived / totalBytes
+        try {
+            const [dl] = await browser.downloads.search({ id: delta.id });
+            if (dl && dl.totalBytes > 0) {
+                const item = downloadQueue.find(q => q.id === queueItemId);
+                if (item && item.status === "downloading") {
+                    item.progress = (dl.bytesReceived / dl.totalBytes) * 100;
+                    item.downloadedSize = formatBytes(dl.bytesReceived);
+                    item.totalSize = formatBytes(dl.totalBytes);
+
+                    // Throttle popup notifications to max once per second
+                    const now = Date.now();
+                    if (now - lastProgressNotify >= 1000) {
+                        lastProgressNotify = now;
+                        notifyPopup();
+                    }
+                }
+            }
+        } catch (e) {
+            // Ignore errors during progress polling
+        }
     }
+
     if (delta.error) {
         logError(`Download ${delta.id} error:`, delta.error.current);
     }

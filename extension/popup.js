@@ -12,12 +12,22 @@ const LOG_COLORS = {
 // Send log to background script for file storage
 async function sendLogToBackground(type, message, data) {
     try {
+        // Serialize data safely for debugging
+        let serialized = null;
+        if (data && data.length > 0) {
+            try {
+                const val = data.length === 1 ? data[0] : data;
+                serialized = typeof val === "string" ? val : JSON.stringify(val, null, 0);
+            } catch (e) {
+                serialized = String(data);
+            }
+        }
         await browser.runtime.sendMessage({
             type: "ADD_LOG",
             source: "popup",
             logType: type.toUpperCase(),
             message: message,
-            data: data && data.length > 0 ? data : null
+            data: serialized
         });
     } catch (e) {
         // Background might not be ready, ignore
@@ -277,12 +287,11 @@ async function loadVideoInfo() {
     videoContainer.style.display = "block";
     downloadBtn.textContent = "Download";
 
-    // Show fallback qualities immediately so user can interact
-    // Better qualities will load in background
-    populateFallbackQualities();
-    qualitySelect.disabled = false;
-    downloadBtn.disabled = false;
-    if (addToQueueBtn) addToQueueBtn.disabled = false;
+    // Show loading state while we fetch real qualities from the server
+    qualitySelect.innerHTML = '<option value="">Fetching qualities...</option>';
+    qualitySelect.disabled = true;
+    downloadBtn.disabled = true;
+    if (addToQueueBtn) addToQueueBtn.disabled = true;
 
     // Get basic info from content script first (for quick display)
     let contentResponse = null;
@@ -354,12 +363,12 @@ async function loadVideoInfo() {
       const cleanUrl = cleanYouTubeUrl(tab.url);
       try {
         logInfo("Fetching video info from server...", { url: cleanUrl });
-        status.textContent = "Loading better qualities...";
+        status.textContent = "Loading video qualities...";
         status.style.color = "#888";
         // Use AbortController for timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-        
+
         const infoResponse = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
           signal: controller.signal
         });
@@ -368,14 +377,16 @@ async function loadVideoInfo() {
         logSuccess("Server response received", { success: infoData.success, title: infoData.title, qualities: infoData.available_qualities?.length });
       } catch (serverError) {
         logError("Server error:", { name: serverError.name, message: serverError.message });
+        qualitySelect.innerHTML = '<option value="">Server unavailable</option>';
+        qualitySelect.disabled = true;
+        downloadBtn.disabled = true;
+        if (addToQueueBtn) addToQueueBtn.disabled = true;
         if (serverError.name === 'AbortError') {
-          status.textContent = "Couldn't load qualities. Using defaults.";
+          status.textContent = "Request timed out. Is the server running?";
         } else {
-          status.textContent = "Server not running. Using default qualities.";
+          status.textContent = "Server not running. Start the backend first.";
         }
         status.style.color = "#ff9800";
-        // Clear status after a moment - fallback qualities are already loaded
-        setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 3000);
         return;
       }
     }
@@ -409,124 +420,113 @@ async function loadVideoInfo() {
         thumbnailImg.src = infoData.thumbnail;
       }
       
-      // Smoothly upgrade from fallback to real qualities
-      upgradeQualities(availableQualities);
+      // Populate with real qualities from the server
+      populateQualities(availableQualities, infoData.duration || 0);
     } else {
-      // Fallback to default qualities if server fetch fails
-      console.warn("Could not fetch qualities from server, using defaults");
-      populateFallbackQualities();
-      qualitySelect.disabled = false;
-      downloadBtn.disabled = false;
-      if (addToQueueBtn) addToQueueBtn.disabled = false;
-      status.textContent = "";
+      // Server returned no qualities — show error state
+      logWarn("Server returned no available qualities");
+      qualitySelect.innerHTML = '<option value="">No qualities available</option>';
+      qualitySelect.disabled = true;
+      downloadBtn.disabled = true;
+      if (addToQueueBtn) addToQueueBtn.disabled = true;
+      status.textContent = "Could not load video qualities.";
+      status.style.color = "#ff9800";
+      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
     }
 
   } catch (error) {
     console.error("Error getting video info:", error);
     videoTitleElement.textContent = "Error loading video info";
+    qualitySelect.innerHTML = '<option value="">Failed to load</option>';
+    qualitySelect.disabled = true;
     downloadBtn.disabled = true;
+    if (addToQueueBtn) addToQueueBtn.disabled = true;
   }
 }
 
-function populateFallbackQualities() {
-  qualitySelect.innerHTML = "";
-  
-  // Provide immediate quality options based on common YouTube formats
-  const fallbackQualities = [
-    { height: 1080, label: "1080p (HD)", codec: "h264" },
-    { height: 720, label: "720p (HD)", codec: "h264" },
-    { height: 480, label: "480p", codec: "h264" },
-    { height: 360, label: "360p", codec: "h264" },
-    { height: 240, label: "240p", codec: "h264" },
-  ];
-  
-  for (const q of fallbackQualities) {
-    const option = document.createElement("option");
-    option.value = JSON.stringify({ 
-      height: q.height, 
-      codec: q.codec,
-      isFallback: true 
-    });
-    option.textContent = q.label;
-    if (q.height === 720) option.selected = true; // Default to 720p
-    qualitySelect.appendChild(option);
+// Estimate filesize from resolution and duration when server doesn't provide one
+// Uses rough average bitrates (video + audio) in bits per second
+function estimateFileSize(height, durationSec) {
+  if (!durationSec || durationSec <= 0) return null;
+  const bitrates = {
+    2160: 20000000,
+    1440: 10000000,
+    1080: 5000000,
+    720:  2500000,
+    480:  1200000,
+    360:  700000,
+    240:  400000,
+    144:  200000,
+  };
+  // Find closest matching bitrate
+  const keys = Object.keys(bitrates).map(Number).sort((a, b) => b - a);
+  let bps = bitrates[360]; // default
+  for (const k of keys) {
+    if (height >= k) { bps = bitrates[k]; break; }
   }
-  
-  // Add audio-only option
-  const audioOption = document.createElement("option");
-  audioOption.value = JSON.stringify({ 
-    height: 0, 
-    codec: "mp3", 
-    isAudio: true,
-    isFallback: true 
-  });
-  audioOption.textContent = "Audio Only (MP3)";
-  qualitySelect.appendChild(audioOption);
-  
-  logInfo("Fallback qualities loaded - UI ready for interaction");
+  return Math.round(bps / 8 * durationSec);
 }
 
-// Upgrade from fallback to real qualities smoothly
-function upgradeQualities(realQualities) {
-  logInfo("Upgrading from fallback to real qualities", { count: realQualities.length });
-  
-  // Remember current selection
-  const currentSelection = qualitySelect.value;
-  let currentQuality = null;
-  try {
-    currentQuality = JSON.parse(currentSelection);
-  } catch (e) {
-    // Invalid selection, ignore
-  }
-  
-  // Clear and populate with real qualities
+// Populate quality selector with real qualities from the server
+function populateQualities(qualities, duration) {
+  logInfo("Populating real qualities from server", { count: qualities.length });
+
   qualitySelect.innerHTML = "";
-  
-  for (const quality of realQualities) {
+
+  for (const quality of qualities) {
     const option = document.createElement("option");
     option.value = JSON.stringify({
       height: quality.height,
       codec: quality.codec,
       vcodec: quality.vcodec
     });
-    
-    // Show quality label with file size if available
+
+    // Show quality label with file size (real or estimated)
     let label = quality.label;
-    if (quality.filesize) {
-      const sizeStr = formatFileSize(quality.filesize);
-      label += ` (${sizeStr})`;
+    let filesize = quality.filesize;
+    if (!filesize && duration) {
+      filesize = estimateFileSize(quality.height, duration);
+    }
+    if (filesize) {
+      const sizeStr = formatFileSize(filesize);
+      if (quality.filesize) {
+        label += `  (${sizeStr})`;
+      } else {
+        label += `  (~${sizeStr})`;
+      }
     }
     option.textContent = label;
-    
-    // Try to maintain similar selection
-    if (currentQuality && quality.height === currentQuality.height) {
+
+    // Default to 720p if available, otherwise first option
+    if (quality.height === 720) {
       option.selected = true;
-    } else if (!currentQuality && quality.height === 720) {
-      option.selected = true; // Default to 720p
     }
-    
+
     qualitySelect.appendChild(option);
   }
-  
+
   // Add audio-only option
   const audioOption = document.createElement("option");
   audioOption.value = JSON.stringify({ height: 0, codec: "mp3", isAudio: true });
-  audioOption.textContent = "Audio Only (MP3)";
-  if (currentQuality && currentQuality.isAudio) {
-    audioOption.selected = true;
+  let audioLabel = "Audio Only (MP3)";
+  if (duration) {
+    // ~128kbps mp3
+    const audioSize = Math.round(128000 / 8 * duration);
+    audioLabel += `  (~${formatFileSize(audioSize)})`;
   }
+  audioOption.textContent = audioLabel;
   qualitySelect.appendChild(audioOption);
-  
-  // Ensure buttons remain enabled
+
+  // Enable UI
   qualitySelect.disabled = false;
   downloadBtn.disabled = false;
   if (addToQueueBtn) addToQueueBtn.disabled = false;
-  
+
   // Clear any loading status
   status.textContent = "";
   status.style.color = "";
-  
-  logSuccess("Quality upgrade complete - real qualities loaded");
+
+  logSuccess(`Loaded ${qualities.length} real qualities from server`);
 }
 
 // Load playlist information
@@ -796,7 +796,7 @@ function renderQueue() {
     failed: downloadQueue.filter(i => i.status === "failed").length
   };
   logUI("Rendering queue", stats);
-  
+
   // Update badge count
   if (queueBadge) {
     queueBadge.textContent = downloadQueue.length;
@@ -830,8 +830,8 @@ function renderQueue() {
   
   // Render queue items
   queueList.innerHTML = "";
-  
-  for (const item of downloadQueue) {
+
+  downloadQueue.forEach((item, index) => {
     const itemEl = document.createElement("div");
     itemEl.className = `queue-item ${item.status}`;
     itemEl.dataset.id = item.id;
@@ -865,7 +865,6 @@ function renderQueue() {
         statusClass = "pending";
     }
     
-    // Truncate title if too long
     const truncatedTitle = item.title.length > 35 
       ? item.title.substring(0, 35) + "..." 
       : item.title;
@@ -886,7 +885,7 @@ function renderQueue() {
     `;
     
     queueList.appendChild(itemEl);
-  }
+  });
   
   // Add click handlers for remove buttons
   queueList.querySelectorAll(".queue-item-remove").forEach(btn => {
