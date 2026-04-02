@@ -8,6 +8,17 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
+# Route-specific rate limits (centralized configuration)
+RATE_LIMITS = {
+    "health": "30 per minute",
+    "ping": "60 per minute",
+    "disk_space": "30 per minute",
+    "info": "30 per minute",
+    "download": "10 per hour",
+    "playlist_info": "20 per minute",
+    "download_playlist": "5 per hour",
+}
+
 
 def init_limiter(app):
     """Initialize the rate limiter with the Flask app and register error handler."""

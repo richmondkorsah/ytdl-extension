@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
-from rate_limiter import limiter, init_limiter
+from rate_limiter import limiter, init_limiter, RATE_LIMITS
 from yt_dlp import YoutubeDL
 import os
 import tempfile
@@ -115,10 +115,10 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "no_color": True,
         # Try to use browser cookies for authentication
         "cookiesfrombrowser": ("firefox",),
-        # CRITICAL: Enable remote JS challenge solver for YouTube
+        # CRITICAL: Enable remote JS challenge solver for YouTube (top-level option)
+        "remote_components": ["ejs:github"],
         "extractor_args": {
             "youtube": {
-                "remote_components": ["ejs:github"],
                 # Performance: skip DASH manifest for info-only requests
                 "skip_dash_manifest": not for_download,
             }
@@ -172,7 +172,7 @@ def get_ydl_opts(for_download=False, format_str="best"):
     return opts
 
 @app.route("/health", methods=["GET"])
-@limiter.limit("30 per minute")
+@limiter.limit(RATE_LIMITS["health"])
 def health_check():
     return jsonify({
         "status": "ok",
@@ -181,13 +181,13 @@ def health_check():
     }), 200
 
 @app.route("/ping", methods=["GET"])
-@limiter.limit("60 per minute") 
+@limiter.limit(RATE_LIMITS["ping"]) 
 def ping():
     """Lightweight server status check"""
     return jsonify({"status": "ok"}), 200
 
 @app.route("/disk-space", methods=["GET"])
-@limiter.limit("30 per minute")
+@limiter.limit(RATE_LIMITS["disk_space"])
 def disk_space():
     """Return free disk space for the downloads directory"""
     try:
@@ -230,20 +230,26 @@ def save_logs():
         if not logs:
             return jsonify({"success": False, "error": "No logs provided"}), 400
         
-        # Format logs as text
+        # Format logs as structured text for easy debugging
         log_lines = []
         for entry in logs:
             timestamp = entry.get("timestamp", "")
+            # Show just time portion for readability, keep date on first line
+            time_part = timestamp[11:23] if len(timestamp) > 23 else timestamp
             source = entry.get("source", "unknown").upper()
             log_type = entry.get("type", "INFO")
             message = entry.get("message", "")
             data_str = entry.get("data", "")
-            
-            line = f"[{timestamp}] [{source}] [{log_type}] {message}"
-            if data_str:
-                line += f" | {data_str}"
+
+            # Structured format: TIME | SOURCE | LEVEL | message
+            level_pad = log_type.ljust(8)
+            source_pad = source.ljust(10)
+            line = f"{time_part}  {source_pad}  {level_pad}  {message}"
+            if data_str and data_str != "null":
+                # Pretty-print data on next line indented for readability
+                line += f"\n{'':>36}  {data_str}"
             log_lines.append(line)
-        
+
         log_text = "\n".join(log_lines)
         
         # Write to file
@@ -398,7 +404,7 @@ def embed_chapters_in_video(video_path, chapters, temp_dir):
 
 
 @app.route("/info", methods=["GET"])
-@limiter.limit("30 per minute")
+@limiter.limit(RATE_LIMITS["info"])
 def info():
     """Get video metadata without downloading"""
     url = request.args.get("url")
@@ -434,48 +440,57 @@ def info():
             resolution_filesizes = {}
             seen_heights = set()
             
-            # Process formats more efficiently - skip full format details for speed
-            video_formats = [f for f in info_dict.get("formats", []) 
+            # Process formats - collect best filesize info per resolution
+            video_formats = [f for f in info_dict.get("formats", [])
                            if f.get("height") and f.get("vcodec") != "none"]
-            
-            # Quick processing of video formats only
+
+            duration = info_dict.get("duration") or 0
+
             for f in video_formats:
                 height = f.get("height")
                 vcodec = f.get("vcodec", "")
                 filesize = f.get("filesize") or f.get("filesize_approx") or 0
-                
-                # Skip if we already have this resolution
+                tbr = f.get("tbr") or 0  # total bitrate in kbps
+                vbr = f.get("vbr") or 0  # video bitrate in kbps
+
+                # Estimate filesize from bitrate if not available
+                if not filesize and duration > 0:
+                    bitrate = tbr or vbr
+                    if bitrate:
+                        filesize = int(bitrate * 1000 / 8 * duration)  # bits to bytes
+
+                # Track best filesize per resolution
+                if filesize and (height not in resolution_filesizes or filesize > resolution_filesizes[height]):
+                    resolution_filesizes[height] = filesize
+
+                # Only create one entry per resolution
                 if height in seen_heights:
-                    # Update filesize if this format has better estimate
-                    if filesize and (height not in resolution_filesizes or filesize > resolution_filesizes[height]):
-                        resolution_filesizes[height] = filesize
                     continue
-                    
                 seen_heights.add(height)
-                
+
                 # Quick codec detection
                 codec_display = (
                     "h264" if "avc" in vcodec.lower() else
                     "h265" if "hevc" in vcodec.lower() or "hev" in vcodec.lower() else
                     "vp9" if "vp9" in vcodec.lower() or "vp09" in vcodec.lower() else
                     "av1" if "av01" in vcodec.lower() or "av1" in vcodec.lower() else
-                    "mp4"  # Default fallback
+                    "mp4"
                 )
-                
-                quality_info = {
+
+                available_qualities.append({
                     "height": height,
                     "label": f"{height}p",
                     "codec": codec_display,
                     "vcodec": vcodec,
-                }
-                
-                # Add filesize if available
-                if filesize:
-                    resolution_filesizes[height] = filesize
-                    quality_info["filesize"] = int(filesize * 1.1)  # Add audio estimate
-                    
-                available_qualities.append(quality_info)
-            
+                })
+
+            # Back-patch filesize onto every quality entry (including estimates)
+            # Add ~10% for audio stream estimate
+            for q in available_qualities:
+                h = q["height"]
+                if h in resolution_filesizes:
+                    q["filesize"] = int(resolution_filesizes[h] * 1.1)
+
             # Sort by height (highest first)
             available_qualities.sort(key=lambda x: x["height"], reverse=True)
             
@@ -518,7 +533,7 @@ def info():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/download", methods=["GET"])
-@limiter.limit("10 per hour")
+@limiter.limit(RATE_LIMITS["download"])
 def download():
     """Download video and stream to client"""
     url = request.args.get("url")
@@ -734,7 +749,7 @@ def download():
 
 
 @app.route("/playlist-info", methods=["GET"])
-@limiter.limit("20 per minute")
+@limiter.limit(RATE_LIMITS["playlist_info"])
 def playlist_info():
     """Get playlist metadata without downloading"""
     url = request.args.get("url")
@@ -783,7 +798,7 @@ def playlist_info():
 
 
 @app.route("/download-playlist", methods=["GET"])
-@limiter.limit("5 per hour")
+@limiter.limit(RATE_LIMITS["download_playlist"])
 def download_playlist():
     """Download entire playlist and stream as ZIP"""
     url = request.args.get("url")

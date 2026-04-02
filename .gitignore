@@ -38,3 +38,10 @@ extension_logs.txt
 
 RATE_LIMITING.md
 RATE_LIMITING_CONFIG.md
+
+*.log
+logs/
+.log.
+
+
+CLAUDE.md
