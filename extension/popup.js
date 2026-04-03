@@ -108,59 +108,67 @@ const status = document.getElementById("status");
 const videoTitleElement = document.getElementById("video-title");
 const channelNameElement = document.getElementById("channel-name");
 const videoDurationElement = document.getElementById("video-duration");
+const videoViewsElement = document.getElementById("video-views");
+const videoDurationOverlay = document.getElementById("video-duration-overlay");
 const thumbnailImg = document.getElementById("thumbnail-img");
 const subtitleCheckbox = document.getElementById("subtitle-checkbox");
 const subtitleLang = document.getElementById("subtitle-lang");
+const videoStatusText = document.getElementById("video-status-text");
+const serverStatusDot = document.getElementById("server-status-dot");
+const serverStatusText = document.getElementById("server-status-text");
+const storageText = document.getElementById("storage-text");
 
 // Queue elements
+const queueBtn = document.getElementById("queue-btn");
+const queueOverlay = document.getElementById("queue-overlay");
+const closeQueueBtn = document.getElementById("close-queue-btn");
 const addToQueueBtn = document.getElementById("add-to-queue-btn");
 const queueList = document.getElementById("queue-list");
-const queueBadge = document.getElementById("queue-badge");
-const clearQueueBtn = document.getElementById("clear-queue-btn");
-const queueSection = document.getElementById("queue-section");
-const toggleQueueBtn = document.getElementById("toggle-queue-btn");
-const queueListContainer = document.getElementById("queue-list-container");
+const queueBadge = document.getElementById("queue-header-badge");
 const queueEmpty = document.getElementById("queue-empty");
-const queueFooter = document.getElementById("queue-footer");
-const queueStats = document.getElementById("queue-stats");
 
 // History elements
-const historySection = document.getElementById("history-section");
+const historyBtn = document.getElementById("history-btn");
+const historyOverlay = document.getElementById("history-overlay");
+const closeHistoryBtn = document.getElementById("close-history-btn");
 const historyList = document.getElementById("history-list");
 const historyBadge = document.getElementById("history-badge");
 const clearHistoryBtn = document.getElementById("clear-history-btn");
-const toggleHistoryBtn = document.getElementById("toggle-history-btn");
-const historyListContainer = document.getElementById("history-list-container");
 const historyEmpty = document.getElementById("history-empty");
-const historyFooter = document.getElementById("history-footer");
 const historyStats = document.getElementById("history-stats");
 const retryAllBtn = document.getElementById("retry-all-btn");
+
+// Settings elements
+const settingsBtn = document.getElementById("settings-btn");
+const settingsOverlay = document.getElementById("settings-overlay");
+const closeSettingsBtn = document.getElementById("close-settings-btn");
+const exportLogsBtn = document.getElementById("export-logs-btn");
+const clearLogsBtn = document.getElementById("clear-logs-btn");
+const logCount = document.getElementById("log-count");
 
 // Download queue state
 let downloadQueue = [];
 let isProcessingQueue = false;
-let queueCollapsed = false;
+let currentQueueFilter = "all";
 
 // Download history state
 let downloadHistory = [];
-let historyCollapsed = true;
 
 // Check if queue UI elements exist (only check essential elements)
-const queueEnabled = !!(addToQueueBtn && queueList && queueSection);
-const historyEnabled = !!(historySection && historyList);
+const queueEnabled = !!(addToQueueBtn && queueList && queueOverlay);
+const historyEnabled = !!(historyOverlay && historyList);
 
 logUI("Queue UI elements check:", {
   enabled: queueEnabled,
   addToQueueBtn: !!addToQueueBtn,
   queueList: !!queueList,
-  queueSection: !!queueSection,
-  queueBadge: !!queueBadge,
-  clearQueueBtn: !!clearQueueBtn
+  queueOverlay: !!queueOverlay,
+  queueBadge: !!queueBadge
 });
 
 logUI("History UI elements check:", {
   enabled: historyEnabled,
-  historySection: !!historySection,
+  historyOverlay: !!historyOverlay,
   historyList: !!historyList
 });
 
@@ -186,6 +194,10 @@ const playlistCount = document.getElementById("playlist-count");
 // Enable/disable subtitle language dropdown based on checkbox
 subtitleCheckbox.addEventListener("change", () => {
   subtitleLang.disabled = !subtitleCheckbox.checked;
+  const langSection = document.querySelector('.language-section');
+  if (langSection) {
+    langSection.classList.toggle('visible', subtitleCheckbox.checked);
+  }
 });
 
 const SERVER_URL = "http://localhost:5000";
@@ -239,6 +251,18 @@ function formatDuration(seconds) {
     return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
   return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Format view count (e.g., 1234567 -> "1.2M views")
+function formatViews(views) {
+  if (!views) return "";
+  const num = parseInt(views);
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M views`;
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K views`;
+  }
+  return `${num} views`;
 }
 
 async function loadVideoInfo() {
@@ -309,7 +333,22 @@ async function loadVideoInfo() {
       currentVideoInfo = contentResponse;
       videoTitleElement.textContent = contentResponse.videoTitle || "Loading...";
       channelNameElement.textContent = contentResponse.channelName || "";
-      videoDurationElement.textContent = contentResponse.duration || "";
+      videoDurationOverlay.textContent = contentResponse.duration || "";
+      
+      // Update video status
+      if (videoStatusText) {
+        videoStatusText.textContent = "Video detected";
+      }
+      
+      // Update views if available
+      if (contentResponse.views && videoViewsElement) {
+        videoViewsElement.textContent = formatViews(contentResponse.views);
+      }
+      // Show/hide separator based on views
+      const metaSep = document.getElementById('meta-separator');
+      if (metaSep) {
+        metaSep.classList.toggle('hidden', !contentResponse.views);
+      }
 
       if (contentResponse.thumbnail) {
         thumbnailImg.onload = () => {
@@ -405,7 +444,13 @@ async function loadVideoInfo() {
         currentVideoInfo.channelName = infoData.channel;
       }
       if (infoData.duration) {
-        videoDurationElement.textContent = formatDuration(infoData.duration);
+        videoDurationOverlay.textContent = formatDuration(infoData.duration);
+      }
+      // Update views if available  
+      if (infoData.view_count && videoViewsElement) {
+        videoViewsElement.textContent = formatViews(infoData.view_count);
+        const metaSep = document.getElementById('meta-separator');
+        if (metaSep) metaSep.classList.remove('hidden');
       }
       if (infoData.thumbnail) {
         thumbnailImg.onload = () => {
@@ -613,7 +658,8 @@ downloadBtn.addEventListener("click", async () => {
     }
     
     logInfo("Starting playlist download", { title: currentPlaylistInfo.title, quality: qualityData });
-    status.textContent = "Starting playlist download...";
+    const subtitleInfo = subtitleCheckbox.checked ? ` (with ${subtitleLang.options[subtitleLang.selectedIndex].text} subtitles)` : "";
+    status.textContent = `Starting playlist download${subtitleInfo}...`;
     downloadBtn.textContent = "Downloading...";
     
     try {
@@ -652,7 +698,8 @@ downloadBtn.addEventListener("click", async () => {
     }
     
     logInfo("Starting video download", { title: currentVideoInfo.videoTitle, quality: qualityData, subtitles: subtitleCheckbox.checked ? subtitleLang.value : null });
-    status.textContent = "Downloading...";
+    const subtitleInfo = subtitleCheckbox.checked ? ` (with ${subtitleLang.options[subtitleLang.selectedIndex].text} subtitles)` : "";
+    status.textContent = `Downloading${subtitleInfo}...`;
     downloadBtn.textContent = "Downloading...";
 
     try {
@@ -796,11 +843,11 @@ function renderQueue() {
     failed: downloadQueue.filter(i => i.status === "failed").length
   };
   logUI("Rendering queue", stats);
-
-  // Update badge count
-  if (queueBadge) {
-    queueBadge.textContent = downloadQueue.length;
-    queueBadge.classList.toggle("empty", downloadQueue.length === 0);
+  
+  // Update queue count
+  const queueCountEl = document.getElementById("queue-count");
+  if (queueCountEl) {
+    queueCountEl.textContent = `${downloadQueue.length} item${downloadQueue.length !== 1 ? 's' : ''}`;
   }
   
   // Show/hide empty state
@@ -808,30 +855,11 @@ function renderQueue() {
     queueEmpty.classList.toggle("hidden", downloadQueue.length > 0);
   }
   
-  // Update stats
-  const completed = downloadQueue.filter(i => i.status === "completed").length;
-  const pending = downloadQueue.filter(i => i.status === "pending").length;
-  const downloading = downloadQueue.filter(i => i.status === "downloading").length;
-  const failed = downloadQueue.filter(i => i.status === "failed").length;
-  
-  if (queueStats && queueFooter) {
-    if (downloadQueue.length > 0) {
-      const parts = [];
-      if (downloading > 0) parts.push(`${downloading} downloading`);
-      if (pending > 0) parts.push(`${pending} waiting`);
-      if (completed > 0) parts.push(`${completed} done`);
-      if (failed > 0) parts.push(`${failed} failed`);
-      queueStats.textContent = parts.join(" • ");
-      queueFooter.classList.add("visible");
-    } else {
-      queueFooter.classList.remove("visible");
-    }
-  }
-  
   // Render queue items
   queueList.innerHTML = "";
-
-  downloadQueue.forEach((item, index) => {
+  
+  for (let i = 0; i < downloadQueue.length; i++) {
+    const item = downloadQueue[i];
     const itemEl = document.createElement("div");
     itemEl.className = `queue-item ${item.status}`;
     itemEl.dataset.id = item.id;
@@ -839,53 +867,92 @@ function renderQueue() {
     const thumbnailUrl = item.thumbnail || 
       (item.videoId ? `https://img.youtube.com/vi/${item.videoId}/default.jpg` : "");
     
-    let statusIcon = "";
     let statusText = "";
-    let statusClass = item.status;
+    let statusClass = "";
     switch (item.status) {
       case "pending":
-        statusIcon = "⏸";
-        statusText = "Queued";
+        statusText = "Waiting";
+        statusClass = "waiting";
         break;
       case "downloading":
-        statusIcon = "●";
-        statusText = "Downloading...";
+        statusText = "Downloading";
+        statusClass = "downloading";
         break;
       case "completed":
-        statusIcon = "✓";
         statusText = "Completed";
+        statusClass = "completed";
         break;
       case "failed":
-        statusIcon = "✕";
-        statusText = item.error ? `Failed: ${item.error.substring(0, 20)}` : "Failed";
+        statusText = "Failed";
+        statusClass = "failed";
         break;
       default:
-        statusIcon = "?";
-        statusText = "Unknown";
-        statusClass = "pending";
+        statusText = "Waiting";
+        statusClass = "waiting";
     }
     
-    const truncatedTitle = item.title.length > 35 
-      ? item.title.substring(0, 35) + "..." 
-      : item.title;
+    // Build progress section — always show for downloading items
+    let progressHTML = "";
+    if (item.status === "downloading") {
+      const progress = Math.round(item.progress || 0);
+      const downloaded = item.downloadedSize || "0 B";
+      const total = item.totalSize || "---";
+      const sizeText = item.totalSize ? `${downloaded} / ${total}` : "Starting...";
+      progressHTML = `
+        <div class="queue-item-progress">
+          <div class="queue-item-progress-bar">
+            <div class="queue-item-progress-fill${progress === 0 ? ' indeterminate' : ''}" style="width: ${progress || 0}%"></div>
+          </div>
+          <div class="queue-item-progress-text">
+            <span>${sizeText}</span>
+            <span>${progress}%</span>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Build details section
+    const qualityLabel = item.qualityLabel || "1080p";
+    const fileSize = item.totalSize || item.fileSize || "";
+    const position = i + 1;
+    
+    let detailsHTML = `
+      <div class="queue-item-details">
+        <span class="queue-item-meta">${qualityLabel}${fileSize ? ' • ' + fileSize : ''}</span>
+    `;
+    
+    // Add badges
+    if (item.subtitles) {
+      detailsHTML += `<span class="queue-item-badge subtitle-badge">CC ${item.subtitles.toUpperCase()}</span>`;
+    }
+    
+    // Add position for waiting items
+    if (item.status === "pending" && position > 1) {
+      detailsHTML += `<span class="queue-item-position">Position #${position} in queue</span>`;
+    }
+    
+    // Add HDR badge if applicable
+    if (item.hdr || qualityLabel.includes("HDR")) {
+      detailsHTML += `<span class="queue-item-badge">HDR</span>`;
+    }
+    
+    detailsHTML += `</div>`;
     
     itemEl.innerHTML = `
       ${thumbnailUrl ? `<img class="queue-item-thumbnail" src="${thumbnailUrl}" alt="">` : ""}
       <div class="queue-item-info">
-        <div class="queue-item-title" title="${item.title}">${truncatedTitle}</div>
-        <div class="queue-item-details">
-          <span class="queue-item-quality">${item.qualityLabel || "720p"}</span>
-          ${item.channel ? `<span>${item.channel}</span>` : ""}
-        </div>
+        <div class="queue-item-title" title="${item.title}">${item.title}</div>
+        <div class="queue-item-status-text ${statusClass}">${statusText}</div>
+        ${progressHTML}
+        ${detailsHTML}
       </div>
-      <span class="queue-item-status ${statusClass}">${statusIcon} ${statusText}</span>
       <div class="queue-item-actions">
-        <button class="queue-item-remove" title="Remove" data-id="${item.id}">×</button>
+        <button class="queue-item-remove" title="Remove" data-id="${item.id}">✕</button>
       </div>
     `;
     
     queueList.appendChild(itemEl);
-  });
+  }
   
   // Add click handlers for remove buttons
   queueList.querySelectorAll(".queue-item-remove").forEach(btn => {
@@ -894,6 +961,90 @@ function renderQueue() {
       removeFromQueue(btn.dataset.id);
     });
   });
+  
+  // Apply current filter after rendering
+  applyQueueFilter();
+  
+  // Update header badge
+  updateQueueBadge();
+}
+
+// Apply queue tab filter to show/hide items
+function applyQueueFilter() {
+  if (!queueList) return;
+  const items = queueList.querySelectorAll(".queue-item");
+  let visibleCount = 0;
+  
+  items.forEach(item => {
+    const id = item.dataset.id;
+    const queueItem = downloadQueue.find(q => q.id === id);
+    if (!queueItem) return;
+    
+    let show = true;
+    const filter = typeof currentQueueFilter !== "undefined" ? currentQueueFilter : "all";
+    
+    if (filter === "active") {
+      show = queueItem.status === "pending" || queueItem.status === "downloading";
+    } else if (filter === "finished") {
+      show = queueItem.status === "completed" || queueItem.status === "failed";
+    }
+    
+    item.style.display = show ? "" : "none";
+    if (show) visibleCount++;
+  });
+  
+  // Show empty state if filter has no results but queue has items
+  if (queueEmpty) {
+    const emptyText = queueEmpty.querySelector(".empty-text");
+    if (downloadQueue.length === 0) {
+      queueEmpty.classList.remove("hidden");
+      if (emptyText) emptyText.textContent = "Queue is empty";
+    } else if (visibleCount === 0) {
+      queueEmpty.classList.remove("hidden");
+      const filter = typeof currentQueueFilter !== "undefined" ? currentQueueFilter : "all";
+      if (emptyText) {
+        emptyText.textContent = 
+          filter === "active" ? "No active downloads" : "No finished downloads";
+      }
+    } else {
+      queueEmpty.classList.add("hidden");
+    }
+  }
+}
+
+// Update the queue badge count in the header
+function updateQueueBadge() {
+  const headerBadge = document.getElementById("queue-header-badge");
+  const pendingCount = downloadQueue.filter(i => i.status === "pending" || i.status === "downloading").length;
+  
+  if (headerBadge) {
+    if (pendingCount > 0) {
+      headerBadge.textContent = pendingCount;
+      headerBadge.classList.remove("hidden");
+    } else {
+      headerBadge.classList.add("hidden");
+    }
+  }
+}
+
+// Sync pause button visual state with background isPaused flag
+function syncPauseButtonState(isPaused) {
+  const pauseAllBtn = document.getElementById("pause-all-btn");
+  if (!pauseAllBtn) return;
+  
+  if (isPaused) {
+    pauseAllBtn.classList.add("paused");
+    const icon = pauseAllBtn.querySelector(".btn-icon");
+    const text = pauseAllBtn.querySelector(".btn-text");
+    if (icon) icon.textContent = "▶";
+    if (text) text.textContent = "Resume All";
+  } else {
+    pauseAllBtn.classList.remove("paused");
+    const icon = pauseAllBtn.querySelector(".btn-icon");
+    const text = pauseAllBtn.querySelector(".btn-text");
+    if (icon) icon.textContent = "⏸";
+    if (text) text.textContent = "Pause All";
+  }
 }
 
 // Remove item from queue (via background script)
@@ -946,6 +1097,7 @@ async function loadQueueFromBackground() {
     if (state && state.queue) {
       downloadQueue = state.queue;
       isProcessingQueue = state.isProcessing;
+      syncPauseButtonState(state.isPaused);
     } else {
       downloadQueue = [];
       isProcessingQueue = false;
@@ -968,6 +1120,7 @@ browser.runtime.onMessage.addListener((message) => {
     });
     downloadQueue = message.queue || [];
     isProcessingQueue = message.isProcessing || false;
+    syncPauseButtonState(message.isPaused);
     renderQueue();
   }
   
@@ -980,43 +1133,30 @@ browser.runtime.onMessage.addListener((message) => {
   }
 });
 
-// Load queue from browser storage (for collapsed state)
+// Load queue from browser storage
 async function loadQueueFromStorage() {
   try {
-    logUI("Loading queue settings from storage...");
-    const data = await browser.storage.local.get(["queueCollapsed"]);
-    
-    // Restore collapsed state
-    if (data.queueCollapsed !== undefined) {
-      queueCollapsed = data.queueCollapsed;
-      logUI("Queue collapsed state:", queueCollapsed);
-      if (queueListContainer) {
-        queueListContainer.classList.toggle("collapsed", queueCollapsed);
-      }
-      if (toggleQueueBtn) {
-        toggleQueueBtn.classList.toggle("collapsed", queueCollapsed);
-      }
-    }
+    logUI("Loading queue from storage...");
     
     // Load actual queue from background script
     await loadQueueFromBackground();
   } catch (e) {
-    logError("Error loading queue settings:", { message: e.message });
+    logError("Error loading queue:", { message: e.message });
     renderQueue();
   }
 }
 
 // Toggle queue collapse
-function toggleQueue() {
-  queueCollapsed = !queueCollapsed;
-  if (queueListContainer) {
-    queueListContainer.classList.toggle("collapsed", queueCollapsed);
+function showQueue() {
+  if (queueOverlay) {
+    queueOverlay.classList.add("active");
   }
-  if (toggleQueueBtn) {
-    toggleQueueBtn.classList.toggle("collapsed", queueCollapsed);
+}
+
+function hideQueue() {
+  if (queueOverlay) {
+    queueOverlay.classList.remove("active");
   }
-  // Save collapsed state
-  browser.storage.local.set({ queueCollapsed: queueCollapsed }).catch(console.error);
 }
 
 // ==================== HISTORY SYSTEM ====================
@@ -1068,15 +1208,16 @@ function renderHistory() {
   }
   
   // Update stats
-  if (historyStats && historyFooter) {
+  const historyPanelFooter = document.getElementById("history-panel-footer");
+  if (historyStats) {
     if (downloadHistory.length > 0) {
       const parts = [];
       if (completedCount > 0) parts.push(`${completedCount} completed`);
       if (failedCount > 0) parts.push(`${failedCount} failed`);
       historyStats.textContent = parts.join(" • ");
-      historyFooter.classList.add("visible");
+      if (historyPanelFooter) historyPanelFooter.classList.add("visible");
     } else {
-      historyFooter.classList.remove("visible");
+      if (historyPanelFooter) historyPanelFooter.classList.remove("visible");
     }
   }
   
@@ -1274,31 +1415,33 @@ async function clearAllHistory() {
 }
 
 // Toggle history collapse
-function toggleHistory() {
-  historyCollapsed = !historyCollapsed;
-  if (historyListContainer) {
-    historyListContainer.classList.toggle("collapsed", historyCollapsed);
+function showHistory() {
+  if (historyOverlay) {
+    historyOverlay.classList.add("active");
   }
-  if (toggleHistoryBtn) {
-    toggleHistoryBtn.classList.toggle("collapsed", historyCollapsed);
+}
+
+function hideHistory() {
+  if (historyOverlay) {
+    historyOverlay.classList.remove("active");
   }
-  // Save collapsed state
-  browser.storage.local.set({ historyCollapsed: historyCollapsed }).catch(console.error);
+}
+
+function showSettings() {
+  if (settingsOverlay) {
+    settingsOverlay.classList.add("active");
+  }
+}
+
+function hideSettings() {
+  if (settingsOverlay) {
+    settingsOverlay.classList.remove("active");
+  }
 }
 
 // Load history collapsed state from storage
 async function loadHistorySettings() {
   try {
-    const data = await browser.storage.local.get(["historyCollapsed"]);
-    if (data.historyCollapsed !== undefined) {
-      historyCollapsed = data.historyCollapsed;
-      if (historyListContainer) {
-        historyListContainer.classList.toggle("collapsed", historyCollapsed);
-      }
-      if (toggleHistoryBtn) {
-        toggleHistoryBtn.classList.toggle("collapsed", historyCollapsed);
-      }
-    }
     await loadHistoryFromBackground();
   } catch (e) {
     logError("Error loading history settings:", { message: e.message });
@@ -1312,23 +1455,75 @@ if (queueEnabled) {
   
   addToQueueBtn.addEventListener("click", addToQueue);
   
-  if (clearQueueBtn) {
-    clearQueueBtn.addEventListener("click", clearCompletedFromQueue);
-  }
+  // Queue control buttons
+  const pauseAllBtn = document.getElementById("pause-all-btn");
+  const clearCompletedBtn = document.getElementById("clear-completed-btn");
   
-  if (toggleQueueBtn) {
-    toggleQueueBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleQueue();
+  if (pauseAllBtn) {
+    pauseAllBtn.addEventListener("click", async () => {
+      const isPaused = pauseAllBtn.classList.contains("paused");
+      logUI(`${isPaused ? "Resume" : "Pause"} all clicked`);
+      
+      try {
+        const result = await browser.runtime.sendMessage({
+          type: isPaused ? "RESUME_QUEUE" : "PAUSE_QUEUE"
+        });
+        
+        if (result && result.success) {
+          if (isPaused) {
+            pauseAllBtn.classList.remove("paused");
+            pauseAllBtn.querySelector(".btn-icon").textContent = "⏸";
+            pauseAllBtn.querySelector(".btn-text").textContent = "Pause All";
+          } else {
+            pauseAllBtn.classList.add("paused");
+            pauseAllBtn.querySelector(".btn-icon").textContent = "▶";
+            pauseAllBtn.querySelector(".btn-text").textContent = "Resume All";
+          }
+        }
+      } catch (e) {
+        logError("Error toggling pause:", { message: e.message });
+      }
     });
   }
   
-  // Click header to toggle (except buttons)
-  const queueHeader = document.getElementById("queue-header");
-  if (queueHeader) {
-    queueHeader.addEventListener("click", (e) => {
-      if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
-        toggleQueue();
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener("click", clearCompletedFromQueue);
+  }
+  
+  // Queue tabs
+  const queueTabs = document.querySelectorAll(".queue-tab");
+  queueTabs.forEach(tab => {
+    tab.addEventListener("click", (e) => {
+      // Remove active from all tabs
+      queueTabs.forEach(t => t.classList.remove("active"));
+      // Add active to clicked tab
+      tab.classList.add("active");
+      
+      currentQueueFilter = tab.dataset.filter;
+      logUI(`Queue filter changed to: ${currentQueueFilter}`);
+      applyQueueFilter();
+    });
+  });
+  
+  if (queueBtn) {
+    queueBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showQueue();
+    });
+  }
+  
+  if (closeQueueBtn) {
+    closeQueueBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideQueue();
+    });
+  }
+  
+  // Click overlay backdrop to close
+  if (queueOverlay) {
+    queueOverlay.addEventListener("click", (e) => {
+      if (e.target === queueOverlay) {
+        hideQueue();
       }
     });
   }
@@ -1339,10 +1534,6 @@ if (queueEnabled) {
   loadQueueFromStorage();
 } else {
   logWarn("Queue UI elements not found - queue disabled");
-  // Hide queue section if elements are missing
-  if (queueSection) {
-    queueSection.style.display = "none";
-  }
 }
 
 // Event listeners for history
@@ -1357,19 +1548,25 @@ if (historyEnabled) {
     retryAllBtn.addEventListener("click", retryAllFailed);
   }
   
-  if (toggleHistoryBtn) {
-    toggleHistoryBtn.addEventListener("click", (e) => {
+  if (historyBtn) {
+    historyBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      toggleHistory();
+      showHistory();
     });
   }
   
-  // Click header to toggle (except buttons)
-  const historyHeader = document.getElementById("history-header");
-  if (historyHeader) {
-    historyHeader.addEventListener("click", (e) => {
-      if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
-        toggleHistory();
+  if (closeHistoryBtn) {
+    closeHistoryBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideHistory();
+    });
+  }
+  
+  // Click overlay backdrop to close
+  if (historyOverlay) {
+    historyOverlay.addEventListener("click", (e) => {
+      if (e.target === historyOverlay) {
+        hideHistory();
       }
     });
   }
@@ -1380,21 +1577,46 @@ if (historyEnabled) {
   loadHistorySettings();
 } else {
   logWarn("History UI elements not found - history disabled");
-  if (historySection) {
-    historySection.style.display = "none";
+}
+
+// ==================== SETTINGS OVERLAY ====================
+if (settingsBtn && settingsOverlay) {
+  // Settings overlay toggle
+  if (settingsBtn) {
+    settingsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showSettings();
+    });
   }
+  
+  if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideSettings();
+    });
+  }
+  
+  // Click overlay backdrop to close
+  if (settingsOverlay) {
+    settingsOverlay.addEventListener("click", (e) => {
+      if (e.target === settingsOverlay) {
+        hideSettings();
+      }
+    });
+  }
+  
+  logSuccess("Settings event listeners ready");
+} else {
+  logWarn("Settings UI elements not found - settings disabled");
 }
 
 // ==================== LOG CONTROLS ====================
-const exportLogsBtn = document.getElementById("export-logs-btn");
-const clearLogsBtn = document.getElementById("clear-logs-btn");
-const logCountEl = document.getElementById("log-count");
 
 // Update log count display
 async function updateLogCount() {
   const count = await getLogCount();
-  if (logCountEl) {
-    logCountEl.textContent = count;
+  if (logCount) {
+    logCount.textContent = count;
   }
 }
 
@@ -1403,14 +1625,15 @@ if (exportLogsBtn) {
   exportLogsBtn.addEventListener("click", async () => {
     logUI("Export button clicked");
     exportLogsBtn.disabled = true;
-    exportLogsBtn.textContent = "📤 Saving...";
+    const exportBtnText = exportLogsBtn.querySelector(".btn-text");
+    if (exportBtnText) exportBtnText.textContent = "Saving...";
     
     try {
       const result = await browser.runtime.sendMessage({ type: "EXPORT_LOGS" });
       console.log("Export result:", result);
       
       exportLogsBtn.disabled = false;
-      exportLogsBtn.textContent = "📤 Export";
+      if (exportBtnText) exportBtnText.textContent = "Export";
       
       if (result && result.success) {
         const msg = result.entries > 0 
@@ -1431,7 +1654,7 @@ if (exportLogsBtn) {
     } catch (e) {
       console.error("Export error:", e);
       exportLogsBtn.disabled = false;
-      exportLogsBtn.textContent = "📤 Export";
+      if (exportBtnText) exportBtnText.textContent = "Export";
       status.textContent = "Error: " + e.message;
       status.style.color = "#f44336";
       setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
@@ -1456,6 +1679,70 @@ if (clearLogsBtn) {
 
 // Update log count on popup open
 updateLogCount();
+
+// Initialize server status
+async function updateServerStatus() {
+  // Check server connectivity
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    
+    const response = await fetch(`${SERVER_URL}/health`, { signal: controller.signal });
+    clearTimeout(timeout);
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (serverStatusText) serverStatusText.textContent = "Server ready";
+      if (serverStatusDot) {
+        serverStatusDot.style.background = "#00ff88";
+        serverStatusDot.style.boxShadow = "0 0 6px rgba(0, 255, 136, 0.6)";
+      }
+      logSuccess("Server connected", data);
+    } else {
+      setServerOffline();
+    }
+  } catch (e) {
+    setServerOffline();
+    logWarn("Server not reachable:", { message: e.message });
+  }
+  
+  // Fetch disk space
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    
+    const response = await fetch(`${SERVER_URL}/disk-space`, { signal: controller.signal });
+    clearTimeout(timeout);
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (storageText) {
+        storageText.textContent = `Free Space: ${data.free_human}`;
+      }
+    }
+  } catch (e) {
+    if (storageText) storageText.textContent = "Free Space: --";
+  }
+  
+  // Set initial video status
+  if (videoStatusText) {
+    videoStatusText.textContent = "Detecting video...";
+  }
+}
+
+function setServerOffline() {
+  if (serverStatusText) serverStatusText.textContent = "Server offline";
+  if (serverStatusDot) {
+    serverStatusDot.style.background = "#ff4444";
+    serverStatusDot.style.boxShadow = "0 0 6px rgba(255, 68, 68, 0.6)";
+  }
+}
+
+// Periodically check server status (every 30 seconds)
+setInterval(updateServerStatus, 30000);
+
+// Initialize UI
+updateServerStatus();
 
 logInfo("Loading video info...");
 loadVideoInfo();

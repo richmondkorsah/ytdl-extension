@@ -399,6 +399,11 @@ initializeHistory();
 // ==================== QUEUE MANAGEMENT ====================
 let downloadQueue = [];
 let isProcessingQueue = false;
+let isQueuePaused = false;
+
+// Download progress tracking: browser downloadId -> queue item id
+let activeDownloadMap = {};  // { downloadId: queueItemId }
+let lastProgressNotify = 0;  // throttle popup updates
 
 // Download progress tracking: browser downloadId -> queue item id
 let activeDownloadMap = {};  // { downloadId: queueItemId }
@@ -509,7 +514,8 @@ async function clearCompletedFromQueue() {
 function getQueueState() {
     return {
         queue: downloadQueue,
-        isProcessing: isProcessingQueue
+        isProcessing: isProcessingQueue,
+        isPaused: isQueuePaused
     };
 }
 
@@ -517,6 +523,11 @@ function getQueueState() {
 async function processQueue() {
     if (isProcessingQueue) {
         logQueue("Queue already processing, skipping");
+        return;
+    }
+    
+    if (isQueuePaused) {
+        logQueue("Queue is paused, skipping processing");
         return;
     }
     
@@ -685,8 +696,26 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === "START_QUEUE") {
+        isQueuePaused = false;
         processQueue();
         sendResponse({ success: true });
+        return false;
+    }
+
+    if (message.type === "PAUSE_QUEUE") {
+        isQueuePaused = true;
+        logQueue("Queue paused by user");
+        notifyPopup();
+        sendResponse({ success: true, isPaused: true });
+        return false;
+    }
+
+    if (message.type === "RESUME_QUEUE") {
+        isQueuePaused = false;
+        logQueue("Queue resumed by user");
+        notifyPopup();
+        processQueue();
+        sendResponse({ success: true, isPaused: false });
         return false;
     }
 
