@@ -326,25 +326,37 @@ def format_timestamp(seconds):
 def extract_chapters(info_dict):
     """Extract chapter information from video metadata"""
     chapters_raw = info_dict.get("chapters", [])
-    
+
     if not chapters_raw:
         logger.info("No chapters found in video")
         return None
-    
+
+    video_duration = info_dict.get("duration") or 0
+
     chapters = []
     for i, ch in enumerate(chapters_raw):
+        start_time = ch.get("start_time") or 0
+        end_time = ch.get("end_time") or 0
+
+        # Last chapter often has end_time=0 or missing — fall back to video duration
+        if end_time <= start_time:
+            if i + 1 < len(chapters_raw):
+                end_time = chapters_raw[i + 1].get("start_time") or 0
+            else:
+                end_time = video_duration
+
         chapter = {
             "index": i,
             "title": ch.get("title", f"Chapter {i + 1}"),
-            "start_time": ch.get("start_time", 0),
-            "end_time": ch.get("end_time", 0),
-            "start_formatted": format_timestamp(ch.get("start_time")),
-            "end_formatted": format_timestamp(ch.get("end_time")),
-            "duration": (ch.get("end_time", 0) - ch.get("start_time", 0)),
-            "duration_formatted": format_timestamp(ch.get("end_time", 0) - ch.get("start_time", 0))
+            "start_time": start_time,
+            "end_time": end_time,
+            "start_formatted": format_timestamp(start_time),
+            "end_formatted": format_timestamp(end_time),
+            "duration": end_time - start_time,
+            "duration_formatted": format_timestamp(end_time - start_time)
         }
         chapters.append(chapter)
-    
+
     logger.info(f"Extracted {len(chapters)} chapters from video")
     return chapters
 
@@ -364,7 +376,7 @@ def embed_chapters_in_video(video_path, chapters, temp_dir):
             for chapter in chapters:
                 start_ms = int(chapter["start_time"] * 1000)
                 end_ms = int(chapter["end_time"] * 1000)
-                title = chapter["title"].replace("=", "\\=").replace(";", "\\;").replace("#", "\\#").replace("\\", "\\\\").replace("\n", " ")
+                title = chapter["title"].replace("\\", "\\\\").replace("=", "\\=").replace(";", "\\;").replace("#", "\\#").replace("\n", " ")
                 
                 f.write("\n[CHAPTER]\n")
                 f.write("TIMEBASE=1/1000\n")
@@ -633,13 +645,21 @@ def download():
                                "av1" if "av01" in vcodec.lower() else \
                                vcodec.split(".")[0] if vcodec else ""
         
-        # Find the downloaded file
+        # Find the downloaded file — pick the largest file to avoid picking subtitle sidecar files
+        VIDEO_EXTS = {".mp4", ".webm", ".mkv", ".mp3", ".m4a", ".opus", ".ogg", ".flac", ".wav"}
         downloaded_file = None
+        best_size = -1
         for f in os.listdir(temp_dir):
             filepath = os.path.join(temp_dir, f)
-            if os.path.isfile(filepath):
+            if not os.path.isfile(filepath):
+                continue
+            ext = os.path.splitext(f)[1].lower()
+            if ext not in VIDEO_EXTS:
+                continue
+            size = os.path.getsize(filepath)
+            if size > best_size:
+                best_size = size
                 downloaded_file = filepath
-                break
         
         if not downloaded_file or not os.path.exists(downloaded_file):
             logger.error("Download failed - no file found")
@@ -647,9 +667,10 @@ def download():
                 shutil.rmtree(temp_dir, ignore_errors=True)
             return jsonify({"error": "Download failed - no file created"}), 500
         
-        # Embed chapters if available and FFmpeg is present
+        # Embed chapters if available and FFmpeg is present (skip for audio-only formats)
+        CHAPTER_SUPPORTED_EXTS = {".mp4", ".mkv", ".webm", ".mov", ".m4v"}
         chapters = extract_chapters(info)
-        if chapters and FFMPEG_AVAILABLE:
+        if chapters and FFMPEG_AVAILABLE and os.path.splitext(downloaded_file)[1].lower() in CHAPTER_SUPPORTED_EXTS:
             downloaded_file = embed_chapters_in_video(downloaded_file, chapters, temp_dir)
         
         file_size = os.path.getsize(downloaded_file)
