@@ -23,6 +23,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 init_limiter(app)
 
+# Deployment config — Render injects PORT and RENDER=true automatically
+PORT = int(os.environ.get("PORT", 5000))
+HOST = "0.0.0.0"
+DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+ON_RENDER = bool(os.environ.get("RENDER"))
+
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
 from threading import Lock
@@ -116,8 +122,6 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "no_warnings": True,
         "ignoreerrors": False,
         "no_color": True,
-        # Try to use browser cookies for authentication
-        "cookiesfrombrowser": ("firefox",),
         # CRITICAL: Enable remote JS challenge solver for YouTube (top-level option)
         "remote_components": ["ejs:github"],
         "extractor_args": {
@@ -172,7 +176,11 @@ def get_ydl_opts(for_download=False, format_str="best"):
                 })
     else:
         opts["skip_download"] = True
-    
+
+    # Firefox cookies only available when running locally
+    if not ON_RENDER:
+        opts["cookiesfrombrowser"] = ("firefox",)
+
     return opts
 
 @app.route("/health", methods=["GET"])
@@ -220,10 +228,14 @@ def disk_space():
         return jsonify({"error": str(e)}), 500
 
 
-# Log file path in project folder
-LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "extension_logs.txt")
+# Log file path — use /tmp on Render (ephemeral), project root locally
+if ON_RENDER:
+    LOG_FILE_PATH = "/tmp/extension_logs.txt"
+else:
+    LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "extension_logs.txt")
 
 @app.route("/save-logs", methods=["POST"])
+@limiter.limit(RATE_LIMITS["save_logs"])
 def save_logs():
     """Save extension logs to a file in the project folder"""
     try:
@@ -947,4 +959,4 @@ if __name__ == "__main__":
     print("  GET /playlist-info?url=<playlist_url> - Get playlist info")
     print("  GET /download-playlist?url=<playlist_url>&format=<format> - Download playlist")
     print("="*60 + "\n")
-    app.run(debug=True, port=5000, threaded=True)
+    app.run(debug=DEBUG, host=HOST, port=PORT, threaded=True, use_reloader=False)

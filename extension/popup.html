@@ -179,6 +179,20 @@
             </div>
             <div id="settings-panel-content">
                 <div class="settings-group">
+                    <h3 class="settings-group-title">Server</h3>
+                    <div class="settings-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                        <div class="settings-info">
+                            <span class="settings-label">Backend URL</span>
+                            <span class="settings-hint">Local or Render server address</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; width: 100%;">
+                            <input id="server-url-input" type="url" placeholder="http://localhost:5000"
+                                style="flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #fff; padding: 4px 8px; font-size: 12px;" />
+                            <button id="save-server-url-btn" class="settings-action-btn">Save</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-group">
                     <h3 class="settings-group-title">Logs</h3>
                     <div class="settings-item">
                         <div class="settings-info">

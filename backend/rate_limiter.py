@@ -17,6 +17,7 @@ RATE_LIMITS = {
     "download": "10 per hour",
     "playlist_info": "20 per minute",
     "download_playlist": "5 per hour",
+    "save_logs": "120 per hour",
 }
 
 

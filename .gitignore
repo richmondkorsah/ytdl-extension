@@ -23,25 +23,26 @@ build/
 .DS_Store
 Thumbs.db
 
-# Test files
-test_video.mp4
+# Downloaded media files
 *.mp4
 *.mp3
 *.webm
+*.mkv
+*.m4a
+*.opus
+*.zip
 
 # Temp files
 *.tmp
 *.temp
 
-
+# Logs
 extension_logs.txt
-
-RATE_LIMITING.md
-RATE_LIMITING_CONFIG.md
-
 *.log
 logs/
-.log.
-
 
 CLAUDE.md
+
+# Docs not for repo
+RATE_LIMITING.md
+RATE_LIMITING_CONFIG.md

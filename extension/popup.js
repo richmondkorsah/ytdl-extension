@@ -200,7 +200,7 @@ subtitleCheckbox.addEventListener("change", () => {
   }
 });
 
-const SERVER_URL = "http://localhost:5000";
+let SERVER_URL = "http://localhost:5000";
 
 let currentVideoInfo = null;
 let currentPlaylistInfo = null;
@@ -406,7 +406,7 @@ async function loadVideoInfo() {
         status.style.color = "#888";
         // Use AbortController for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
         const infoResponse = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
           signal: controller.signal
@@ -1610,6 +1610,23 @@ if (settingsBtn && settingsOverlay) {
   logWarn("Settings UI elements not found - settings disabled");
 }
 
+// ==================== SERVER URL SETTINGS ====================
+
+const saveServerUrlBtn = document.getElementById("save-server-url-btn");
+if (saveServerUrlBtn) {
+  saveServerUrlBtn.addEventListener("click", async () => {
+    const input = document.getElementById("server-url-input");
+    if (!input) return;
+    const newUrl = input.value.trim().replace(/\/$/, ""); // strip trailing slash
+    if (!newUrl) return;
+    SERVER_URL = newUrl;
+    await browser.runtime.sendMessage({ type: "SET_SERVER_URL", url: newUrl });
+    saveServerUrlBtn.textContent = "Saved!";
+    setTimeout(() => { saveServerUrlBtn.textContent = "Save"; }, 2000);
+    updateServerStatus();
+  });
+}
+
 // ==================== LOG CONTROLS ====================
 
 // Update log count display
@@ -1738,11 +1755,19 @@ function setServerOffline() {
   }
 }
 
-// Periodically check server status (every 30 seconds)
-setInterval(updateServerStatus, 30000);
+// Initialize — load server URL from storage first, then boot the UI
+(async () => {
+  const result = await browser.storage.local.get("serverUrl");
+  if (result.serverUrl) SERVER_URL = result.serverUrl;
 
-// Initialize UI
-updateServerStatus();
+  // Populate server URL input in settings
+  const serverUrlInput = document.getElementById("server-url-input");
+  if (serverUrlInput) serverUrlInput.value = SERVER_URL;
 
-logInfo("Loading video info...");
-loadVideoInfo();
+  // Periodically check server status (every 30 seconds)
+  setInterval(updateServerStatus, 30000);
+
+  updateServerStatus();
+  logInfo("Loading video info...");
+  loadVideoInfo();
+})();

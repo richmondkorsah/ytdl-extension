@@ -1,7 +1,13 @@
 // Background script - central controller for the extension
 // Handles messages from popup/content scripts and communicates with Flask backend
 
-const SERVER_URL = "http://localhost:5000";
+let SERVER_URL = "http://localhost:5000";
+
+async function loadServerUrl() {
+    const result = await browser.storage.local.get("serverUrl");
+    if (result.serverUrl) SERVER_URL = result.serverUrl;
+}
+loadServerUrl();
 
 // ==================== LOGGING UTILITIES ====================
 const LOG_PREFIX = "[BG]";
@@ -405,10 +411,6 @@ let isQueuePaused = false;
 let activeDownloadMap = {};  // { downloadId: queueItemId }
 let lastProgressNotify = 0;  // throttle popup updates
 
-// Download progress tracking: browser downloadId -> queue item id
-let activeDownloadMap = {};  // { downloadId: queueItemId }
-let lastProgressNotify = 0;  // throttle popup updates
-
 // Load queue from storage on startup
 async function initializeQueue() {
     logQueue("Initializing queue from storage...");
@@ -634,6 +636,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             .then(result => sendResponse(result))
             .catch(error => sendResponse({ success: false, error: error.message }));
         return true; // Keep the message channel open for async response
+    }
+
+    if (message.type === "SET_SERVER_URL") {
+        SERVER_URL = message.url;
+        browser.storage.local.set({ serverUrl: message.url });
+        sendResponse({ success: true });
+        return false;
     }
 
     if (message.type === "DOWNLOAD_PLAYLIST") {
@@ -1291,6 +1300,12 @@ async function handlePlaylistDownload(message) {
 // Optional: Listen for extension install/update
 browser.runtime.onInstalled.addListener((details) => {
     console.log("Extension installed/updated:", details.reason);
+    // Set default server URL if not already configured
+    browser.storage.local.get("serverUrl").then(result => {
+        if (!result.serverUrl) {
+            browser.storage.local.set({ serverUrl: "http://localhost:5000" });
+        }
+    });
     // Prefetch for existing YouTube tabs after install/update
     setTimeout(prefetchExistingYouTubeTabs, 1000);
 });
