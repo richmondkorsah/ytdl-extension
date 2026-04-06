@@ -1,7 +1,7 @@
 // Background script - central controller for the extension
 // Handles messages from popup/content scripts and communicates with Flask backend
 
-let SERVER_URL = "http://localhost:5000";
+let SERVER_URL = "https://ytdl-extension.onrender.com";
 
 async function loadServerUrl() {
     const result = await browser.storage.local.get("serverUrl");
@@ -1303,7 +1303,7 @@ browser.runtime.onInstalled.addListener((details) => {
     // Set default server URL if not already configured
     browser.storage.local.get("serverUrl").then(result => {
         if (!result.serverUrl) {
-            browser.storage.local.set({ serverUrl: "http://localhost:5000" });
+            browser.storage.local.set({ serverUrl: "https://ytdl-extension.onrender.com" });
         }
     });
     // Prefetch for existing YouTube tabs after install/update

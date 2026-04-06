@@ -200,7 +200,7 @@ subtitleCheckbox.addEventListener("change", () => {
   }
 });
 
-let SERVER_URL = "http://localhost:5000";
+let SERVER_URL = "https://ytdl-extension.onrender.com";
 
 let currentVideoInfo = null;
 let currentPlaylistInfo = null;
