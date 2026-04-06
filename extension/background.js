@@ -5,7 +5,12 @@ let SERVER_URL = "https://ytdl-extension.onrender.com";
 
 async function loadServerUrl() {
     const result = await browser.storage.local.get("serverUrl");
-    if (result.serverUrl) SERVER_URL = result.serverUrl;
+    if (result.serverUrl && result.serverUrl !== "http://localhost:5000") {
+        SERVER_URL = result.serverUrl;
+    } else if (result.serverUrl === "http://localhost:5000") {
+        // Migrate stale localhost URL to current default
+        await browser.storage.local.set({ serverUrl: SERVER_URL });
+    }
 }
 loadServerUrl();
 
@@ -1302,7 +1307,7 @@ browser.runtime.onInstalled.addListener((details) => {
     console.log("Extension installed/updated:", details.reason);
     // Set default server URL if not already configured
     browser.storage.local.get("serverUrl").then(result => {
-        if (!result.serverUrl) {
+        if (!result.serverUrl || result.serverUrl === "http://localhost:5000") {
             browser.storage.local.set({ serverUrl: "https://ytdl-extension.onrender.com" });
         }
     });

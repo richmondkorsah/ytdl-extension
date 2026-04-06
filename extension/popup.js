@@ -1758,7 +1758,11 @@ function setServerOffline() {
 // Initialize — load server URL from storage first, then boot the UI
 (async () => {
   const result = await browser.storage.local.get("serverUrl");
-  if (result.serverUrl) SERVER_URL = result.serverUrl;
+  if (result.serverUrl && result.serverUrl !== "http://localhost:5000") {
+    SERVER_URL = result.serverUrl;
+  } else if (result.serverUrl === "http://localhost:5000") {
+    await browser.storage.local.set({ serverUrl: SERVER_URL });
+  }
 
   // Populate server URL input in settings
   const serverUrlInput = document.getElementById("server-url-input");
