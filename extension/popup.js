@@ -413,7 +413,7 @@ async function loadVideoInfo() {
         });
         clearTimeout(timeoutId);
         infoData = await infoResponse.json();
-        logSuccess("Server response received", { success: infoData.success, title: infoData.title, qualities: infoData.available_qualities?.length });
+        logSuccess("Server response received", { success: infoData.success, title: infoData.title, qualities: infoData.available_qualities?.length, error: infoData.error });
       } catch (serverError) {
         logError("Server error:", { name: serverError.name, message: serverError.message });
         qualitySelect.innerHTML = '<option value="">Server unavailable</option>';
@@ -469,14 +469,15 @@ async function loadVideoInfo() {
       populateQualities(availableQualities, infoData.duration || 0);
     } else {
       // Server returned no qualities — show error state
-      logWarn("Server returned no available qualities");
+      const serverError = infoData?.error || "Unknown server error";
+      logWarn("Server returned no available qualities", { error: serverError });
       qualitySelect.innerHTML = '<option value="">No qualities available</option>';
       qualitySelect.disabled = true;
       downloadBtn.disabled = true;
       if (addToQueueBtn) addToQueueBtn.disabled = true;
-      status.textContent = "Could not load video qualities.";
+      status.textContent = `Error: ${serverError}`;
       status.style.color = "#ff9800";
-      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 8000);
     }
 
   } catch (error) {

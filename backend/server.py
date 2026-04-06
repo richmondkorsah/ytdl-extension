@@ -29,6 +29,20 @@ HOST = "0.0.0.0"
 DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 ON_RENDER = bool(os.environ.get("RENDER"))
 
+# Write YouTube cookies from env var to a temp file (set via upload_cookies.py)
+COOKIES_FILE = None
+if ON_RENDER:
+    import base64
+    cookies_b64 = os.environ.get("YOUTUBE_COOKIES")
+    if cookies_b64:
+        try:
+            COOKIES_FILE = "/tmp/yt_cookies.txt"
+            with open(COOKIES_FILE, "w") as f:
+                f.write(base64.b64decode(cookies_b64).decode("utf-8"))
+            print("✓ YouTube cookies loaded")
+        except Exception as e:
+            print(f"⚠ Failed to load cookies: {e}")
+
 
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
@@ -125,9 +139,9 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "no_color": True,
         "extractor_args": {
             "youtube": {
-                # Use iOS client on Render to bypass bot detection (no cookies needed)
+                # Use multiple clients on Render as fallback chain (data-center IPs get blocked)
                 # Fall back to web on local where Firefox cookies are available
-                "player_client": ["ios"] if ON_RENDER else ["web", "ios"],
+                "player_client": ["ios", "tv_embedded", "mweb"] if ON_RENDER else ["web", "ios", "tv_embedded"],
                 # Performance: skip DASH manifest for info-only requests
                 "skip_dash_manifest": not for_download,
             }
@@ -178,7 +192,10 @@ def get_ydl_opts(for_download=False, format_str="best"):
     else:
         opts["skip_download"] = True
 
-    if not ON_RENDER:
+    if ON_RENDER:
+        if COOKIES_FILE:
+            opts["cookiesfile"] = COOKIES_FILE
+    else:
         opts["cookiesfrombrowser"] = ("firefox",)
 
     return opts
