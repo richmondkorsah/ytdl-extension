@@ -29,6 +29,7 @@ HOST = "0.0.0.0"
 DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 ON_RENDER = bool(os.environ.get("RENDER"))
 
+
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
 from threading import Lock
@@ -122,11 +123,11 @@ def get_ydl_opts(for_download=False, format_str="best"):
         "no_warnings": True,
         "ignoreerrors": False,
         "no_color": True,
-        # CRITICAL: Enable remote JS challenge solver for YouTube (top-level option)
-        "remote_components": ["ejs:github"],
         "extractor_args": {
             "youtube": {
-                "remote_components": ["ejs:github"],
+                # Use iOS client on Render to bypass bot detection (no cookies needed)
+                # Fall back to web on local where Firefox cookies are available
+                "player_client": ["ios"] if ON_RENDER else ["web", "ios"],
                 # Performance: skip DASH manifest for info-only requests
                 "skip_dash_manifest": not for_download,
             }
@@ -177,7 +178,6 @@ def get_ydl_opts(for_download=False, format_str="best"):
     else:
         opts["skip_download"] = True
 
-    # Firefox cookies only available when running locally
     if not ON_RENDER:
         opts["cookiesfrombrowser"] = ("firefox",)
 
