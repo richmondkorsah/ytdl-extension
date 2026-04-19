@@ -16,6 +16,7 @@
         "downloads",
         "tabs",
         "storage",
+        "nativeMessaging",
         "https://www.youtube.com/*",
         "http://localhost:5000/*"
     ],

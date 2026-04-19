@@ -405,10 +405,6 @@ let isQueuePaused = false;
 let activeDownloadMap = {};  // { downloadId: queueItemId }
 let lastProgressNotify = 0;  // throttle popup updates
 
-// Download progress tracking: browser downloadId -> queue item id
-let activeDownloadMap = {};  // { downloadId: queueItemId }
-let lastProgressNotify = 0;  // throttle popup updates
-
 // Load queue from storage on startup
 async function initializeQueue() {
     logQueue("Initializing queue from storage...");
@@ -798,6 +794,19 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "GET_SERVER_STATUS") {
+        sendResponse({ online: serverOnline });
+        return false;
+    }
+
+    if (message.type === "START_SERVER") {
+        serverStartAttempted = false; // allow fresh retry
+        tryAutoStartServer()
+            .then(result => sendResponse({ success: result }))
+            .catch(() => sendResponse({ success: false }));
+        return true;
+    }
+
     return false;
 });
 
@@ -905,26 +914,24 @@ function getCachedInfo(videoId) {
     return null;
 }
 
-// Get cached info, waiting for in-progress fetches (up to 10 seconds)
+// Get cached info, waiting for an in-progress prefetch to finish (up to 55 seconds).
+// The prefetch itself can take up to 60s, so we wait nearly as long before giving up.
 async function getCachedInfoAsync(videoId) {
-    // First check if we have cached data
     const immediate = getCachedInfo(videoId);
     if (immediate) return immediate;
-    
-    // Check if a fetch is in progress
+
     const cached = videoInfoCache.get(videoId);
     if (cached && cached.fetching) {
-        console.log("Waiting for in-progress fetch for:", videoId);
-        // Wait for the fetch to complete (poll every 200ms, max 10 seconds)
-        for (let i = 0; i < 50; i++) {
-            await new Promise(resolve => setTimeout(resolve, 200));
+        logInfo(`Waiting for in-progress prefetch: ${videoId}`);
+        // Poll every 500ms for up to 55 seconds
+        for (let i = 0; i < 110; i++) {
+            await new Promise(resolve => setTimeout(resolve, 500));
             const result = getCachedInfo(videoId);
             if (result) return result;
-            // Check if fetch failed (entry removed)
-            if (!videoInfoCache.has(videoId)) break;
+            if (!videoInfoCache.has(videoId)) break; // fetch failed
         }
     }
-    
+
     return null;
 }
 
@@ -965,7 +972,7 @@ async function prefetchVideoInfo(url, videoId, options = {}) {
         const timeoutId = setTimeout(() => {
             controller.abort();
             logWarn(`Prefetch timeout for: ${videoId}`);
-        }, 10000); // 10 second timeout for prefetch
+        }, 60000); // 60 second timeout — yt-dlp needs 20-40s for DASH manifest
         
         const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
             method: "GET",
@@ -1302,27 +1309,41 @@ browser.runtime.onStartup.addListener(() => {
     setTimeout(prefetchExistingYouTubeTabs, 1000);
 });
 
-// Function to prefetch info for all existing YouTube video tabs
+// Prefetch info for all existing YouTube video tabs.
+// Active tab fires immediately (high priority); background tabs stagger 30s apart
+// so the server handles one yt-dlp call at a time.
 async function prefetchExistingYouTubeTabs() {
     try {
         logInfo("Scanning existing tabs for YouTube videos...");
         const tabs = await browser.tabs.query({ url: "*://www.youtube.com/watch*" });
-        
-        if (tabs.length > 0) {
-            logInfo(`Found ${tabs.length} existing YouTube video tabs - starting prefetch`);
-            
-            for (const tab of tabs) {
-                const videoId = extractVideoId(tab.url);
-                if (videoId && !getCachedInfo(videoId)) {
-                    logInfo(`Startup prefetch for existing tab ${tab.id}: ${videoId}`);
-                    // Stagger the requests to avoid overwhelming the server
-                    setTimeout(() => {
-                        prefetchVideoInfo(tab.url, videoId);
-                    }, Math.random() * 2000); // Random delay 0-2 seconds
-                }
-            }
-        } else {
+
+        if (tabs.length === 0) {
             logInfo("No existing YouTube video tabs found");
+            return;
+        }
+
+        logInfo(`Found ${tabs.length} existing YouTube video tab(s) - scheduling prefetch`);
+
+        // Find the active tab so we can prioritise it
+        const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+        const activeTabId = activeTab ? activeTab.id : null;
+
+        let bgDelay = 0; // ms offset for non-active tabs
+        for (const tab of tabs) {
+            const videoId = extractVideoId(tab.url);
+            if (!videoId || getCachedInfo(videoId)) continue;
+
+            if (tab.id === activeTabId) {
+                // Active tab — fetch immediately at high priority
+                logInfo(`Immediate prefetch (active tab ${tab.id}): ${videoId}`);
+                prefetchVideoInfo(tab.url, videoId, { priority: 'high' });
+            } else {
+                // Background tabs — stagger 30s apart so the server isn't flooded
+                bgDelay += 30000;
+                const delay = bgDelay;
+                logInfo(`Scheduled prefetch in ${delay / 1000}s (tab ${tab.id}): ${videoId}`);
+                setTimeout(() => prefetchVideoInfo(tab.url, videoId), delay);
+            }
         }
     } catch (error) {
         logError("Error scanning existing tabs:", error.message);
@@ -1383,6 +1404,89 @@ browser.downloads.onChanged.addListener(async (delta) => {
         logError(`Download ${delta.id} error:`, delta.error.current);
     }
 });
+
+// ==================== SERVER HEALTH MONITORING ====================
+let serverOnline = false;
+let serverStartAttempted = false;
+const SERVER_CHECK_INTERVAL = 30000; // 30 seconds
+
+async function checkServerHealth() {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const response = await fetch(`${SERVER_URL}/ping`, {
+            signal: controller.signal,
+            mode: "cors"
+        });
+        clearTimeout(timeoutId);
+        const wasOffline = !serverOnline;
+        serverOnline = response.ok;
+        if (wasOffline && serverOnline) {
+            logSuccess("Companion server came online");
+            serverStartAttempted = false;
+            broadcastServerStatus(true, false);
+        }
+        return serverOnline;
+    } catch (e) {
+        const wasOnline = serverOnline;
+        serverOnline = false;
+        if (wasOnline) {
+            logWarn("Companion server went offline");
+            broadcastServerStatus(false, false);
+        }
+        return false;
+    }
+}
+
+function broadcastServerStatus(online, starting) {
+    browser.runtime.sendMessage({ type: "SERVER_STATUS", online, starting }).catch(() => {});
+}
+
+async function tryAutoStartServer() {
+    if (serverStartAttempted) return false;
+    serverStartAttempted = true;
+    logInfo("Attempting to auto-start companion server via native messaging...");
+    broadcastServerStatus(false, true);
+
+    try {
+        const response = await browser.runtime.sendNativeMessage(
+            "ytdl_companion",
+            { action: "start" }
+        );
+
+        if (response && response.success) {
+            logSuccess("Companion launcher responded:", response.message);
+            // Poll until server responds (max 15 seconds)
+            for (let i = 0; i < 15; i++) {
+                await new Promise(r => setTimeout(r, 1000));
+                if (await checkServerHealth()) {
+                    logSuccess("Companion server is now online after auto-start");
+                    return true;
+                }
+            }
+            logWarn("Server process started but didn't respond within 15s");
+        } else {
+            logWarn("Companion launcher failed:", response && response.error);
+        }
+    } catch (e) {
+        logWarn("Native messaging unavailable - run native_host/install.py to enable auto-start:", e.message);
+    }
+
+    serverStartAttempted = false;
+    broadcastServerStatus(false, false);
+    return false;
+}
+
+async function serverHealthLoop() {
+    const online = await checkServerHealth();
+    if (!online) {
+        tryAutoStartServer(); // fire-and-forget; don't await
+    }
+}
+
+// Start health monitoring immediately, then poll every 30s
+serverHealthLoop();
+setInterval(serverHealthLoop, SERVER_CHECK_INTERVAL);
 
 logInfo("═══════════════════════════════════════");
 logInfo("Background script loaded");

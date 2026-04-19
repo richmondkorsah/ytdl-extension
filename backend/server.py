@@ -500,12 +500,14 @@ def info():
                     "vcodec": vcodec,
                 })
 
-            # Back-patch filesize onto every quality entry (including estimates)
-            # Add ~10% for audio stream estimate
+            # Back-patch filesize onto every quality entry.
+            # For DASH video-only streams add a fixed audio estimate (~130 kbps opus/aac)
+            # rather than a flat percentage — audio size depends on duration, not resolution.
+            audio_bytes = int(130 * 1000 / 8 * duration) if duration > 0 else 0
             for q in available_qualities:
                 h = q["height"]
                 if h in resolution_filesizes:
-                    q["filesize"] = int(resolution_filesizes[h] * 1.1)
+                    q["filesize"] = resolution_filesizes[h] + audio_bytes
 
             # Sort by height (highest first)
             available_qualities.sort(key=lambda x: x["height"], reverse=True)

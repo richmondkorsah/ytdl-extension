@@ -489,27 +489,30 @@ async function loadVideoInfo() {
   }
 }
 
-// Estimate filesize from resolution and duration when server doesn't provide one
-// Uses rough average bitrates (video + audio) in bits per second
+// Estimate filesize from resolution and duration when server doesn't provide one.
+// Uses DASH video-only bitrates (bps) + a fixed audio stream (130 kbps opus/aac).
 function estimateFileSize(height, durationSec) {
   if (!durationSec || durationSec <= 0) return null;
-  const bitrates = {
-    2160: 20000000,
-    1440: 10000000,
-    1080: 5000000,
-    720:  2500000,
-    480:  1200000,
-    360:  700000,
-    240:  400000,
-    144:  200000,
+  // Typical YouTube DASH video-only stream bitrates (bps) — H.264/VP9 mix
+  const videoBps = {
+    2160: 15000000,  // 15 Mbps
+    1440:  8000000,  //  8 Mbps
+    1080:  4000000,  //  4 Mbps
+    720:   2000000,  //  2 Mbps
+    480:    900000,  // 900 kbps
+    360:    450000,  // 450 kbps
+    240:    250000,  // 250 kbps
+    144:    120000,  // 120 kbps
   };
-  // Find closest matching bitrate
-  const keys = Object.keys(bitrates).map(Number).sort((a, b) => b - a);
-  let bps = bitrates[360]; // default
+  const AUDIO_BPS = 130000; // ~130 kbps opus/aac
+  const keys = Object.keys(videoBps).map(Number).sort((a, b) => b - a);
+  let bps = videoBps[360];
   for (const k of keys) {
-    if (height >= k) { bps = bitrates[k]; break; }
+    if (height >= k) { bps = videoBps[k]; break; }
   }
-  return Math.round(bps / 8 * durationSec);
+  const videoBytes = Math.round(bps / 8 * durationSec);
+  const audioBytes = Math.round(AUDIO_BPS / 8 * durationSec);
+  return videoBytes + audioBytes;
 }
 
 // Populate quality selector with real qualities from the server
@@ -1110,8 +1113,31 @@ async function loadQueueFromBackground() {
   }
 }
 
-// Listen for queue updates from background script
+// Listen for messages from background script (queue updates, server status)
 browser.runtime.onMessage.addListener((message) => {
+  if (message.type === "SERVER_STATUS") {
+    if (message.online) {
+      if (serverStatusText) serverStatusText.textContent = "Server ready";
+      if (serverStatusDot) {
+        serverStatusDot.style.background = "#00ff88";
+        serverStatusDot.style.boxShadow = "0 0 6px rgba(0, 255, 136, 0.6)";
+      }
+      logSuccess("Background: server came online");
+      // Reload video info if qualities haven't loaded yet
+      if (!availableQualities.length) {
+        loadVideoInfo();
+      }
+    } else if (message.starting) {
+      if (serverStatusText) serverStatusText.textContent = "Starting companion...";
+      if (serverStatusDot) {
+        serverStatusDot.style.background = "#ff9800";
+        serverStatusDot.style.boxShadow = "0 0 6px rgba(255, 152, 0, 0.6)";
+      }
+    } else {
+      setServerOffline();
+    }
+  }
+
   if (message.type === "QUEUE_UPDATED") {
     logQueue("📩 Received QUEUE_UPDATED from background", {
       queueLength: message.queue?.length || 0,
