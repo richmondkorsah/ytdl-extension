@@ -1,3 +1,9 @@
+function escapeHTML(str) {
+    const d = document.createElement("div");
+    d.textContent = String(str ?? "");
+    return d.innerHTML;
+}
+
 // ==================== LOGGING UTILITIES ====================
 const LOG_PREFIX = "[POPUP]";
 const LOG_COLORS = {
@@ -206,6 +212,8 @@ let currentVideoInfo = null;
 let currentPlaylistInfo = null;
 let isPlaylistMode = false;
 let availableQualities = [];
+let currentVideoId = null;
+let qualityLoadTimeout = null;
 
 // Extract video ID from URL
 function extractVideoId(url) {
@@ -264,6 +272,64 @@ function formatViews(views) {
   }
   return `${num} views`;
 }
+
+function applyInfoData(infoData) {
+  if (infoData && infoData.success && infoData.available_qualities) {
+    availableQualities = infoData.available_qualities;
+    if (infoData.title) {
+      videoTitleElement.textContent = infoData.title;
+      if (currentVideoInfo) currentVideoInfo.videoTitle = infoData.title;
+    }
+    if (infoData.channel) {
+      channelNameElement.textContent = infoData.channel;
+      if (currentVideoInfo) currentVideoInfo.channelName = infoData.channel;
+    }
+    if (infoData.duration) videoDurationOverlay.textContent = formatDuration(infoData.duration);
+    if (infoData.view_count && videoViewsElement) {
+      videoViewsElement.textContent = formatViews(infoData.view_count);
+      const metaSep = document.getElementById('meta-separator');
+      if (metaSep) metaSep.classList.remove('hidden');
+    }
+    if (infoData.thumbnail) {
+      thumbnailImg.onload = () => { thumbnailImg.style.display = "block"; };
+      thumbnailImg.onerror = () => {
+        if (currentVideoInfo && currentVideoInfo.videoId) {
+          thumbnailImg.src = `https://img.youtube.com/vi/${currentVideoInfo.videoId}/hqdefault.jpg`;
+        }
+      };
+      thumbnailImg.src = infoData.thumbnail;
+    }
+    populateQualities(availableQualities, infoData.duration || 0);
+  } else {
+    logWarn("Server returned no available qualities");
+    qualitySelect.innerHTML = '<option value="">No qualities available</option>';
+    qualitySelect.disabled = true;
+    downloadBtn.disabled = true;
+    if (addToQueueBtn) addToQueueBtn.disabled = true;
+    status.textContent = "Could not load video qualities.";
+    status.style.color = "#ff9800";
+    setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+  }
+}
+
+// Listen for background push when prefetch completes
+browser.runtime.onMessage.addListener((message) => {
+  if (message.type === "VIDEO_INFO_READY" && message.videoId === currentVideoId) {
+    clearTimeout(qualityLoadTimeout);
+    logSuccess("Background pushed video info:", { videoId: message.videoId });
+    applyInfoData(message.data);
+  }
+  if (message.type === "VIDEO_INFO_ERROR" && message.videoId === currentVideoId) {
+    clearTimeout(qualityLoadTimeout);
+    logError("Background prefetch failed for:", message.videoId);
+    qualitySelect.innerHTML = '<option value="">Failed to load</option>';
+    qualitySelect.disabled = true;
+    downloadBtn.disabled = true;
+    if (addToQueueBtn) addToQueueBtn.disabled = true;
+    status.textContent = "Server not running. Start the backend first.";
+    status.style.color = "#ff9800";
+  }
+});
 
 async function loadVideoInfo() {
   logInfo("Loading video info...");
@@ -377,106 +443,42 @@ async function loadVideoInfo() {
       }
     }
 
-    // Check if we have cached info from background script (prefetched)
+    // Track which video this popup instance is for (used by the push listener above)
+    currentVideoId = videoId;
+
+    // Instant synchronous cache check — no waiting
     let infoData = null;
     if (videoId) {
       try {
-        logInfo("Checking for cached video info...");
-        const cachedInfo = await browser.runtime.sendMessage({
-          type: "GET_CACHED_INFO",
-          videoId: videoId
-        });
-        if (cachedInfo && cachedInfo.success) {
-          logSuccess("Using cached video info!", { title: cachedInfo.title, qualities: cachedInfo.available_qualities?.length });
-          infoData = cachedInfo;
+        logInfo("Checking sync cache for video info...");
+        const cached = await browser.runtime.sendMessage({ type: "GET_CACHED_INFO_SYNC", videoId });
+        if (cached && cached.success) {
+          logSuccess("Cache hit — instant load!", { title: cached.title, qualities: cached.available_qualities?.length });
+          infoData = cached;
         } else {
-          logInfo("No cached info available");
+          logInfo("Cache miss — waiting for background fetch...");
         }
       } catch (e) {
-        logWarn("Cache check error:", e.message);
+        logWarn("Sync cache check failed:", e.message);
       }
     }
 
-    // If no cached info, fetch from server
-    if (!infoData) {
-      const cleanUrl = cleanYouTubeUrl(tab.url);
-      try {
-        logInfo("Fetching video info from server...", { url: cleanUrl });
-        status.textContent = "Loading video qualities...";
-        status.style.color = "#888";
-        // Use AbortController for timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-
-        const infoResponse = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        infoData = await infoResponse.json();
-        logSuccess("Server response received", { success: infoData.success, title: infoData.title, qualities: infoData.available_qualities?.length });
-      } catch (serverError) {
-        logError("Server error:", { name: serverError.name, message: serverError.message });
-        qualitySelect.innerHTML = '<option value="">Server unavailable</option>';
+    if (infoData) {
+      // Already cached — apply immediately
+      applyInfoData(infoData);
+    } else {
+      // Background fetch is in progress (started via IMMEDIATE_PREFETCH above).
+      // The VIDEO_INFO_READY / VIDEO_INFO_ERROR push listener will update the UI.
+      // Fall back to an error state after 65 s in case something goes wrong.
+      qualityLoadTimeout = setTimeout(() => {
+        logWarn("Quality load timed out after 65s");
+        qualitySelect.innerHTML = '<option value="">Request timed out</option>';
         qualitySelect.disabled = true;
         downloadBtn.disabled = true;
         if (addToQueueBtn) addToQueueBtn.disabled = true;
-        if (serverError.name === 'AbortError') {
-          status.textContent = "Request timed out. Is the server running?";
-        } else {
-          status.textContent = "Server not running. Start the backend first.";
-        }
+        status.textContent = "Request timed out. Is the server running?";
         status.style.color = "#ff9800";
-        return;
-      }
-    }
-
-    // Process the info data (from cache or fresh fetch)
-    if (infoData && infoData.success && infoData.available_qualities) {
-      availableQualities = infoData.available_qualities;
-      
-      // Update video info from server (more accurate)
-      if (infoData.title) {
-        videoTitleElement.textContent = infoData.title;
-        currentVideoInfo.videoTitle = infoData.title;
-      }
-      if (infoData.channel) {
-        channelNameElement.textContent = infoData.channel;
-        currentVideoInfo.channelName = infoData.channel;
-      }
-      if (infoData.duration) {
-        videoDurationOverlay.textContent = formatDuration(infoData.duration);
-      }
-      // Update views if available  
-      if (infoData.view_count && videoViewsElement) {
-        videoViewsElement.textContent = formatViews(infoData.view_count);
-        const metaSep = document.getElementById('meta-separator');
-        if (metaSep) metaSep.classList.remove('hidden');
-      }
-      if (infoData.thumbnail) {
-        thumbnailImg.onload = () => {
-          thumbnailImg.style.display = "block";
-        };
-        thumbnailImg.onerror = () => {
-          // Try fallback thumbnail
-          if (currentVideoInfo && currentVideoInfo.videoId) {
-            thumbnailImg.src = `https://img.youtube.com/vi/${currentVideoInfo.videoId}/hqdefault.jpg`;
-          }
-        };
-        thumbnailImg.src = infoData.thumbnail;
-      }
-      
-      // Populate with real qualities from the server
-      populateQualities(availableQualities, infoData.duration || 0);
-    } else {
-      // Server returned no qualities — show error state
-      logWarn("Server returned no available qualities");
-      qualitySelect.innerHTML = '<option value="">No qualities available</option>';
-      qualitySelect.disabled = true;
-      downloadBtn.disabled = true;
-      if (addToQueueBtn) addToQueueBtn.disabled = true;
-      status.textContent = "Could not load video qualities.";
-      status.style.color = "#ff9800";
-      setTimeout(() => { status.textContent = ""; status.style.color = ""; }, 4000);
+      }, 65000);
     }
 
   } catch (error) {
@@ -625,7 +627,7 @@ async function loadPlaylistInfo(url, playlistId) {
         playlistId: playlistId
       };
       playlistTitle.textContent = data.title || "Playlist";
-      playlistCount.innerHTML = `<span class="count-number">${data.video_count}</span> videos`;
+      playlistCount.innerHTML = `<span class="count-number">${escapeHTML(data.video_count)}</span> videos`;
     } else {
       playlistTitle.textContent = "Playlist";
       playlistCount.textContent = "Ready to download";
@@ -907,8 +909,8 @@ function renderQueue() {
             <div class="queue-item-progress-fill${progress === 0 ? ' indeterminate' : ''}" style="width: ${progress || 0}%"></div>
           </div>
           <div class="queue-item-progress-text">
-            <span>${sizeText}</span>
-            <span>${progress}%</span>
+            <span>${escapeHTML(sizeText)}</span>
+            <span>${escapeHTML(progress)}%</span>
           </div>
         </div>
       `;
@@ -921,19 +923,19 @@ function renderQueue() {
     
     let detailsHTML = `
       <div class="queue-item-details">
-        <span class="queue-item-meta">${qualityLabel}${fileSize ? ' • ' + fileSize : ''}</span>
+        <span class="queue-item-meta">${escapeHTML(qualityLabel)}${fileSize ? ' • ' + escapeHTML(fileSize) : ''}</span>
     `;
-    
+
     // Add badges
     if (item.subtitles) {
-      detailsHTML += `<span class="queue-item-badge subtitle-badge">CC ${item.subtitles.toUpperCase()}</span>`;
+      detailsHTML += `<span class="queue-item-badge subtitle-badge">CC ${escapeHTML(item.subtitles.toUpperCase())}</span>`;
     }
-    
+
     // Add position for waiting items
     if (item.status === "pending" && position > 1) {
-      detailsHTML += `<span class="queue-item-position">Position #${position} in queue</span>`;
+      detailsHTML += `<span class="queue-item-position">Position #${escapeHTML(position)} in queue</span>`;
     }
-    
+
     // Add HDR badge if applicable
     if (item.hdr || qualityLabel.includes("HDR")) {
       detailsHTML += `<span class="queue-item-badge">HDR</span>`;
@@ -942,15 +944,15 @@ function renderQueue() {
     detailsHTML += `</div>`;
     
     itemEl.innerHTML = `
-      ${thumbnailUrl ? `<img class="queue-item-thumbnail" src="${thumbnailUrl}" alt="">` : ""}
+      ${thumbnailUrl ? `<img class="queue-item-thumbnail" src="${escapeHTML(thumbnailUrl)}" alt="">` : ""}
       <div class="queue-item-info">
-        <div class="queue-item-title" title="${item.title}">${item.title}</div>
-        <div class="queue-item-status-text ${statusClass}">${statusText}</div>
+        <div class="queue-item-title" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</div>
+        <div class="queue-item-status-text ${statusClass}">${escapeHTML(statusText)}</div>
         ${progressHTML}
         ${detailsHTML}
       </div>
       <div class="queue-item-actions">
-        <button class="queue-item-remove" title="Remove" data-id="${item.id}">✕</button>
+        <button class="queue-item-remove" title="Remove" data-id="${escapeHTML(item.id)}">✕</button>
       </div>
     `;
     
@@ -1267,7 +1269,7 @@ function renderHistory() {
         break;
       case "failed":
         statusIcon = "✕";
-        statusText = item.error ? `Failed: ${item.error.substring(0, 20)}...` : "Failed";
+        statusText = item.error ? `Failed: ${escapeHTML(item.error.substring(0, 20))}...` : "Failed";
         break;
       default:
         statusIcon = "?";
@@ -1284,21 +1286,21 @@ function renderHistory() {
       : (item.title || "Unknown");
     
     // Build action buttons
-    let actionButtons = `<button class="history-item-remove" title="Remove" data-id="${item.id}">×</button>`;
+    let actionButtons = `<button class="history-item-remove" title="Remove" data-id="${escapeHTML(item.id)}">×</button>`;
     if (item.status === "failed") {
-      actionButtons = `<button class="history-item-retry" title="Retry download" data-id="${item.id}">🔄</button>` + actionButtons;
+      actionButtons = `<button class="history-item-retry" title="Retry download" data-id="${escapeHTML(item.id)}">🔄</button>` + actionButtons;
     }
-    
+
     itemEl.innerHTML = `
-      ${thumbnailUrl ? `<img class="history-item-thumbnail" src="${thumbnailUrl}" alt="">` : ""}
+      ${thumbnailUrl ? `<img class="history-item-thumbnail" src="${escapeHTML(thumbnailUrl)}" alt="">` : ""}
       <div class="history-item-info">
-        <div class="history-item-title" title="${item.title || ''}">${truncatedTitle}</div>
+        <div class="history-item-title" title="${escapeHTML(item.title || '')}">${escapeHTML(truncatedTitle)}</div>
         <div class="history-item-details">
-          <span class="history-item-quality">${item.qualityLabel || ""}</span>
-          ${dateStr ? `<span class="history-item-date">${dateStr}</span>` : ""}
+          <span class="history-item-quality">${escapeHTML(item.qualityLabel || "")}</span>
+          ${dateStr ? `<span class="history-item-date">${escapeHTML(dateStr)}</span>` : ""}
         </div>
       </div>
-      <span class="history-item-status ${item.status}">${statusIcon} ${statusText}</span>
+      <span class="history-item-status ${item.status}">${statusIcon} ${escapeHTML(statusText)}</span>
       <div class="history-item-actions">
         ${actionButtons}
       </div>

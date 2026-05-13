@@ -223,13 +223,11 @@ observer.observe(document.body, { childList: true, subtree: true });
             type: "PREFETCH_INFO",
             url: window.location.href,
             videoId: videoId
-        }).catch(() => {
-            // Background script might not be ready yet, that's ok
-        });
+        }).catch(() => {});
     }
 })();
 
-// Also trigger prefetch on YouTube SPA navigation
+// Trigger prefetch on YouTube SPA navigation
 let lastVideoId = getVideoId();
 const navObserver = new MutationObserver(() => {
     const currentVideoId = getVideoId();
@@ -245,3 +243,46 @@ const navObserver = new MutationObserver(() => {
 });
 
 navObserver.observe(document.body, { childList: true, subtree: true });
+
+// Hover prefetch: trigger when the user hovers over any video thumbnail/link
+(function setupHoverPrefetch() {
+    let hoverTimer = null;
+    let currentHoveredVideoId = null;
+
+    document.addEventListener("mouseover", (event) => {
+        const anchor = event.target.closest('a[href*="/watch?v="]');
+        if (!anchor) return;
+
+        let videoId;
+        try {
+            videoId = new URL(anchor.href).searchParams.get("v");
+        } catch (e) { return; }
+        if (!videoId || videoId === currentHoveredVideoId) return;
+
+        clearTimeout(hoverTimer);
+        currentHoveredVideoId = videoId;
+        hoverTimer = setTimeout(() => {
+            browser.runtime.sendMessage({
+                type: "PREFETCH_INFO",
+                url: `https://www.youtube.com/watch?v=${videoId}`,
+                videoId,
+                source: "hover"
+            }).catch(() => {});
+        }, 200);
+    });
+
+    document.addEventListener("mouseout", (event) => {
+        const anchor = event.target.closest('a[href*="/watch?v="]');
+        if (!anchor) return;
+
+        let videoId;
+        try {
+            videoId = new URL(anchor.href).searchParams.get("v");
+        } catch (e) { return; }
+
+        if (videoId === currentHoveredVideoId && !anchor.contains(event.relatedTarget)) {
+            clearTimeout(hoverTimer);
+            currentHoveredVideoId = null;
+        }
+    });
+})();

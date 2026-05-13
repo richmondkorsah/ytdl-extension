@@ -41,7 +41,7 @@ def install_windows():
         "description": "YouTube Downloader Companion App Launcher",
         "path": launcher,
         "type": "stdio",
-        "allowed_extensions": ["ytdl@richmondkorsah"],
+        "allowed_extensions": ["yt-downloader@richmond"],
     }
     with open(MANIFEST_PATH, "w") as f:
         json.dump(manifest, f, indent=2)
@@ -65,7 +65,7 @@ def install_unix():
         "description": "YouTube Downloader Companion App Launcher",
         "path": HOST_SCRIPT,
         "type": "stdio",
-        "allowed_extensions": ["ytdl@richmondkorsah"],
+        "allowed_extensions": ["yt-downloader@richmond"],
     }
     with open(MANIFEST_PATH, "w") as f:
         json.dump(manifest, f, indent=2)

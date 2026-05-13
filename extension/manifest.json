@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Youtube Video Downloader",
-    "version": "1.0",
+    "version": "1.0.2",
     "description": "Download videos from YouTube easily.",
 
     "icons": {
@@ -40,5 +40,15 @@
         "matches": ["https://www.youtube.com/*"],
         "js": ["content.js"]
         }
-    ]
+    ],
+
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "yt-downloader@richmond",
+            "data_collection_permissions": {
+                "required": [],
+                "optional": []
+            }
+        }
+    }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "ytdl_companion",
+  "description": "YouTube Downloader Companion App Launcher",
+  "path": "C:\\Code\\yt_downloader\\native_host\\launch_host.bat",
+  "type": "stdio",
+  "allowed_extensions": [
+    "yt-downloader@richmond"
+  ]
+}

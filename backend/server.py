@@ -4,7 +4,6 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
 
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
-from rate_limiter import limiter, init_limiter, RATE_LIMITS
 from yt_dlp import YoutubeDL
 import os
 import tempfile
@@ -20,8 +19,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-
-init_limiter(app)
 
 # Server-side cache for video info (reduces repeated yt-dlp calls)
 from functools import lru_cache
@@ -176,7 +173,6 @@ def get_ydl_opts(for_download=False, format_str="best"):
     return opts
 
 @app.route("/health", methods=["GET"])
-@limiter.limit(RATE_LIMITS["health"])
 def health_check():
     return jsonify({
         "status": "ok",
@@ -185,13 +181,11 @@ def health_check():
     }), 200
 
 @app.route("/ping", methods=["GET"])
-@limiter.limit(RATE_LIMITS["ping"]) 
 def ping():
     """Lightweight server status check"""
     return jsonify({"status": "ok"}), 200
 
 @app.route("/disk-space", methods=["GET"])
-@limiter.limit(RATE_LIMITS["disk_space"])
 def disk_space():
     """Return free disk space for the downloads directory"""
     try:
@@ -420,7 +414,6 @@ def embed_chapters_in_video(video_path, chapters, temp_dir):
 
 
 @app.route("/info", methods=["GET"])
-@limiter.limit(RATE_LIMITS["info"])
 def info():
     """Get video metadata without downloading"""
     url = request.args.get("url")
@@ -551,7 +544,6 @@ def info():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/download", methods=["GET"])
-@limiter.limit(RATE_LIMITS["download"])
 def download():
     """Download video and stream to client"""
     url = request.args.get("url")
@@ -754,7 +746,6 @@ def download():
 
 
 @app.route("/playlist-info", methods=["GET"])
-@limiter.limit(RATE_LIMITS["playlist_info"])
 def playlist_info():
     """Get playlist metadata without downloading"""
     url = request.args.get("url")
@@ -803,7 +794,6 @@ def playlist_info():
 
 
 @app.route("/download-playlist", methods=["GET"])
-@limiter.limit(RATE_LIMITS["download_playlist"])
 def download_playlist():
     """Download entire playlist and stream as ZIP"""
     url = request.args.get("url")

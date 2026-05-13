@@ -99,27 +99,32 @@ function log(type, message, ...data) {
     scheduleServerLogSave();
 }
 
-// Server file logging
+// Server file logging — throttled to at most once per 30s; suppressed during active downloads
 let serverLogSaveTimeout = null;
+let serverLogLastSent = 0;
+const SERVER_LOG_INTERVAL = 30000;
+let activeDownloadCount = 0;
 
 function scheduleServerLogSave() {
-    if (serverLogSaveTimeout) {
-        clearTimeout(serverLogSaveTimeout);
-    }
-    // Save to server file every 2 seconds (debounced)
-    serverLogSaveTimeout = setTimeout(saveLogsToServer, 2000);
+    if (activeDownloadCount > 0) return; // suppress during active downloads
+    if (serverLogSaveTimeout) return; // already pending, let it fire
+    const elapsed = Date.now() - serverLogLastSent;
+    const delay = Math.max(0, SERVER_LOG_INTERVAL - elapsed);
+    serverLogSaveTimeout = setTimeout(saveLogsToServer, delay);
 }
 
 async function saveLogsToServer() {
+    serverLogSaveTimeout = null;
+    serverLogLastSent = Date.now();
     if (logBuffer.length === 0) return;
-    
+
     try {
         const response = await fetch(`${SERVER_URL}/save-logs`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ logs: logBuffer, append: false })
         });
-        
+
         if (!response.ok) {
             console.error("Failed to save logs to server:", response.status);
         }
@@ -229,7 +234,8 @@ async function exportLogs() {
 
 // Cache for video info - keyed by video ID
 const videoInfoCache = new Map();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL for tab-navigated entries
+const HOVER_CACHE_TTL = 10 * 60 * 1000; // 10 minutes TTL for hover-prefetched entries
 
 // ==================== DOWNLOAD HISTORY ====================
 const MAX_HISTORY_ENTRIES = 100;
@@ -647,9 +653,17 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Keep channel open for async response
     }
 
+    if (message.type === "GET_CACHED_INFO_SYNC") {
+        // Instant synchronous cache check — returns null if fetch is still in progress
+        sendResponse(getCachedInfo(message.videoId));
+        return false;
+    }
+
     if (message.type === "PREFETCH_INFO") {
-        // Trigger prefetch without waiting
-        prefetchVideoInfo(message.url, message.videoId, { priority: message.priority || 'normal' });
+        prefetchVideoInfo(message.url, message.videoId, {
+            priority: message.priority || 'normal',
+            source: message.source || 'tab'
+        });
         sendResponse({ acknowledged: true });
         return false;
     }
@@ -812,25 +826,28 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Enhanced tab listeners for immediate video info prefetching
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // Start prefetching as soon as URL is available (don't wait for complete status)
     if (tab.url && tab.url.includes("youtube.com/watch")) {
         const videoId = extractVideoId(tab.url);
-        if (videoId && !getCachedInfo(videoId)) {
-            // Check if we should prefetch based on loading state
-            if (changeInfo.status === "loading" || changeInfo.status === "complete") {
-                logInfo(`Tab ${tabId} ${changeInfo.status} - immediate prefetch for: ${videoId}`);
-                // Start prefetching immediately
-                prefetchVideoInfo(tab.url, videoId);
+        if (videoId) {
+            // User navigated to this video — cancel any pending hover eviction
+            cancelHoverEviction(videoId);
+            if (!getCachedInfo(videoId)) {
+                if (changeInfo.status === "loading" || changeInfo.status === "complete") {
+                    logInfo(`Tab ${tabId} ${changeInfo.status} - immediate prefetch for: ${videoId}`);
+                    prefetchVideoInfo(tab.url, videoId);
+                }
             }
         }
     }
-    
-    // Also handle URL changes (navigation within same tab)
+
     if (changeInfo.url && changeInfo.url.includes("youtube.com/watch")) {
         const videoId = extractVideoId(changeInfo.url);
-        if (videoId && !getCachedInfo(videoId)) {
-            logInfo(`Tab ${tabId} URL changed - immediate prefetch for: ${videoId}`);
-            prefetchVideoInfo(changeInfo.url, videoId);
+        if (videoId) {
+            cancelHoverEviction(videoId);
+            if (!getCachedInfo(videoId)) {
+                logInfo(`Tab ${tabId} URL changed - immediate prefetch for: ${videoId}`);
+                prefetchVideoInfo(changeInfo.url, videoId);
+            }
         }
     }
 });
@@ -842,10 +859,10 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
         if (tab.url && tab.url.includes("youtube.com/watch")) {
             const videoId = extractVideoId(tab.url);
             if (videoId) {
+                cancelHoverEviction(videoId);
                 const cached = getCachedInfo(videoId);
                 if (!cached) {
                     logInfo(`Tab ${activeInfo.tabId} activated - high priority prefetch for: ${videoId}`);
-                    // High priority prefetch for active tab
                     prefetchVideoInfo(tab.url, videoId, { priority: 'high' });
                 } else {
                     logInfo(`Tab ${activeInfo.tabId} activated - already cached: ${videoId}`);
@@ -853,7 +870,6 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
             }
         }
     } catch (e) {
-        // Tab might not exist anymore
         logWarn("Tab activation error (tab may not exist):", e.message);
     }
 });
@@ -935,22 +951,36 @@ async function getCachedInfoAsync(videoId) {
     return null;
 }
 
+// Cancel the 10-min hover eviction for a video the user actually navigated to
+function cancelHoverEviction(videoId) {
+    const entry = videoInfoCache.get(videoId);
+    if (!entry) return;
+    if (entry.hoverEvictTimer) {
+        clearTimeout(entry.hoverEvictTimer);
+        logInfo(`Hover eviction cancelled - user navigated to: ${videoId}`);
+    }
+    // Promote to a full tab-sourced entry so normal CACHE_TTL applies
+    entry.source = 'tab';
+    entry.hoverPrefetch = false;
+    entry.hoverEvictTimer = null;
+}
+
 // Prefetch video info from server and cache it
 async function prefetchVideoInfo(url, videoId, options = {}) {
     const priority = options.priority || 'normal';
-    
+    const source = options.source || 'tab';
+
     // For high priority (active tab), allow override of current fetches
     if (priority === 'high' && videoInfoCache.has(videoId)) {
         const cached = videoInfoCache.get(videoId);
         if (cached.fetching) {
             logInfo(`High priority override for ongoing fetch: ${videoId}`);
-            // Don't duplicate, but log that it's prioritized
         } else if (Date.now() - cached.timestamp < CACHE_TTL) {
             logInfo(`High priority but already cached: ${videoId}`);
             return;
         }
     }
-    
+
     // Don't prefetch if already cached or currently fetching (for normal priority)
     if (priority === 'normal' && videoInfoCache.has(videoId)) {
         const cached = videoInfoCache.get(videoId);
@@ -960,47 +990,68 @@ async function prefetchVideoInfo(url, videoId, options = {}) {
         }
     }
 
-    // Mark as fetching to prevent duplicate requests
-    videoInfoCache.set(videoId, { fetching: true, timestamp: Date.now() });
-    logInfo(`Starting ${priority} priority prefetch for: ${videoId}`);
+    // Mark as fetching — store source so tab navigation can promote hover entries
+    videoInfoCache.set(videoId, { fetching: true, timestamp: Date.now(), source });
+    logInfo(`Starting ${priority} priority prefetch (source: ${source}) for: ${videoId}`);
 
     try {
         const cleanUrl = cleanYouTubeUrl(url);
-        
-        // Add timeout to prevent hanging requests
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
             controller.abort();
             logWarn(`Prefetch timeout for: ${videoId}`);
-        }, 60000); // 60 second timeout — yt-dlp needs 20-40s for DASH manifest
-        
+        }, 60000);
+
         const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
             method: "GET",
             mode: "cors",
             signal: controller.signal
         });
-        
+
         clearTimeout(timeoutId);
 
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
+                // Check current source in case tab navigation promoted this entry while fetching
+                const currentEntry = videoInfoCache.get(videoId);
+                const isHover = source === 'hover' && currentEntry?.source === 'hover';
+
+                let hoverEvictTimer = null;
+                if (isHover) {
+                    hoverEvictTimer = setTimeout(() => {
+                        const e = videoInfoCache.get(videoId);
+                        if (e && e.hoverPrefetch) {
+                            logInfo(`Hover cache evicted after 10 min: ${videoId}`);
+                            videoInfoCache.delete(videoId);
+                        }
+                    }, HOVER_CACHE_TTL);
+                }
+
                 videoInfoCache.set(videoId, {
-                    data: data,
+                    data,
                     timestamp: Date.now(),
-                    fetching: false
+                    fetching: false,
+                    source: isHover ? 'hover' : 'tab',
+                    hoverPrefetch: isHover,
+                    hoverEvictTimer
                 });
                 logSuccess(`Prefetch complete: "${data.title}" (${videoId})`, {
                     qualities: data.available_qualities?.length || 0,
-                    duration: data.duration
+                    duration: data.duration,
+                    source: isHover ? 'hover (10min evict)' : 'tab'
                 });
+                browser.runtime.sendMessage({ type: "VIDEO_INFO_READY", videoId, data }).catch(() => {});
             } else {
                 logWarn(`Prefetch returned error for ${videoId}:`, data.error);
                 videoInfoCache.delete(videoId);
+                browser.runtime.sendMessage({ type: "VIDEO_INFO_ERROR", videoId }).catch(() => {});
             }
         } else {
             logError(`Prefetch HTTP error for ${videoId}:`, { status: response.status });
             videoInfoCache.delete(videoId);
+            browser.runtime.sendMessage({ type: "VIDEO_INFO_ERROR", videoId }).catch(() => {});
         }
     } catch (error) {
         if (error.name === 'AbortError') {
@@ -1009,6 +1060,7 @@ async function prefetchVideoInfo(url, videoId, options = {}) {
             logError(`Prefetch exception for ${videoId}:`, { message: error.message });
         }
         videoInfoCache.delete(videoId);
+        browser.runtime.sendMessage({ type: "VIDEO_INFO_ERROR", videoId }).catch(() => {});
     }
 }
 
@@ -1109,6 +1161,7 @@ async function handleDownload(message) {
         }
     }
 
+    activeDownloadCount++;
     try {
         // First check if server is running
         logInfo("Checking server health...");
@@ -1181,15 +1234,18 @@ async function handleDownload(message) {
         }
     } catch (error) {
         logError("Download error", { message: error.message, stack: error.stack });
-        
+
         // Provide helpful error messages
         if (error.message.includes("NetworkError") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
             const networkError = new Error("Cannot connect to server. Make sure Flask is running: python backend/server.py");
             logError("Network error - server unreachable");
             throw networkError;
         }
-        
+
         throw error;
+    } finally {
+        activeDownloadCount = Math.max(0, activeDownloadCount - 1);
+        if (activeDownloadCount === 0) scheduleServerLogSave(); // flush after download ends
     }
 }
 
