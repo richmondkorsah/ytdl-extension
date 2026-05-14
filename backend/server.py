@@ -1,6 +1,9 @@
-import sys
-if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
-    sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
+import sys, io
+try:
+    if sys.stdout and sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+        sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
+except (AttributeError, io.UnsupportedOperation):
+    pass
 
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
@@ -939,4 +942,4 @@ if __name__ == "__main__":
     print("  GET /playlist-info?url=<playlist_url> - Get playlist info")
     print("  GET /download-playlist?url=<playlist_url>&format=<format> - Download playlist")
     print("="*60 + "\n")
-    app.run(debug=True, port=5000, threaded=True)
+    app.run(debug=True, use_reloader=False, port=5000, threaded=True)

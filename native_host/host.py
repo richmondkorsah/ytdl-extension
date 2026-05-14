@@ -40,26 +40,32 @@ def is_server_running(port=5000):
 
 def start_server():
     """Launch server.py as a fully detached background process."""
-    # native_host/ is one level below the project root
     here = os.path.dirname(os.path.abspath(__file__))
     project = os.path.dirname(here)
 
     server_script = os.path.join(project, "backend", "server.py")
     venv_python = os.path.join(project, ".venv", "Scripts", "python.exe")
+    log_file = os.path.join(project, "native_host", "launch.log")
 
     if not os.path.exists(venv_python):
         venv_python = os.path.join(project, ".venv", "bin", "python")
     if not os.path.exists(venv_python):
-        venv_python = sys.executable  # last resort
+        venv_python = sys.executable
 
     if not os.path.exists(server_script):
         return False, f"server.py not found: {server_script}"
 
     try:
+        log = open(log_file, "w")
+        log.write(f"python: {venv_python}\n")
+        log.write(f"script: {server_script}\n")
+        log.write(f"cwd: {os.path.join(project, 'backend')}\n")
+        log.flush()
+
         kwargs = dict(
             cwd=os.path.join(project, "backend"),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log,
+            stderr=log,
             stdin=subprocess.DEVNULL,
         )
         if os.name == "nt":

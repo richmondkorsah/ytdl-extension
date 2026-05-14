@@ -44,7 +44,7 @@
 
     "browser_specific_settings": {
         "gecko": {
-            "id": "yt-downloader@richmond",
+            "id": "ytdl@richmondkorsah",
             "data_collection_permissions": {
                 "required": [],
                 "optional": []
