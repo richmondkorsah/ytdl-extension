@@ -974,12 +974,12 @@ async function prefetchVideoInfo(url, videoId, options = {}) {
     try {
         const cleanUrl = cleanYouTubeUrl(url);
         
-        // Add timeout to prevent hanging requests
         const controller = new AbortController();
+        const prefetchTimeout = SERVER_URL.includes("onrender.com") ? 70000 : 10000;
         const timeoutId = setTimeout(() => {
             controller.abort();
             logWarn(`Prefetch timeout for: ${videoId}`);
-        }, 10000); // 10 second timeout for prefetch
+        }, prefetchTimeout);
         
         const response = await fetch(`${SERVER_URL}/info?url=${encodeURIComponent(cleanUrl)}`, {
             method: "GET",

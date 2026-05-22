@@ -1700,14 +1700,31 @@ updateLogCount();
 
 // Initialize server status
 async function updateServerStatus() {
+  const isRender = SERVER_URL.includes("onrender.com");
+  const WAKE_TIMEOUT = 65000;
+  const FAST_TIMEOUT = 5000;
+
   // Check server connectivity
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    
+    const timeout = setTimeout(() => controller.abort(), isRender ? WAKE_TIMEOUT : FAST_TIMEOUT);
+
+    // Show "waking up" state for Render cold starts
+    let wakeTimer = null;
+    if (isRender) {
+      wakeTimer = setTimeout(() => {
+        if (serverStatusText) serverStatusText.textContent = "Waking up...";
+        if (serverStatusDot) {
+          serverStatusDot.style.background = "#ffaa00";
+          serverStatusDot.style.boxShadow = "0 0 6px rgba(255, 170, 0, 0.6)";
+        }
+      }, FAST_TIMEOUT);
+    }
+
     const response = await fetch(`${SERVER_URL}/health`, { signal: controller.signal });
     clearTimeout(timeout);
-    
+    if (wakeTimer) clearTimeout(wakeTimer);
+
     if (response.ok) {
       const data = await response.json();
       if (serverStatusText) serverStatusText.textContent = "Server ready";
@@ -1717,6 +1734,7 @@ async function updateServerStatus() {
       }
       logSuccess("Server connected", data);
     } else {
+      if (wakeTimer) clearTimeout(wakeTimer);
       setServerOffline();
     }
   } catch (e) {
