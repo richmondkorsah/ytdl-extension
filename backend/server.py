@@ -318,10 +318,10 @@ def invidious_get_info(video_id):
 
 PIPED_INSTANCES = [
     "https://pipedapi.kavin.rocks",
-    "https://pipedapi.adminforge.de",
-    "https://pipedapi.leptons.xyz",
     "https://piped-api.garudalinux.org",
-    "https://pipedapi.coldforge.xyz",
+    "https://pipedapi.adminforge.de",
+    "https://watchapi.whatever.social",
+    "https://api.piped.yt",
 ]
 
 
@@ -330,10 +330,12 @@ def _piped_fetch(video_id):
     random.shuffle(instances)
 
     def _try(base):
-        req = urllib.request.Request(
-            f"{base}/streams/{video_id}",
-            headers={"User-Agent": "Mozilla/5.0"},
-        )
+        target = f"{base}/streams/{video_id}"
+        if CF_WORKER_URL:
+            fetch_url = f"{CF_WORKER_URL}?url={urllib.parse.quote(target, safe='')}"
+        else:
+            fetch_url = target
+        req = urllib.request.Request(fetch_url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=20) as resp:
             return json.loads(resp.read())
 
