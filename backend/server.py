@@ -12,7 +12,9 @@ import subprocess
 import logging
 import shutil
 import urllib.parse
+import urllib.request
 import zipfile
+import uuid
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -28,6 +30,8 @@ PORT = int(os.environ.get("PORT", 5000))
 HOST = "0.0.0.0"
 DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 ON_RENDER = bool(os.environ.get("RENDER"))
+RENDER_MODE = os.environ.get("RENDER_MODE", "0") == "1"
+WORKER_API_KEY = os.environ.get("WORKER_API_KEY", "")
 
 # Write YouTube cookies from env var to a temp file (set via upload_cookies.py)
 COOKIES_FILE = None
@@ -45,8 +49,8 @@ if ON_RENDER:
 
 
 # Server-side cache for video info (reduces repeated yt-dlp calls)
-from functools import lru_cache
-from threading import Lock
+from functools import lru_cache, wraps
+from threading import Lock, Event
 import time
 
 # Simple in-memory cache with TTL
@@ -79,6 +83,55 @@ class VideoInfoCache:
                 del self.cache[oldest_key]
 
 video_cache = VideoInfoCache()
+
+
+class JobQueue:
+    """Thread-safe queue for delegating work to the local worker process."""
+
+    def __init__(self):
+        self._pending = {}
+        self._results = {}
+        self._events = {}
+        self._lock = Lock()
+
+    def create(self, job_type, **kwargs):
+        job_id = str(uuid.uuid4())
+        ev = Event()
+        with self._lock:
+            self._pending[job_id] = {"id": job_id, "type": job_type, **kwargs}
+            self._events[job_id] = ev
+        return job_id, ev
+
+    def take_pending(self):
+        with self._lock:
+            jobs = list(self._pending.values())
+            self._pending.clear()
+        return jobs
+
+    def set_result(self, job_id, result, error=None):
+        with self._lock:
+            self._results[job_id] = {"result": result, "error": error}
+            ev = self._events.get(job_id)
+        if ev:
+            ev.set()
+
+    def pop_result(self, job_id):
+        with self._lock:
+            self._events.pop(job_id, None)
+            return self._results.pop(job_id, None)
+
+
+job_queue = JobQueue()
+
+
+def require_worker_key(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not WORKER_API_KEY or request.headers.get("X-Worker-Key") != WORKER_API_KEY:
+            return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
 
 # Find Deno path and add to environment if needed
 def setup_deno_path():
@@ -199,6 +252,111 @@ def get_ydl_opts(for_download=False, format_str="best"):
         opts["cookiesfrombrowser"] = ("firefox",)
 
     return opts
+
+@app.route("/worker/jobs", methods=["GET"])
+@require_worker_key
+def worker_jobs():
+    """Worker polls this to claim pending jobs."""
+    return jsonify({"jobs": job_queue.take_pending()})
+
+
+@app.route("/worker/result", methods=["POST"])
+@require_worker_key
+def worker_result():
+    """Worker posts resolved job results here."""
+    data = request.get_json()
+    job_id = data.get("job_id") if data else None
+    if not job_id:
+        return jsonify({"error": "job_id required"}), 400
+    job_queue.set_result(job_id, data.get("result"), data.get("error"))
+    return jsonify({"ok": True})
+
+
+def _build_download_filename(video_title, channel_name, resolution, codec, ext):
+    safe_title = "".join(c for c in video_title if c.isalnum() or c in " -_").strip() or "video"
+    safe_channel = "".join(c for c in channel_name if c.isalnum() or c in " -_").strip()
+    if safe_channel and resolution and codec:
+        filename = f"{safe_title} - {safe_channel} ({resolution}, {codec}){ext}"
+    elif safe_channel and resolution:
+        filename = f"{safe_title} - {safe_channel} ({resolution}){ext}"
+    elif safe_channel:
+        filename = f"{safe_title} - {safe_channel}{ext}"
+    else:
+        filename = f"{safe_title}{ext}"
+    return filename
+
+
+def stream_from_worker_result(data, video_title, channel_name, resolution, codec, format_str):
+    """Proxy the video stream from googlevideo.com CDN URLs resolved by the local worker."""
+    from urllib.parse import quote
+
+    stream_urls = data.get("stream_urls", [])
+    if not stream_urls:
+        return jsonify({"error": "No stream URLs returned by worker"}), 500
+
+    title = video_title or data.get("title", "video")
+    channel = channel_name or data.get("channel", "")
+    height = data.get("height")
+    ext = "." + data.get("ext", "mp4").lstrip(".")
+    res_str = resolution or (f"{height}p" if height else "")
+    codec_str = codec or data.get("vcodec_display", "")
+
+    filename = _build_download_filename(title, channel, res_str, codec_str, ext)
+    filename_encoded = quote(filename)
+    ascii_filename = "".join(c if ord(c) < 128 else '_' for c in filename)
+
+    is_audio = format_str in ("bestaudio", "bestaudio/best")
+    mime_type = "audio/mpeg" if is_audio else "video/mp4"
+
+    headers = {
+        "Content-Disposition": f"attachment; filename=\"{ascii_filename}\"; filename*=UTF-8''{filename_encoded}",
+        "Content-Type": mime_type,
+        "Cache-Control": "no-cache",
+    }
+
+    if len(stream_urls) == 1:
+        cdn_url = stream_urls[0]
+
+        def generate_single():
+            req = urllib.request.Request(cdn_url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                content_length = resp.headers.get("Content-Length")
+                if content_length:
+                    headers["Content-Length"] = content_length
+                while True:
+                    chunk = resp.read(65536)
+                    if not chunk:
+                        break
+                    yield chunk
+
+        return Response(stream_with_context(generate_single()), mimetype=mime_type, headers=headers)
+
+    else:
+        # Separate video + audio — merge on-the-fly with FFmpeg
+        cmd = [
+            "ffmpeg",
+            "-i", stream_urls[0],
+            "-i", stream_urls[1],
+            "-c", "copy",
+            "-f", "mp4",
+            "-movflags", "frag_keyframe+empty_moov",
+            "pipe:1",
+        ]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+        def generate_merged():
+            try:
+                while True:
+                    chunk = proc.stdout.read(65536)
+                    if not chunk:
+                        break
+                    yield chunk
+            finally:
+                proc.stdout.close()
+                proc.wait()
+
+        return Response(stream_with_context(generate_merged()), mimetype="video/mp4", headers=headers)
+
 
 @app.route("/health", methods=["GET"])
 @limiter.limit(RATE_LIMITS["health"])
@@ -471,7 +629,21 @@ def info():
         cached = video_cache.get(video_id)
         if cached:
             return jsonify(cached)
-    
+
+    if RENDER_MODE:
+        job_id, ev = job_queue.create("info", url=url)
+        logger.info(f"Queued info job {job_id} for {url}")
+        if not ev.wait(timeout=60):
+            job_queue.pop_result(job_id)
+            return jsonify({"error": "Worker did not respond in time"}), 504
+        outcome = job_queue.pop_result(job_id)
+        if not outcome or outcome.get("error"):
+            return jsonify({"success": False, "error": (outcome or {}).get("error", "No result from worker")}), 500
+        result = outcome["result"]
+        if video_id:
+            video_cache.set(video_id, result)
+        return jsonify(result)
+
     logger.info(f"Fetching info for: {url}")
     
     ydl_opts = get_ydl_opts(for_download=False)
@@ -595,7 +767,18 @@ def download():
     
     url = clean_url(url)
     logger.info(f"Starting download: {url} (format: {format_str})")
-    
+
+    if RENDER_MODE:
+        job_id, ev = job_queue.create("resolve", url=url, format=format_str)
+        logger.info(f"Queued resolve job {job_id} for {url}")
+        if not ev.wait(timeout=120):
+            job_queue.pop_result(job_id)
+            return jsonify({"error": "Worker did not respond in time"}), 504
+        outcome = job_queue.pop_result(job_id)
+        if not outcome or outcome.get("error"):
+            return jsonify({"success": False, "error": (outcome or {}).get("error", "No result from worker")}), 500
+        return stream_from_worker_result(outcome["result"], video_title, channel_name, resolution, codec, format_str)
+
     temp_dir = None
     
     try:
