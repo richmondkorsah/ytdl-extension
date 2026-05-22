@@ -15,6 +15,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 import uuid
+import json
+import re
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -169,6 +171,175 @@ def check_ffmpeg():
         return False
 
 FFMPEG_AVAILABLE = check_ffmpeg()
+
+# Invidious instances used when ON_RENDER (tried in order, first success wins)
+INVIDIOUS_INSTANCES = [
+    "https://inv.nadeko.net",
+    "https://invidious.nerdvpn.de",
+    "https://yt.artemislena.eu",
+    "https://inv.tux.pizza",
+]
+
+
+def _invidious_fetch(path):
+    last_err = None
+    for base in INVIDIOUS_INSTANCES:
+        try:
+            req = urllib.request.Request(
+                f"{base}{path}",
+                headers={"User-Agent": "Mozilla/5.0"},
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                return json.loads(resp.read())
+        except Exception as exc:
+            logger.warning(f"Invidious {base} failed: {exc}")
+            last_err = exc
+    raise RuntimeError(f"All Invidious instances failed — last error: {last_err}")
+
+
+def _height_from_label(label):
+    if label:
+        m = re.match(r"(\d+)p", str(label))
+        if m:
+            return int(m.group(1))
+    return 0
+
+
+def invidious_get_info(video_id):
+    fields = "title,author,lengthSeconds,viewCount,videoThumbnails,adaptiveFormats,formatStreams,chapters"
+    data = _invidious_fetch(f"/api/v1/videos/{video_id}?fields={fields}")
+
+    duration = data.get("lengthSeconds") or 0
+    adaptive = data.get("adaptiveFormats") or []
+    prebuilt = data.get("formatStreams") or []
+
+    available_qualities = []
+    seen_heights = set()
+    resolution_filesizes = {}
+
+    for f in adaptive:
+        mime = f.get("type", "")
+        if "video" not in mime or "audio" in mime:
+            continue
+        height = _height_from_label(f.get("qualityLabel", ""))
+        if not height or height in seen_heights:
+            continue
+        seen_heights.add(height)
+
+        vcodec = f.get("encoding", "")
+        codec_display = (
+            "h264" if any(x in vcodec.lower() for x in ("h264", "avc")) else
+            "h265" if any(x in vcodec.lower() for x in ("h265", "hevc")) else
+            "vp9"  if "vp9" in vcodec.lower() else
+            "av1"  if "av1" in vcodec.lower() else
+            vcodec or "mp4"
+        )
+
+        filesize = int(f.get("clen") or 0)
+        if not filesize:
+            bitrate = int(f.get("bitrate") or 0)
+            if bitrate and duration:
+                filesize = int(bitrate / 8 * duration)
+        if filesize:
+            resolution_filesizes[height] = filesize
+
+        available_qualities.append({"height": height, "label": f"{height}p", "codec": codec_display, "vcodec": vcodec})
+
+    for f in prebuilt:
+        height = _height_from_label(f.get("qualityLabel", ""))
+        if not height or height in seen_heights:
+            continue
+        seen_heights.add(height)
+        available_qualities.append({"height": height, "label": f"{height}p", "codec": "h264", "vcodec": "avc1"})
+
+    audio_bytes = int(130_000 / 8 * duration) if duration else 0
+    for q in available_qualities:
+        if q["height"] in resolution_filesizes:
+            q["filesize"] = resolution_filesizes[q["height"]] + audio_bytes
+
+    available_qualities.sort(key=lambda x: x["height"], reverse=True)
+
+    formats = [{
+        "format_id": "best", "ext": "mp4",
+        "resolution": f"{max(seen_heights) if seen_heights else 720}p",
+        "height": max(seen_heights) if seen_heights else 720,
+        "vcodec": "h264", "acodec": "aac",
+    }] if seen_heights else []
+
+    raw_ch = data.get("chapters") or []
+    chapters = None
+    if raw_ch:
+        chapters = []
+        for i, ch in enumerate(raw_ch):
+            start = ch.get("start") or 0
+            end = raw_ch[i + 1].get("start", duration) if i + 1 < len(raw_ch) else duration
+            chapters.append({
+                "index": i, "title": ch.get("title", f"Chapter {i + 1}"),
+                "start_time": start, "end_time": end,
+                "start_formatted": format_timestamp(start), "end_formatted": format_timestamp(end),
+                "duration": end - start, "duration_formatted": format_timestamp(end - start),
+            })
+
+    thumbs = data.get("videoThumbnails") or []
+    thumbnail = thumbs[0].get("url") if thumbs else None
+
+    return {
+        "success": True, "id": video_id,
+        "title": data.get("title"), "thumbnail": thumbnail,
+        "duration": duration, "channel": data.get("author"),
+        "view_count": data.get("viewCount"), "upload_date": None,
+        "formats": formats, "available_qualities": available_qualities, "chapters": chapters,
+    }
+
+
+def invidious_get_streams(video_id, format_str):
+    data = _invidious_fetch(f"/api/v1/videos/{video_id}?fields=adaptiveFormats,formatStreams,title,author")
+    adaptive = data.get("adaptiveFormats") or []
+    prebuilt = data.get("formatStreams") or []
+
+    if format_str in ("bestaudio", "bestaudio/best"):
+        audio = sorted(
+            [f for f in adaptive if "audio" in f.get("type", "")],
+            key=lambda f: int(f.get("bitrate") or 0), reverse=True
+        )
+        if not audio:
+            raise RuntimeError("No audio streams from Invidious")
+        return {"stream_urls": [audio[0]["url"]], "title": data.get("title"),
+                "channel": data.get("author"), "ext": "m4a", "height": None, "vcodec_display": ""}
+
+    m = re.search(r"height<=(\d+)", format_str)
+    max_h = int(m.group(1)) if m else None
+
+    video_s = [f for f in adaptive if "video" in f.get("type", "") and "audio" not in f.get("type", "")]
+    audio_s = [f for f in adaptive if "audio" in f.get("type", "")]
+    if max_h:
+        video_s = [f for f in video_s if _height_from_label(f.get("qualityLabel", "")) <= max_h]
+
+    if video_s and audio_s:
+        video_s.sort(key=lambda f: (_height_from_label(f.get("qualityLabel", "")), int(f.get("bitrate") or 0)), reverse=True)
+        audio_s.sort(key=lambda f: int(f.get("bitrate") or 0), reverse=True)
+        bv, ba = video_s[0], audio_s[0]
+        height = _height_from_label(bv.get("qualityLabel", ""))
+        vcodec = bv.get("encoding", "")
+        vcodec_display = (
+            "h264" if any(x in vcodec.lower() for x in ("h264", "avc")) else
+            "h265" if any(x in vcodec.lower() for x in ("h265", "hevc")) else
+            "vp9" if "vp9" in vcodec.lower() else
+            "av1" if "av1" in vcodec.lower() else vcodec or ""
+        )
+        return {"stream_urls": [bv["url"], ba["url"]], "title": data.get("title"),
+                "channel": data.get("author"), "ext": "mp4", "height": height, "vcodec_display": vcodec_display}
+
+    if max_h:
+        prebuilt = [f for f in prebuilt if _height_from_label(f.get("qualityLabel", "")) <= max_h]
+    prebuilt.sort(key=lambda f: _height_from_label(f.get("qualityLabel", "")), reverse=True)
+    if prebuilt:
+        best = prebuilt[0]
+        return {"stream_urls": [best["url"]], "title": data.get("title"),
+                "channel": data.get("author"), "ext": "mp4",
+                "height": _height_from_label(best.get("qualityLabel", "")), "vcodec_display": "h264"}
+
+    raise RuntimeError("No suitable streams found via Invidious")
 
 
 def clean_url(url):
@@ -644,6 +815,18 @@ def info():
             video_cache.set(video_id, result)
         return jsonify(result)
 
+    if ON_RENDER:
+        if not video_id:
+            return jsonify({"success": False, "error": "Only YouTube watch URLs are supported in hosted mode"}), 400
+        logger.info(f"Fetching info via Invidious for: {video_id}")
+        try:
+            result = invidious_get_info(video_id)
+            video_cache.set(video_id, result)
+            return jsonify(result)
+        except Exception as e:
+            logger.error(f"Invidious error: {e}")
+            return jsonify({"success": False, "error": str(e)}), 500
+
     logger.info(f"Fetching info for: {url}")
     
     ydl_opts = get_ydl_opts(for_download=False)
@@ -778,6 +961,19 @@ def download():
         if not outcome or outcome.get("error"):
             return jsonify({"success": False, "error": (outcome or {}).get("error", "No result from worker")}), 500
         return stream_from_worker_result(outcome["result"], video_title, channel_name, resolution, codec, format_str)
+
+    if ON_RENDER:
+        parsed = urllib.parse.urlparse(url)
+        vid = urllib.parse.parse_qs(parsed.query).get("v", [None])[0]
+        if not vid:
+            return jsonify({"error": "Only YouTube watch URLs are supported in hosted mode"}), 400
+        logger.info(f"Fetching streams via Invidious for: {vid}")
+        try:
+            data = invidious_get_streams(vid, format_str)
+            return stream_from_worker_result(data, video_title, channel_name, resolution, codec, format_str)
+        except Exception as e:
+            logger.error(f"Invidious error: {e}")
+            return jsonify({"success": False, "error": str(e)}), 500
 
     temp_dir = None
     
