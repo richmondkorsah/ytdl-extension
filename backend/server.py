@@ -17,6 +17,8 @@ import zipfile
 import uuid
 import json
 import re
+import random
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -172,28 +174,42 @@ def check_ffmpeg():
 
 FFMPEG_AVAILABLE = check_ffmpeg()
 
-# Invidious instances used when ON_RENDER (tried in order, first success wins)
+# Invidious instances used when ON_RENDER (all tried in parallel, first success wins)
 INVIDIOUS_INSTANCES = [
     "https://inv.nadeko.net",
     "https://invidious.nerdvpn.de",
     "https://yt.artemislena.eu",
     "https://inv.tux.pizza",
+    "https://yewtu.be",
+    "https://invidious.privacydev.net",
+    "https://inv.vern.cc",
+    "https://invidious.projectsegfau.lt",
+    "https://invidious.perennialte.ch",
 ]
 
 
 def _invidious_fetch(path):
+    instances = list(INVIDIOUS_INSTANCES)
+    random.shuffle(instances)
+
+    def _try(base):
+        req = urllib.request.Request(
+            f"{base}{path}",
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.loads(resp.read())
+
     last_err = None
-    for base in INVIDIOUS_INSTANCES:
-        try:
-            req = urllib.request.Request(
-                f"{base}{path}",
-                headers={"User-Agent": "Mozilla/5.0"},
-            )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                return json.loads(resp.read())
-        except Exception as exc:
-            logger.warning(f"Invidious {base} failed: {exc}")
-            last_err = exc
+    with ThreadPoolExecutor(max_workers=len(instances)) as pool:
+        futures = {pool.submit(_try, base): base for base in instances}
+        for fut in as_completed(futures, timeout=25):
+            base = futures[fut]
+            try:
+                return fut.result()
+            except Exception as exc:
+                logger.warning(f"Invidious {base} failed: {exc}")
+                last_err = exc
     raise RuntimeError(f"All Invidious instances failed — last error: {last_err}")
 
 
