@@ -36,6 +36,7 @@ DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 ON_RENDER = bool(os.environ.get("RENDER"))
 RENDER_MODE = os.environ.get("RENDER_MODE", "0") == "1"
 WORKER_API_KEY = os.environ.get("WORKER_API_KEY", "")
+CF_WORKER_URL = os.environ.get("CF_WORKER_URL", "").rstrip("/")
 
 # Write YouTube cookies from env var to a temp file (set via upload_cookies.py)
 COOKIES_FILE = None
@@ -174,6 +175,11 @@ def check_ffmpeg():
 
 FFMPEG_AVAILABLE = check_ffmpeg()
 
+if CF_WORKER_URL:
+    logger.info(f"CF Worker proxy configured: {CF_WORKER_URL}")
+else:
+    logger.warning("CF_WORKER_URL not set - Invidious requests will be direct (may be blocked on Render)")
+
 # Invidious instances used when ON_RENDER (all tried in parallel, first success wins)
 INVIDIOUS_INSTANCES = [
     "https://inv.nadeko.net",
@@ -193,10 +199,12 @@ def _invidious_fetch(path):
     random.shuffle(instances)
 
     def _try(base):
-        req = urllib.request.Request(
-            f"{base}{path}",
-            headers={"User-Agent": "Mozilla/5.0"},
-        )
+        target = f"{base}{path}"
+        if CF_WORKER_URL:
+            fetch_url = f"{CF_WORKER_URL}?url={urllib.parse.quote(target, safe='')}"
+        else:
+            fetch_url = target
+        req = urllib.request.Request(fetch_url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=20) as resp:
             return json.loads(resp.read())
 
@@ -677,7 +685,9 @@ def health_check():
     return jsonify({
         "status": "ok",
         "deno": DENO_AVAILABLE,
-        "ffmpeg": FFMPEG_AVAILABLE
+        "ffmpeg": FFMPEG_AVAILABLE,
+        "cf_worker": bool(CF_WORKER_URL),
+        "cf_worker_url": CF_WORKER_URL or None,
     }), 200
 
 @app.route("/ping", methods=["GET"])
