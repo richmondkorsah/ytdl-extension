@@ -42,6 +42,7 @@ extension_logs.txt
 logs/
 
 CLAUDE.md
+worker/.env
 
 # Docs not for repo
 RATE_LIMITING.md

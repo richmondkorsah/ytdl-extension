@@ -4,9 +4,8 @@ Local worker — polls Render for pending jobs and resolves them using
 local yt-dlp (Firefox cookies + Deno). Render never touches YouTube directly.
 
 Usage:
-    set RENDER_URL=https://your-app.onrender.com
-    set WORKER_API_KEY=your-secret-key
-    python worker/worker.py
+    1. Edit worker/.env with your RENDER_URL and WORKER_API_KEY
+    2. python worker/worker.py
 """
 
 import os
@@ -22,12 +21,22 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Load .env from the same directory as this file
+_env_path = os.path.join(os.path.dirname(__file__), ".env")
+if os.path.exists(_env_path):
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip())
+
 RENDER_URL = os.environ.get("RENDER_URL", "").rstrip("/")
 WORKER_API_KEY = os.environ.get("WORKER_API_KEY", "")
 POLL_INTERVAL = float(os.environ.get("POLL_INTERVAL", "2"))
 
 if not RENDER_URL or not WORKER_API_KEY:
-    print("ERROR: RENDER_URL and WORKER_API_KEY must be set as environment variables.")
+    print("ERROR: Set RENDER_URL and WORKER_API_KEY in worker/.env")
     sys.exit(1)
 
 
