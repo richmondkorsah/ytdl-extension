@@ -308,6 +308,132 @@ def invidious_get_info(video_id):
     }
 
 
+PIPED_INSTANCES = [
+    "https://pipedapi.kavin.rocks",
+    "https://pipedapi.adminforge.de",
+    "https://pipedapi.leptons.xyz",
+    "https://piped-api.garudalinux.org",
+    "https://pipedapi.coldforge.xyz",
+]
+
+
+def _piped_fetch(video_id):
+    instances = list(PIPED_INSTANCES)
+    random.shuffle(instances)
+
+    def _try(base):
+        req = urllib.request.Request(
+            f"{base}/streams/{video_id}",
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.loads(resp.read())
+
+    last_err = None
+    with ThreadPoolExecutor(max_workers=len(instances)) as pool:
+        futures = {pool.submit(_try, base): base for base in instances}
+        for fut in as_completed(futures, timeout=25):
+            base = futures[fut]
+            try:
+                return fut.result()
+            except Exception as exc:
+                logger.warning(f"Piped {base} failed: {exc}")
+                last_err = exc
+    raise RuntimeError(f"All Piped instances failed — last error: {last_err}")
+
+
+def piped_get_info(video_id):
+    data = _piped_fetch(video_id)
+    duration = data.get("duration") or 0
+    video_streams = data.get("videoStreams") or []
+    audio_streams = data.get("audioStreams") or []
+
+    available_qualities = []
+    seen_heights = set()
+    for s in video_streams:
+        height = s.get("height") or _height_from_label(s.get("quality", ""))
+        if not height or height in seen_heights:
+            continue
+        seen_heights.add(height)
+        mime = s.get("mimeType", "")
+        codec = s.get("codec", "")
+        codec_display = (
+            "h264" if any(x in codec.lower() for x in ("h264", "avc")) else
+            "h265" if any(x in codec.lower() for x in ("h265", "hevc")) else
+            "vp9"  if "vp9" in codec.lower() else
+            "av1"  if "av01" in codec.lower() or "av1" in codec.lower() else
+            "webm" if "webm" in mime else "mp4"
+        )
+        available_qualities.append({"height": height, "label": f"{height}p", "codec": codec_display, "vcodec": codec})
+
+    available_qualities.sort(key=lambda x: x["height"], reverse=True)
+    formats = [{"format_id": "best", "ext": "mp4",
+                "resolution": f"{max(seen_heights)}p" if seen_heights else "720p",
+                "height": max(seen_heights) if seen_heights else 720,
+                "vcodec": "h264", "acodec": "aac"}] if seen_heights else []
+
+    raw_ch = data.get("chapters") or []
+    chapters = None
+    if raw_ch:
+        chapters = []
+        for i, ch in enumerate(raw_ch):
+            start = ch.get("start") or 0
+            end = raw_ch[i + 1].get("start", duration) if i + 1 < len(raw_ch) else duration
+            chapters.append({
+                "index": i, "title": ch.get("title", f"Chapter {i + 1}"),
+                "start_time": start, "end_time": end,
+                "start_formatted": format_timestamp(start), "end_formatted": format_timestamp(end),
+                "duration": end - start, "duration_formatted": format_timestamp(end - start),
+            })
+
+    return {
+        "success": True, "id": video_id,
+        "title": data.get("title"), "thumbnail": data.get("thumbnailUrl"),
+        "duration": duration, "channel": data.get("uploader"),
+        "view_count": data.get("views"), "upload_date": None,
+        "formats": formats, "available_qualities": available_qualities, "chapters": chapters,
+    }
+
+
+def piped_get_streams(video_id, format_str):
+    data = _piped_fetch(video_id)
+    video_streams = data.get("videoStreams") or []
+    audio_streams = data.get("audioStreams") or []
+
+    if format_str in ("bestaudio", "bestaudio/best"):
+        best = max(audio_streams, key=lambda s: s.get("bitrate") or 0, default=None)
+        if not best:
+            raise RuntimeError("No audio streams from Piped")
+        return {"stream_urls": [best["url"]], "title": data.get("title"),
+                "channel": data.get("uploader"), "ext": "m4a", "height": None, "vcodec_display": ""}
+
+    m = re.search(r"height<=(\d+)", format_str)
+    max_h = int(m.group(1)) if m else None
+
+    vid_s = [s for s in video_streams if s.get("videoOnly", True)]
+    aud_s = audio_streams
+    if max_h:
+        vid_s = [s for s in vid_s if (s.get("height") or 0) <= max_h]
+
+    if vid_s and aud_s:
+        vid_s.sort(key=lambda s: (s.get("height") or 0, s.get("bitrate") or 0), reverse=True)
+        aud_s.sort(key=lambda s: s.get("bitrate") or 0, reverse=True)
+        bv, ba = vid_s[0], aud_s[0]
+        height = bv.get("height") or _height_from_label(bv.get("quality", ""))
+        codec = bv.get("codec", "")
+        codec_display = (
+            "h264" if any(x in codec.lower() for x in ("h264", "avc")) else
+            "vp9" if "vp9" in codec.lower() else
+            "av1" if "av01" in codec.lower() else codec or ""
+        )
+        mime = bv.get("mimeType", "")
+        ext = "webm" if "webm" in mime else "mp4"
+        return {"stream_urls": [bv["url"], ba["url"]], "title": data.get("title"),
+                "channel": data.get("uploader"), "ext": ext, "height": height, "vcodec_display": codec_display}
+
+    raise RuntimeError("No suitable streams found via Piped")
+
+
 def invidious_get_streams(video_id, format_str):
     data = _invidious_fetch(f"/api/v1/videos/{video_id}?fields=adaptiveFormats,formatStreams,title,author")
     adaptive = data.get("adaptiveFormats") or []
@@ -839,9 +965,15 @@ def info():
             result = invidious_get_info(video_id)
             video_cache.set(video_id, result)
             return jsonify(result)
-        except Exception as e:
-            logger.error(f"Invidious error: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
+        except Exception as inv_err:
+            logger.warning(f"Invidious failed, trying Piped: {inv_err}")
+            try:
+                result = piped_get_info(video_id)
+                video_cache.set(video_id, result)
+                return jsonify(result)
+            except Exception as piped_err:
+                logger.error(f"Piped also failed: {piped_err}")
+                return jsonify({"success": False, "error": f"All sources failed. Invidious: {inv_err}. Piped: {piped_err}"}), 503
 
     logger.info(f"Fetching info for: {url}")
     
@@ -987,9 +1119,14 @@ def download():
         try:
             data = invidious_get_streams(vid, format_str)
             return stream_from_worker_result(data, video_title, channel_name, resolution, codec, format_str)
-        except Exception as e:
-            logger.error(f"Invidious error: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
+        except Exception as inv_err:
+            logger.warning(f"Invidious failed, trying Piped: {inv_err}")
+            try:
+                data = piped_get_streams(vid, format_str)
+                return stream_from_worker_result(data, video_title, channel_name, resolution, codec, format_str)
+            except Exception as piped_err:
+                logger.error(f"Piped also failed: {piped_err}")
+                return jsonify({"success": False, "error": f"All sources failed. Invidious: {inv_err}. Piped: {piped_err}"}), 503
 
     temp_dir = None
     
