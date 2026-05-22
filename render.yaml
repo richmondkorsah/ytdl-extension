@@ -2,7 +2,7 @@ services:
   - type: web
     name: yt-downloader
     runtime: python
-    buildCommand: "apt-get update -qq && apt-get install -y ffmpeg && curl -fsSL https://deno.land/install.sh | sh && pip install -r requirements.txt"
+    buildCommand: "bash build.sh"
     startCommand: "cd backend && gunicorn server:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 300"
     envVars:
       - key: FLASK_DEBUG
